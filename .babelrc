@@ -1,0 +1,13 @@
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "browsers": ["> 1%", "ie >= 8"]
+      },
+      "useBuiltIns": true,
+      "modules": "commonjs"
+    }],
+    "stage-2",
+    "stage-3"
+  ]
+}
