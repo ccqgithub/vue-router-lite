@@ -11,8 +11,8 @@
 
 <script>
 import { warning } from '../util/utils';
-import Route from './Route';
-import Link from './Link';
+import Route from './Route.vue';
+import Link from './Link.vue';
 
 const NavLink = {
   components: {

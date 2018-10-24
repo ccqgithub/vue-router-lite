@@ -7,7 +7,7 @@
 <script>
 import { warning } from '../util/utils';
 import { createLocation, createPath } from "history";
-import Router from "./Router";
+import Router from "./Router.vue";
 
 const addLeadingSlash = path => {
   return path.charAt(0) === "/" ? path : "/" + path;

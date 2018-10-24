@@ -1,4 +1,4 @@
-import Route from "../component/Route";
+import Route from "../component/Route.vue";
 
 /**
  * wrap Component with Route, 

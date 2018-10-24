@@ -7,7 +7,7 @@
 <script>
 import { createBrowserHistory as createHistory } from "history";
 import { warning } from '../util/utils';
-import Router from './Router';
+import Router from './Router.vue';
 
 const BrowserRouter = {
   components: {
