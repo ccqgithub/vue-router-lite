@@ -2,7 +2,7 @@
  * Used for conditional rendering in template. 
  */
 const Empty = {
-  render(h) {
+  render() {
     return null;
   }
 }

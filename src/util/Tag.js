@@ -3,8 +3,8 @@
  */
 const Tag = {
   functional: true,
-  render(h, context) {
-    return h(context.props.tag || 'div', context.data, context.children);
+  render(createElement, context) {
+    return createElement(context.props.tag || 'div', context.data, context.children);
   }
 }
 

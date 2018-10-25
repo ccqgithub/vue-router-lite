@@ -1519,4 +1519,4 @@ exports.Switch = Switch;
 exports.generatePath = generatePath;
 exports.matchPath = matchPath;
 exports.withRouter = withRouter;
-//# sourceMappingURL=gentx.common.js.map
+//# sourceMappingURL=router.common.js.map

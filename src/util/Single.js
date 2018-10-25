@@ -5,7 +5,7 @@ import { warning } from './utils';
  */
 const Single = {
   functional: true,
-  render(h, context) {
+  render(createElement, context) {
     if (!context.children.length) return null;
 
     if (context.children > 1) {

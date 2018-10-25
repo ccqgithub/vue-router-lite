@@ -17,7 +17,7 @@ const Switch = {
     }
   },
 
-  render(h) {
+  render() {
     const vnode = this.$slots.default.find(vnode => {
       if (!vnode.componentOptions) return false;
       const { path, exact, strict, sensitive } = vnode.componentOptions.propsData;

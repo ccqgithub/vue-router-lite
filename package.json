@@ -3,11 +3,13 @@
   "version": "1.0.0",
   "description": "> vue-router-lite",
   "main": "dist/vue-router-lite.common.js",
+  "module": "dist/vue-router-lite.esm.js",
   "devDependencies": {
     "@babel/core": "^7.1.2",
     "@babel/preset-env": "^7.1.0",
     "rollup": "^0.66.6",
     "rollup-plugin-babel": "^4.0.3",
+    "rollup-plugin-commonjs": "^9.2.0",
     "rollup-plugin-node-resolve": "^3.4.0",
     "rollup-plugin-vue": "^4.3.2",
     "vue-template-compiler": "^2.5.17"

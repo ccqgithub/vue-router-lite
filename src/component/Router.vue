@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { warning, copyJson } from '../util/utils';
+import { warning } from '../util/utils';
 import Single from '../util/Single';
 
 const Router = {
@@ -22,10 +22,12 @@ const Router = {
 
   provide() {
     return {
-      router: {
-        history: this.history,
-        route: this.route
-      }
+      $history: this.history,
+      $location: 
+      $router: {
+        history: this.history
+      },
+      $route: this.route
     }
   },
 
@@ -56,7 +58,7 @@ const Router = {
     computeRoute(history) {
       let pathname = history.location.pathname;
       return {
-        location: copyJson(history.location),
+        location: history.location,
         match: {
           path: "/",
           url: "/",
