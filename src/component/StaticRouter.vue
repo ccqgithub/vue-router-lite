@@ -1,6 +1,6 @@
 <template>
   <router v-bind="childProps">
-    <slot></slot>
+    <slot />
   </router>
 </template>
 
@@ -9,7 +9,7 @@ import { warning } from '../util/utils';
 import { createLocation, createPath } from "history";
 import Router from "./Router.vue";
 
-const addLeadingSlash = path => {
+const addLeadingSlash = (path) => {
   return path.charAt(0) === "/" ? path : "/" + path;
 };
 
@@ -18,7 +18,7 @@ const addBasename = (basename, location) => {
 
   return {
     ...location,
-    pathname: addLeadingSlash(basename) + location.pathname
+    pathname: addLeadingSlash(basename) + location.pathname,
   };
 };
 
@@ -31,14 +31,14 @@ const stripBasename = (basename, location) => {
 
   return {
     ...location,
-    pathname: location.pathname.substr(base.length)
+    pathname: location.pathname.substr(base.length),
   };
 };
 
-const createURL = location =>
+const createURL = (location) =>
   typeof location === "string" ? location : createPath(location);
 
-const staticHandler = methodName => () => {
+const staticHandler = (methodName) => () => {
   throw new Error(`You cannot ${methodName} with <StaticRouter>`);
 };
 
@@ -46,39 +46,24 @@ const noop = () => {};
 
 const StaticRouter = {
   components: {
-    Router
+    Router,
   },
   
   props: {
-    // just use to check if user pass history
-    history: {
-      validator: function (value) {
-        return true;
-      }
-    },
-
     basename: {
       type: 'String',
-      default: '' 
+      default: '',
     },
     context: {
       type: Object,
       default() {
         return {};
-      }
+      },
     },
     location: {
       type: [String, Object],
-      default: '/'
-    }
-  },
-
-  provide() {
-    return {
-      router: {
-        staticContext: this.context
-      }
-    };
+      default: '/',
+    },
   },
 
   computed: {
@@ -95,10 +80,10 @@ const StaticRouter = {
         push: (...rest) => this.handlePush(...rest),
         replace: (...rest) => this.handleReplace(...rest), 
         listen: () => noop,
-        block: () => noop
+        block: () => noop,
       };
 
-      return { history };
+      return { history, context };
     }
   },
 
@@ -119,15 +104,6 @@ const StaticRouter = {
       context.url = createURL(context.location);
     }
   },
-
-  beforeMount() {
-    if (this.history) {
-      warning(
-        '<StaticRouter> ignores the history prop. To use a custom history, ' +
-        'use `import { Router }` instead of `import { StaticRouter as Router }`.'
-      )
-    }
-  }
 }
 
 export default StaticRouter;

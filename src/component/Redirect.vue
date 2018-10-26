@@ -1,5 +1,5 @@
 <template>
-  <empty></empty>
+  <empty />
 </template>
 
 <script>
@@ -10,46 +10,55 @@ import Empty from '../util/empty';
 
 const Redirect = {
   components: {
-    Empty
+    Empty,
   },
 
   props: {
-    computedMatch: Object,
-    push: {
-      type: Boolean,
-      default: false
-    },
-    from: String,
+    // to path
     to: {
       type: [String, Object],
-      required: true
-    }
+      required: true,
+    },
+    // wheather push
+    push: {
+      type: Boolean,
+      default: false,
+    },
+    // route match
+    match: {
+      type: Object,
+    },
+    // route location
+    location: {
+      type: Object
+    },
+    // router history
+    history: {
+      type: Object,
+    },
   },
 
-  inject: ['router'],
+  inject: ['$router'],
 
   created() {
-    if (!this.router) {
-      warning('You should not use <Redirect> outside a <Router>');
+    if (!this.$router) {
+      warning('You must not use <Redirect> outside a <Router>.');
     }
 
-    this.lastTo = this.to;
+    // static router
     if (this.isStatic()) this.perform();
   },
 
   mounted() {
+    // not static router
     if (!this.isStatic()) this.perform();
   },
 
   updated() {
-    const prevTo = createLocation(this.lastTo);
-    const nextTo = createLocation(this.to);
+    const to = this.computeTo();
 
-    if (locationsAreEqual(prevTo, nextTo)) {
-      warning(
-        `You tried to redirect to the same route you're currently on: ` +
-        `"${nextTo.pathname}${nextTo.search}"`
-      );
+    // already redirect
+    if (locationsAreEqual(this.lastTo, to)) {
       return;
     }
 
@@ -57,39 +66,51 @@ const Redirect = {
   },
 
   methods: {
+    // if static router
     isStatic() {
-      return this.router && this.router.staticContext;
+      return this.$router && this.$router.context;
     },
 
-    computeTo({ computedMatch, to }) {
-      if (computedMatch) {
-        if (typeof to === "string") {
-          return generatePath(to, computedMatch.params);
+    // to location
+    computeTo() {
+      // to
+      let p = this.to;
+      // route
+      if (this.match) {
+        if (typeof this.to === 'string') {
+          // to is string
+          p = generatePath(this.to, this.match.params);
         } else {
-          return {
-            ...to,
-            pathname: generatePath(to.pathname, computedMatch.params)
+          // to is object
+          p = {
+            ...this.to,
+            pathname: generatePath(
+              this.to.pathname,
+              this.match.params,
+            )
           };
         }
       }
-  
+
+      // to
+      const to = createLocation(p); 
+
       return to;
     },
 
     perform() {
-      const { history } = this.router;
-      const push = this.push;
-      const to = this.computeTo({
-        computedMatch: this.computedMatch,
-        to: this.to
-      });
-      
-      this.lastTo = this.to;
-      if (push) {
-        history.push(to);
-      } else {
-        history.replace(to);
-      }
+      const { history } = this.$router;
+
+      // history method
+      const method = this.push
+        ? history.push
+        : history.replace;
+
+      const to = this.computeTo();
+
+      // redirect
+      this.lastTo = to;
+      method(to);
     }
   }
 }

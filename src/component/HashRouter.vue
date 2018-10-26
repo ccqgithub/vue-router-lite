@@ -1,6 +1,6 @@
 <template>
-  <router :history="childHistory">
-    <slot></slot>
+  <router :history="history">
+    <slot />
   </router>
 </template>
 
@@ -11,33 +11,37 @@ import Router from './Router.vue';
 
 const HashRouter = {
   components: {
-    Router
+    Router,
   },
 
   props: {
-    history: Object,
-    basename: String,
-    hashType: {
-      validator: function(value) {
-        return ["hashbang", "noslash", "slash"].indexOf(value) !== -1
-      }
+    basename: {
+      type: String,
+      default: '',
     },
-    getUserConfirmation: Function
+    hashType: {
+      validator(value) {
+        return ["hashbang", "noslash", "slash"].indexOf(value) !== -1;
+      },
+    },
+    getUserConfirmation: {
+      type: Function,
+      default(message, callback) {
+        callback(window.confirm(message));
+      },
+    },
   },
 
   data() {
-    let history = this.history;
-    if (!history) {
-      history = createHistory({
-        basename: this.basename,
-        hashType: this.hashType,
-        getUserConfirmation: this.getUserConfirmation
-      });
-    }
+    let history = createHistory({
+      basename: this.basename,
+      hashType: this.hashType,
+      getUserConfirmation: this.getUserConfirmation,
+    });
 
     return {
-      childHistory: history
-    }
+      history,
+    };
   }
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <empty></empty>
+  <empty />
 </template>
 
 <script>
@@ -8,24 +8,24 @@ import Empty from '../util/empty';
 
 const Prompt = {
   components: {
-    Empty
+    Empty,
   },
 
   props: {
     when: {
       type: Boolean,
-      default: true
+      default: true,
     },
     message: {
       type: [Function, String],
-      required: true
+      required: true,
     }
   },
 
-  inject: ['router'],
+  inject: ['$router'],
 
   beforeMount() {
-    if (!this.router) {
+    if (!this.$router) {
       warning('You should not use <Prompt> outside a <Router>');
     }
 

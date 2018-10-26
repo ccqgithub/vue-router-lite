@@ -1,7 +1,6 @@
 <template>
   <single v-if="match">
-    <component v-if="component" :is="component" v-bind="childProps"></component>
-    <slot v-bind="childProps"></slot>
+    <slot v-bind="childProps" />
   </single>
 </template>
 
@@ -12,59 +11,69 @@ import Single from '../util/Single';
 
 const Route = {
   props: {
-    path: String,
-    exact: Boolean,
-    strict: Boolean,
-    sensitive: Boolean,
-    location: Object,
-    component: Object,
+    path: {
+      type: [String, Array],
+    },
+    exact: {
+      type: Boolean,
+      default: true,
+    },
+    strict: {
+      type: Boolean,
+      default: false,
+    },
+    sensitive: {
+      type: Boolean,
+      default: false,
+    },
+    location: {
+      type: Object,
+    },
   },
 
-  inject: ['router'],
+  inject: ['$router', '$route'],
 
   provide() {
     return {
-      router: {
-        history: this.router.history,
-        route: {
-          location: this.location || this.router.route.location,
-          match: this.match,
-        },
-      },
-    };
+      $route: {
+        match: this.match,
+        location: this.computedLocation,
+      }
+    }
+  },
+
+  created() {
+    if (!this.$router) {
+      throw new Error(
+        `You should not use <Route> outside a <Router>`,
+      );
+    }
   },
 
   computed: {
+    computedLocation() {
+      return this.location || this.$route.location;
+    },
     match() {
-      let { location, path, strict, exact, sensitive, router } = this;
+      let { computedLocation, path, strict, exact, sensitive, $route } = this;
+      const pathname = computedLocation.pathname;
 
-      if (!router) {
-        throw new Error(
-          `You should not use <Route> or withRouter() outside a <Router>`,
-        );
-      }
-
-      const { route } = router;
-      const pathname = (location || route.location).pathname;
-
-      return matchPath(
-        pathname,
-        { path, strict, exact, sensitive },
-        route.match,
-      );
+      return path ? 
+        matchPath(
+          pathname,
+          { path, strict, exact, sensitive },
+        ) : $route.match;
     },
 
     childProps() {
-      let { location, match } = this;
-      const { history, route, staticContext } = this.router;
-      const nLocation = this.location || route.location;
+      const { history } = this.$router;
+      let location = this.computedLocation;
+      let match = this.match;
 
       return {
-        ...this.$attrs,
         match,
-        location: nLocation,
+        location,
         history,
-        staticContext,
       };
     },
   },

@@ -1,6 +1,6 @@
 <template>
   <single>
-    <slot></slot>
+    <slot />
   </single>
 </template>
 
@@ -10,37 +10,45 @@ import Single from '../util/Single';
 
 const Router = {
   components: {
-    Single
+    Single,
   },
 
   props: {
+    // history control
     history: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
+    // just for static router
+    context: {
+      type: Object,
+    },
   },
 
   provide() {
     return {
-      $history: this.history,
-      $location: 
-      $router: {
-        history: this.history
-      },
-      $route: this.route
-    }
+      $router: this.router,
+      $route: this.route,
+    };
   },
 
   data() {
     return {
-      route: this.computeRoute(this.history)
-    }
+      router: {
+        history: this.history,
+        context: this.context,
+      },
+      route: {
+        location: this.history.location,
+        match: this.computed(),
+      },
+    };
   },
 
   beforeMount() {
     const { history } = this;
     this.unlisten = history.listen(() => {
-      this.route = this.computeRoute(history);
+      this.route.location = history.location;
     });
   },
 
@@ -51,23 +59,17 @@ const Router = {
   watch: {
     history(val, oldVal) {
       warning('You cannot change <Router history>');
-    }
+    },
+    context(val, oldVal) {
+      warning('You cannot change <Router context>');
+    },
   },
 
   methods: {
-    computeRoute(history) {
-      let pathname = history.location.pathname;
-      return {
-        location: history.location,
-        match: {
-          path: "/",
-          url: "/",
-          params: {},
-          isExact: pathname === "/"
-        }
-      }
-    }
-  }
+    computeMatch(pathname) {
+      return { path: "/", url: "/", params: {}, isExact: pathname === "/" };
+    },
+  },
 }
 
 export default Router;

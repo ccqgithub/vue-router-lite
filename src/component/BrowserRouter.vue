@@ -1,6 +1,6 @@
 <template>
-  <router :history="childHistory">
-    <slot></slot>
+  <router :history="history">
+    <slot />
   </router>
 </template>
 
@@ -11,31 +11,41 @@ import Router from './Router.vue';
 
 const BrowserRouter = {
   components: {
-    Router
+    Router,
   },
 
   props: {
-    history: Object,
-    basename: String,
-    forceRefresh: Boolean,
-    keyLength: Number,
-    getUserConfirmation: Function
+    basename: {
+      type: String,
+      default: '',
+    },
+    forceRefresh: {
+      type: Boolean,
+      default: false,
+    },
+    keyLength: {
+      type: Number,
+      default: 6,
+    },
+    getUserConfirmation: {
+      type: Function,
+      default(message, callback) {
+        callback(window.confirm(message));
+      },
+    }
   },
 
   data() {
-    let history = this.history;
-    if (!history) {
-      history = createHistory({
-        basename: this.basename,
-        forceRefresh: this.forceRefresh,
-        getUserConfirmation: this.getUserConfirmation,
-        keyLength: this.keyLength
-      });
-    }
+    let history = createHistory({
+      basename: this.basename,
+      forceRefresh: this.forceRefresh,
+      getUserConfirmation: this.getUserConfirmation,
+      keyLength: this.keyLength
+    });
 
     return {
-      childHistory: history
-    }
+      history,
+    };
   }
 }
 

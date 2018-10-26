@@ -1,6 +1,6 @@
 <template>
-  <router :history="childHistory">
-    <slot></slot>
+  <router :history="history">
+    <slot />
   </router>
 </template>
 
@@ -11,21 +11,25 @@ import Router from './Router.vue';
 
 const MemoryRouter = {
   components: {
-    Router
+    Router,
   },
 
   props: {
-    // just use to check if user pass history
-    history: {
-      validator: function (value) {
-        return true;
-      }
+    initialEntries: {
+      type: Array,
+      default: () => ['/'],
     },
-
-    initialEntries: Array,
-    initialIndex: Number,
-    getUserConfirmation: Function,
-    keyLength: Number
+    initialIndex: {
+      type: Number,
+      default: 0,
+    },
+    keyLength: {
+      type: Number,
+      default: 6,
+    },
+    getUserConfirmation: {
+      type: Function,
+    },
   },
 
   data() {
@@ -33,22 +37,13 @@ const MemoryRouter = {
       initialEntries: this.initialEntries,
       initialIndex: this.initialIndex,
       getUserConfirmation: this.getUserConfirmation,
-      keyLength: this.keyLength
+      keyLength: this.keyLength,
     });
 
     return {
-      childHistory: history
-    }
+      history,
+    };
   },
-
-  beforeMount() {
-    if (this.history) {
-      warning(
-        '<MemoryRouter> ignores the history prop. To use a custom history, ' +
-        'use `import { Router }` instead of `import { MemoryRouter as Router }`.'
-      )
-    }
-  }
 }
 
 export default MemoryRouter;
