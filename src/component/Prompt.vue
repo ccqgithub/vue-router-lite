@@ -22,48 +22,47 @@ const Prompt = {
     }
   },
 
-  inject: ['$router'],
+  inject: ['$router', '$route'],
 
-  beforeMount() {
+  created() {
     if (!this.$router) {
       warning('You should not use <Prompt> outside a <Router>');
     }
 
-    if(this.when) this.enable(this.message);
+    this.lastMessage = null;
+    this.unblock = null;
   },
 
-  watch: {
-    when(val, old) {
-      if (val) {
-        if (!old && this.message)
-          this.enable(this.message);
-      } else {
-        this.disable();
-      }
-    },
-    message(val) {
-      if (val) {
-        this.enable(this.message);
-      }
+  mounted() {
+    if(this.when) this.block(); 
+  },
+
+  updated() {
+    if (!this.when) {
+      if (this.unblock) this.unblock()
+    } else {
+      this.block();
     }
   },
 
   methods: {
-    enable(message) {
-      if (this.unblock) this.unblock();
-      this.unblock = this.router.history.block(message);
-    },
+    block() {
+      let { message, lastMessage } = this;
 
-    disable() {
-      if (this.unblock) {
+      if (!this.unblock) {
+        this.unblock = this.$router.history.block(message);
+      } else if (message !== lastMessage) {
         this.unblock();
-        this.unblock = null;
+        this.unblock = this.$router.history.block(message);
       }
-    }
+
+      // last message
+      this.lastMessage = message;
+    },
   },
 
   beforeDestroy() {
-    this.disable();
+    if (this.unblock) this.unblock();
   }
 }
 

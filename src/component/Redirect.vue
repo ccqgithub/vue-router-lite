@@ -24,21 +24,9 @@ const Redirect = {
       type: Boolean,
       default: false,
     },
-    // route match
-    match: {
-      type: Object,
-    },
-    // route location
-    location: {
-      type: Object
-    },
-    // router history
-    history: {
-      type: Object,
-    },
   },
 
-  inject: ['$router'],
+  inject: ['$router', '$route'],
 
   created() {
     if (!this.$router) {
@@ -73,20 +61,21 @@ const Redirect = {
 
     // to location
     computeTo() {
+      const { match, location } = this.$route;
       // to
       let p = this.to;
       // route
-      if (this.match) {
+      if (match) {
         if (typeof this.to === 'string') {
           // to is string
-          p = generatePath(this.to, this.match.params);
+          p = generatePath(this.to, match.params);
         } else {
           // to is object
           p = {
             ...this.to,
             pathname: generatePath(
               this.to.pathname,
-              this.match.params,
+              match.params,
             )
           };
         }

@@ -1,17 +1,15 @@
 <template>
   <single>
-    <slot :href="href" :history="router.history"></slot>
+    <slot :href="href" :history="router.history" />
     
     <tag 
-      :tag="tag" 
-      :class="className" 
-      :style="style" 
-      :target="target" 
-      :href="href"
       v-bind="$attrs"
+      :tag="tag" 
+      :target="target === '_self' ? false : target" 
+      :href="href"
       @click="handleClick"
     >
-      <slot></slot>
+      <slot />
     </tag>
   </single>
 </template>
@@ -24,10 +22,12 @@ import Single from '../util/Single';
 
 const isModifiedEvent = event =>
   !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
+// Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
+const escapedPath = path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
 
 const Link = {
   components: {
-    Tag
+    Tag,
   },
 
   props: {
@@ -36,37 +36,57 @@ const Link = {
       type: [String, Object],
       required: true
     },
-
-    // below props not used for slot scope
-    target: String,
-    replace: {
-      type: Boolean,
-      default: false
-    },
+    // tag
     tag: {
       type: String,
       default: 'a'
     },
-    className: {
-      type: [String, Object, Array],
-      default: () => {}
+    // target
+    target: {
+      type: String,
+      default: '_self',
     },
-    style: {
-      type: [String, Object, Array],
-      default: () => {}
-    }
+    // replace or push
+    replace: {
+      type: Boolean,
+      default: false,
+    },
+    // active class name
+    activeClassName: {
+      type: String,
+      default: '',
+    },
+    // user to check active
+    exact: {
+      type: Boolean,
+      default: true,
+    },
+    // user to check active
+    strict: {
+      type: Boolean,
+      default: false,
+    },
+    // user to check active
+    sensitive: {
+      type: Boolean,
+      default: false,
+    },
+    // user to check active
+    location: {
+      type: Object,
+    },
   },
 
-  inject: ['router'],
+  inject: ['$router', '$route'],
 
   computed: {
     href() {
-      const { history } = this.router;
+      const { to } = this;
       const location =
-        typeof to === "string"
-          ? createLocation(to, null, null, history.location)
+        typeof to === 'string'
+          ? createLocation(to, null, null, this.$route.location)
           : to;
-      const href = history.createHref(location);
+      const href = location ? history.createHref(location) : '';
 
       return href;
     }
@@ -75,10 +95,19 @@ const Link = {
   methods: {
     handleClick(event) {
       this.$emit('click', event);
+
+      if (
+        this.target !== '_self' || // et browser handle "target=_blank" etc.
+        event.defaultPrevented || // onClick prevented default
+        event.button === 0 || // ignore everything but left clicks
+        isModifiedEvent(event) // ignore clicks with modifier keys
+      ) {
+        return false;
+      }
   
       event.preventDefault();
   
-      const { history } = this.router;
+      const { history } = this.$router;
       const { replace, to } = this;
 
       if (replace) {
@@ -89,13 +118,13 @@ const Link = {
     }
   },
 
-  beforeMount() {
-    if (!this.to) {
-      throw new Error('You must specify the "to" property');
-    }
-
+  created() {
     if (!this.router) {
       warning('You should not use <Link> outside a <Router>');
+    }
+
+    if (!this.to) {
+      throw new Error('You must specify the "to" property');
     }
   }
 }

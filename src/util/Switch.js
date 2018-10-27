@@ -6,22 +6,24 @@ import matchPath from "./matchPath";
  */
 const Switch = {
   props: {
-    location: Object
+    location: Object,
   },
 
-  inject: ['router'],
+  inject: ['$router', '$route'],
 
   beforeMount() {
-    if (!this.router) {
+    if (!this.$router) {
       warning('You should not use <Switch> outside a <Router>');
     }
   },
 
   render() {
-    const vnode = this.$slots.default.find(vnode => {
+    let location = this.location || this.$route.location;
+    const vnode = this.$slots.default.find((vnode) => {
       if (!vnode.componentOptions) return false;
+      if (!vnode.componentOptions.propsData) return false;
       const { path, exact, strict, sensitive } = vnode.componentOptions.propsData;
-      return matchPath(path, { exact, strict, sensitive }, this.router.location)
+      return matchPath(path, { exact, strict, sensitive }, location);
     });
     return vnode;
   }
