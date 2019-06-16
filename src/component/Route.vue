@@ -12,23 +12,23 @@ import Single from '../util/Single';
 const Route = {
   props: {
     path: {
-      type: [String, Array],
+      type: [String, Array]
     },
     exact: {
       type: Boolean,
-      default: true,
+      default: true
     },
     strict: {
       type: Boolean,
-      default: false,
+      default: false
     },
     sensitive: {
       type: Boolean,
-      default: false,
+      default: false
     },
     location: {
-      type: Object,
-    },
+      type: Object
+    }
   },
 
   inject: ['$router', '$route'],
@@ -37,7 +37,7 @@ const Route = {
     return {
       $route: {
         match: this.match,
-        location: this.computedLocation,
+        location: this.computedLocation
       }
     }
   },
@@ -45,7 +45,7 @@ const Route = {
   created() {
     if (!this.$router) {
       throw new Error(
-        `You should not use <Route> outside a <Router>`,
+        `You should not use <Route> outside a <Router>`
       );
     }
   },
@@ -61,7 +61,7 @@ const Route = {
       return path ? 
         matchPath(
           pathname,
-          { path, strict, exact, sensitive },
+          { path, strict, exact, sensitive }
         ) : $route.match;
     },
 
@@ -73,10 +73,10 @@ const Route = {
       return {
         match,
         location,
-        history,
+        history
       };
-    },
-  },
+    }
+  }
 };
 
 export default Route;

@@ -33,7 +33,7 @@ function compilePath(path, options) {
 function matchPath(pathname, options = {}) {
   if (typeof options === "string") options = { path: options };
 
-  const { path, exact = false, strict = false, sensitive = false } = options;
+  const { path, exact = true, strict = false, sensitive = true } = options;
 
   const paths = [].concat(path);
 

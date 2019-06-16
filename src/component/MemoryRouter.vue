@@ -11,39 +11,39 @@ import Router from './Router.vue';
 
 const MemoryRouter = {
   components: {
-    Router,
+    Router
   },
 
   props: {
     initialEntries: {
       type: Array,
-      default: () => ['/'],
+      default: () => ['/']
     },
     initialIndex: {
       type: Number,
-      default: 0,
+      default: 0
     },
     keyLength: {
       type: Number,
-      default: 6,
+      default: 6
     },
     getUserConfirmation: {
-      type: Function,
-    },
+      type: Function
+    }
   },
 
   data() {
     let history = createHistory({
       initialEntries: this.initialEntries,
       initialIndex: this.initialIndex,
-      getUserConfirmation: this.getUserConfirmation,
       keyLength: this.keyLength,
+      getUserConfirmation: this.getUserConfirmation
     });
 
     return {
-      history,
+      history
     };
-  },
+  }
 }
 
 export default MemoryRouter;

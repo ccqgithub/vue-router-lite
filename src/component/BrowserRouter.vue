@@ -11,27 +11,27 @@ import Router from './Router.vue';
 
 const BrowserRouter = {
   components: {
-    Router,
+    Router
   },
 
   props: {
     basename: {
       type: String,
-      default: '',
+      default: ''
     },
     forceRefresh: {
       type: Boolean,
-      default: false,
+      default: false
     },
     keyLength: {
       type: Number,
-      default: 6,
+      default: 6
     },
     getUserConfirmation: {
       type: Function,
       default(message, callback) {
         callback(window.confirm(message));
-      },
+      }
     }
   },
 
@@ -39,12 +39,12 @@ const BrowserRouter = {
     let history = createHistory({
       basename: this.basename,
       forceRefresh: this.forceRefresh,
-      getUserConfirmation: this.getUserConfirmation,
-      keyLength: this.keyLength
+      keyLength: this.keyLength,
+      getUserConfirmation: this.getUserConfirmation
     });
 
     return {
-      history,
+      history
     };
   }
 }

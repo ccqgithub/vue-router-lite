@@ -4,20 +4,16 @@ import pathToRegexp from 'path-to-regexp';
 // warning
 function warning(message) {
   if (!console || !console.warn) return;
-  console.warn(message);
+  console.warn("[vue-router-lite] ".concat(message));
 } // copyJson
 
-function copyJson(data) {
-  return JSON.parse(JSON.stringify(data));
-}
-
 /**
- * render the first existent child or empty
+ * render the single child or empty
  */
 
 var Single = {
   functional: true,
-  render: function render(h, context) {
+  render: function render(createElement, context) {
     if (!context.children.length) return null;
 
     if (context.children > 1) {
@@ -34,22 +30,33 @@ var Router = {
     Single: Single
   },
   props: {
+    // history control
     history: {
       type: Object,
       required: true
+    },
+    // just for static router
+    context: {
+      type: Object,
+      "default": null
     }
   },
   provide: function provide() {
     return {
-      router: {
-        history: this.history,
-        route: this.route
-      }
+      $router: this.router,
+      $route: this.route
     };
   },
   data: function data() {
     return {
-      route: this.computeRoute(this.history)
+      router: {
+        history: this.history,
+        context: this.context
+      },
+      route: {
+        location: this.history.location,
+        match: this.computeMatch(this.history.location.pathname)
+      }
     };
   },
   beforeMount: function beforeMount() {
@@ -57,7 +64,8 @@ var Router = {
 
     var history = this.history;
     this.unlisten = history.listen(function () {
-      _this.route = _this.computeRoute(history);
+      _this.route.location = history.location;
+      _this.route.match = _this.computeMatch(history.location.pathname);
     });
   },
   befreDestory: function befreDestory() {
@@ -66,33 +74,117 @@ var Router = {
   watch: {
     history: function history(val, oldVal) {
       warning('You cannot change <Router history>');
+    },
+    context: function context(val, oldVal) {
+      warning('You cannot change <Router context>');
     }
   },
   methods: {
-    computeRoute: function computeRoute(history) {
-      var pathname = history.location.pathname;
+    computeMatch: function computeMatch(pathname) {
       return {
-        location: copyJson(history.location),
-        match: {
-          path: "/",
-          url: "/",
-          params: {},
-          isExact: pathname === "/"
-        }
+        path: "/",
+        url: "/",
+        params: {},
+        isExact: pathname === "/"
       };
     }
   }
 };
 
+function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
+/* server only */
+, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
+  if (typeof shadowMode !== 'boolean') {
+    createInjectorSSR = createInjector;
+    createInjector = shadowMode;
+    shadowMode = false;
+  } // Vue.extend constructor export interop.
+
+
+  var options = typeof script === 'function' ? script.options : script; // render functions
+
+  if (template && template.render) {
+    options.render = template.render;
+    options.staticRenderFns = template.staticRenderFns;
+    options._compiled = true; // functional template
+
+    if (isFunctionalTemplate) {
+      options.functional = true;
+    }
+  } // scopedId
+
+
+  if (scopeId) {
+    options._scopeId = scopeId;
+  }
+
+  var hook;
+
+  if (moduleIdentifier) {
+    // server build
+    hook = function hook(context) {
+      // 2.3 injection
+      context = context || // cached call
+      this.$vnode && this.$vnode.ssrContext || // stateful
+      this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext; // functional
+      // 2.2 with runInNewContext: true
+
+      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+        context = __VUE_SSR_CONTEXT__;
+      } // inject component styles
+
+
+      if (style) {
+        style.call(this, createInjectorSSR(context));
+      } // register component module identifier for async chunk inference
+
+
+      if (context && context._registeredComponents) {
+        context._registeredComponents.add(moduleIdentifier);
+      }
+    }; // used by ssr in case component is cached and beforeCreate
+    // never gets called
+
+
+    options._ssrRegister = hook;
+  } else if (style) {
+    hook = shadowMode ? function () {
+      style.call(this, createInjectorShadow(this.$root.$options.shadowRoot));
+    } : function (context) {
+      style.call(this, createInjector(context));
+    };
+  }
+
+  if (hook) {
+    if (options.functional) {
+      // register for functional component in vue file
+      var originalRender = options.render;
+
+      options.render = function renderWithStyleInjection(h, context) {
+        hook.call(context);
+        return originalRender(h, context);
+      };
+    } else {
+      // inject component registration as beforeCreate hook
+      var existing = options.beforeCreate;
+      options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
+    }
+  }
+
+  return script;
+}
+
+var normalizeComponent_1 = normalizeComponent;
+
 /* script */
-            const __vue_script__ = Router;
-            
+const __vue_script__ = Router;
+
 /* template */
 var __vue_render__ = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
-  return _c("single", [_vm._t("default")], 2)
+  return _c("single", { attrs: { name: "router" } }, [_vm._t("default")], 2)
 };
 var __vue_staticRenderFns__ = [];
 __vue_render__._withStripped = true;
@@ -105,36 +197,13 @@ __vue_render__._withStripped = true;
   const __vue_module_identifier__ = undefined;
   /* functional template */
   const __vue_is_functional_template__ = false;
-  /* component normalizer */
-  function __vue_normalize__(
-    template, style, script,
-    scope, functional, moduleIdentifier,
-    createInjector, createInjectorSSR
-  ) {
-    const component = (typeof script === 'function' ? script.options : script) || {};
-
-    // For security concerns, we use only base name in production mode.
-    component.__file = "/Users/season/Documents/pwork/vue-router-lite/src/component/Router.vue";
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    return component
-  }
   /* style inject */
   
   /* style inject SSR */
   
 
   
-  var Router$1 = __vue_normalize__(
+  var Router$1 = normalizeComponent_1(
     { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
     __vue_inject_styles__,
     __vue_script__,
@@ -151,38 +220,40 @@ var MemoryRouter = {
     Router: Router$1
   },
   props: {
-    // just use to check if user pass history
-    history: {
-      validator: function validator(value) {
-        return true;
+    initialEntries: {
+      type: Array,
+      "default": function _default() {
+        return ['/'];
       }
     },
-    initialEntries: Array,
-    initialIndex: Number,
-    getUserConfirmation: Function,
-    keyLength: Number
+    initialIndex: {
+      type: Number,
+      "default": 0
+    },
+    keyLength: {
+      type: Number,
+      "default": 6
+    },
+    getUserConfirmation: {
+      type: Function
+    }
   },
   data: function data() {
     var history = createMemoryHistory({
       initialEntries: this.initialEntries,
       initialIndex: this.initialIndex,
-      getUserConfirmation: this.getUserConfirmation,
-      keyLength: this.keyLength
+      keyLength: this.keyLength,
+      getUserConfirmation: this.getUserConfirmation
     });
     return {
-      childHistory: history
+      history: history
     };
-  },
-  beforeMount: function beforeMount() {
-    if (this.history) {
-      warning('<MemoryRouter> ignores the history prop. To use a custom history, ' + 'use `import { Router }` instead of `import { MemoryRouter as Router }`.');
-    }
   }
 };
 
 /* script */
-            const __vue_script__$1 = MemoryRouter;
-            
+const __vue_script__$1 = MemoryRouter;
+
 /* template */
 var __vue_render__$1 = function() {
   var _vm = this;
@@ -190,7 +261,7 @@ var __vue_render__$1 = function() {
   var _c = _vm._self._c || _h;
   return _c(
     "router",
-    { attrs: { history: _vm.childHistory } },
+    { attrs: { history: _vm.history } },
     [_vm._t("default")],
     2
   )
@@ -206,36 +277,13 @@ __vue_render__$1._withStripped = true;
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
   const __vue_is_functional_template__$1 = false;
-  /* component normalizer */
-  function __vue_normalize__$1(
-    template, style, script,
-    scope, functional, moduleIdentifier,
-    createInjector, createInjectorSSR
-  ) {
-    const component = (typeof script === 'function' ? script.options : script) || {};
-
-    // For security concerns, we use only base name in production mode.
-    component.__file = "/Users/season/Documents/pwork/vue-router-lite/src/component/MemoryRouter.vue";
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    return component
-  }
   /* style inject */
   
   /* style inject SSR */
   
 
   
-  var MemoryRouter$1 = __vue_normalize__$1(
+  var MemoryRouter$1 = normalizeComponent_1(
     { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
     __vue_inject_styles__$1,
     __vue_script__$1,
@@ -252,35 +300,37 @@ var HashRouter = {
     Router: Router$1
   },
   props: {
-    history: Object,
-    basename: String,
+    basename: {
+      type: String,
+      "default": ''
+    },
     hashType: {
       validator: function validator(value) {
         return ["hashbang", "noslash", "slash"].indexOf(value) !== -1;
       }
     },
-    getUserConfirmation: Function
+    getUserConfirmation: {
+      type: Function,
+      "default": function _default(message, callback) {
+        callback(window.confirm(message));
+      }
+    }
   },
   data: function data() {
-    var history = this.history;
-
-    if (!history) {
-      history = createHashHistory({
-        basename: this.basename,
-        hashType: this.hashType,
-        getUserConfirmation: this.getUserConfirmation
-      });
-    }
-
+    var history = createHashHistory({
+      basename: this.basename,
+      hashType: this.hashType,
+      getUserConfirmation: this.getUserConfirmation
+    });
     return {
-      childHistory: history
+      history: history
     };
   }
 };
 
 /* script */
-            const __vue_script__$2 = HashRouter;
-            
+const __vue_script__$2 = HashRouter;
+
 /* template */
 var __vue_render__$2 = function() {
   var _vm = this;
@@ -288,7 +338,7 @@ var __vue_render__$2 = function() {
   var _c = _vm._self._c || _h;
   return _c(
     "router",
-    { attrs: { history: _vm.childHistory } },
+    { attrs: { history: _vm.history } },
     [_vm._t("default")],
     2
   )
@@ -304,36 +354,13 @@ __vue_render__$2._withStripped = true;
   const __vue_module_identifier__$2 = undefined;
   /* functional template */
   const __vue_is_functional_template__$2 = false;
-  /* component normalizer */
-  function __vue_normalize__$2(
-    template, style, script,
-    scope, functional, moduleIdentifier,
-    createInjector, createInjectorSSR
-  ) {
-    const component = (typeof script === 'function' ? script.options : script) || {};
-
-    // For security concerns, we use only base name in production mode.
-    component.__file = "/Users/season/Documents/pwork/vue-router-lite/src/component/HashRouter.vue";
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    return component
-  }
   /* style inject */
   
   /* style inject SSR */
   
 
   
-  var HashRouter$1 = __vue_normalize__$2(
+  var HashRouter$1 = normalizeComponent_1(
     { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
     __vue_inject_styles__$2,
     __vue_script__$2,
@@ -350,33 +377,41 @@ var BrowserRouter = {
     Router: Router$1
   },
   props: {
-    history: Object,
-    basename: String,
-    forceRefresh: Boolean,
-    keyLength: Number,
-    getUserConfirmation: Function
+    basename: {
+      type: String,
+      "default": ''
+    },
+    forceRefresh: {
+      type: Boolean,
+      "default": false
+    },
+    keyLength: {
+      type: Number,
+      "default": 6
+    },
+    getUserConfirmation: {
+      type: Function,
+      "default": function _default(message, callback) {
+        callback(window.confirm(message));
+      }
+    }
   },
   data: function data() {
-    var history = this.history;
-
-    if (!history) {
-      history = createBrowserHistory({
-        basename: this.basename,
-        forceRefresh: this.forceRefresh,
-        getUserConfirmation: this.getUserConfirmation,
-        keyLength: this.keyLength
-      });
-    }
-
+    var history = createBrowserHistory({
+      basename: this.basename,
+      forceRefresh: this.forceRefresh,
+      keyLength: this.keyLength,
+      getUserConfirmation: this.getUserConfirmation
+    });
     return {
-      childHistory: history
+      history: history
     };
   }
 };
 
 /* script */
-            const __vue_script__$3 = BrowserRouter;
-            
+const __vue_script__$3 = BrowserRouter;
+
 /* template */
 var __vue_render__$3 = function() {
   var _vm = this;
@@ -384,7 +419,7 @@ var __vue_render__$3 = function() {
   var _c = _vm._self._c || _h;
   return _c(
     "router",
-    { attrs: { history: _vm.childHistory } },
+    { attrs: { history: _vm.history } },
     [_vm._t("default")],
     2
   )
@@ -400,36 +435,13 @@ __vue_render__$3._withStripped = true;
   const __vue_module_identifier__$3 = undefined;
   /* functional template */
   const __vue_is_functional_template__$3 = false;
-  /* component normalizer */
-  function __vue_normalize__$3(
-    template, style, script,
-    scope, functional, moduleIdentifier,
-    createInjector, createInjectorSSR
-  ) {
-    const component = (typeof script === 'function' ? script.options : script) || {};
-
-    // For security concerns, we use only base name in production mode.
-    component.__file = "/Users/season/Documents/pwork/vue-router-lite/src/component/BrowserRouter.vue";
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    return component
-  }
   /* style inject */
   
   /* style inject SSR */
   
 
   
-  var BrowserRouter$1 = __vue_normalize__$3(
+  var BrowserRouter$1 = normalizeComponent_1(
     { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
     __vue_inject_styles__$3,
     __vue_script__$3,
@@ -527,33 +539,20 @@ var StaticRouter = {
     Router: Router$1
   },
   props: {
-    // just use to check if user pass history
-    history: {
-      validator: function validator(value) {
-        return true;
-      }
-    },
     basename: {
       type: 'String',
-      default: ''
+      "default": ''
     },
     context: {
       type: Object,
-      default: function _default() {
+      "default": function _default() {
         return {};
       }
     },
     location: {
       type: [String, Object],
-      default: '/'
+      "default": '/'
     }
-  },
-  provide: function provide() {
-    return {
-      router: {
-        staticContext: this.context
-      }
-    };
   },
   computed: {
     childProps: function childProps() {
@@ -585,7 +584,8 @@ var StaticRouter = {
         }
       };
       return {
-        history: history
+        history: history,
+        context: context
       };
     }
   },
@@ -607,17 +607,12 @@ var StaticRouter = {
       context.location = addBasename(basename, createLocation(location));
       context.url = createURL(context.location);
     }
-  },
-  beforeMount: function beforeMount() {
-    if (this.history) {
-      warning('<StaticRouter> ignores the history prop. To use a custom history, ' + 'use `import { Router }` instead of `import { StaticRouter as Router }`.');
-    }
   }
 };
 
 /* script */
-            const __vue_script__$4 = StaticRouter;
-            
+const __vue_script__$4 = StaticRouter;
+
 /* template */
 var __vue_render__$4 = function() {
   var _vm = this;
@@ -641,36 +636,13 @@ __vue_render__$4._withStripped = true;
   const __vue_module_identifier__$4 = undefined;
   /* functional template */
   const __vue_is_functional_template__$4 = false;
-  /* component normalizer */
-  function __vue_normalize__$4(
-    template, style, script,
-    scope, functional, moduleIdentifier,
-    createInjector, createInjectorSSR
-  ) {
-    const component = (typeof script === 'function' ? script.options : script) || {};
-
-    // For security concerns, we use only base name in production mode.
-    component.__file = "/Users/season/Documents/pwork/vue-router-lite/src/component/StaticRouter.vue";
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    return component
-  }
   /* style inject */
   
   /* style inject SSR */
   
 
   
-  var StaticRouter$1 = __vue_normalize__$4(
+  var StaticRouter$1 = normalizeComponent_1(
     { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
     __vue_inject_styles__$4,
     __vue_script__$4,
@@ -681,164 +653,160 @@ __vue_render__$4._withStripped = true;
     undefined
   );
 
-var patternCache = {};
+var cache = {};
 var cacheLimit = 10000;
 var cacheCount = 0;
 
-var compilePath = function compilePath(pattern, options) {
+function compilePath(path, options) {
   var cacheKey = "".concat(options.end).concat(options.strict).concat(options.sensitive);
-  var cache = patternCache[cacheKey] || (patternCache[cacheKey] = {});
-  if (cache[pattern]) return cache[pattern];
+  var pathCache = cache[cacheKey] || (cache[cacheKey] = {});
+  if (pathCache[path]) return pathCache[path];
   var keys = [];
-  var re = pathToRegexp(pattern, keys, options);
-  var compiledPattern = {
-    re: re,
+  var regexp = pathToRegexp(path, keys, options);
+  var result = {
+    regexp: regexp,
     keys: keys
   };
 
   if (cacheCount < cacheLimit) {
-    cache[pattern] = compiledPattern;
+    pathCache[path] = result;
     cacheCount++;
   }
 
-  return compiledPattern;
-};
+  return result;
+}
 /**
- * Public API for matching a URL pathname to a path pattern.
+ * Public API for matching a URL pathname to a path.
  */
 
 
-var matchPath = function matchPath(pathname) {
+function matchPath(pathname) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var parent = arguments.length > 2 ? arguments[2] : undefined;
   if (typeof options === "string") options = {
     path: options
   };
   var _options = options,
       path = _options.path,
       _options$exact = _options.exact,
-      exact = _options$exact === void 0 ? false : _options$exact,
+      exact = _options$exact === void 0 ? true : _options$exact,
       _options$strict = _options.strict,
       strict = _options$strict === void 0 ? false : _options$strict,
       _options$sensitive = _options.sensitive,
-      sensitive = _options$sensitive === void 0 ? false : _options$sensitive;
-  if (path == null) return parent;
+      sensitive = _options$sensitive === void 0 ? true : _options$sensitive;
+  var paths = [].concat(path);
+  return paths.reduce(function (matched, path) {
+    if (matched) return matched;
 
-  var _compilePath = compilePath(path, {
-    end: exact,
-    strict: strict,
-    sensitive: sensitive
-  }),
-      re = _compilePath.re,
-      keys = _compilePath.keys;
+    var _compilePath = compilePath(path, {
+      end: exact,
+      strict: strict,
+      sensitive: sensitive
+    }),
+        regexp = _compilePath.regexp,
+        keys = _compilePath.keys;
 
-  var match = re.exec(pathname);
-  if (!match) return null;
+    var match = regexp.exec(pathname);
+    if (!match) return null;
 
-  var _match = _toArray(match),
-      url = _match[0],
-      values = _match.slice(1);
+    var _match = _toArray(match),
+        url = _match[0],
+        values = _match.slice(1);
 
-  var isExact = pathname === url;
-  if (exact && !isExact) return null;
-  return {
-    path: path,
-    // the path pattern used to match
-    url: path === "/" && url === "" ? "/" : url,
-    // the matched portion of the URL
-    isExact: isExact,
-    // whether or not we matched exactly
-    params: keys.reduce(function (memo, key, index) {
-      memo[key.name] = values[index];
-      return memo;
-    }, {})
-  };
-};
+    var isExact = pathname === url;
+    if (exact && !isExact) return null;
+    return {
+      path: path,
+      // the path used to match
+      url: path === "/" && url === "" ? "/" : url,
+      // the matched portion of the URL
+      isExact: isExact,
+      // whether or not we matched exactly
+      params: keys.reduce(function (memo, key, index) {
+        memo[key.name] = values[index];
+        return memo;
+      }, {})
+    };
+  }, null);
+}
 
+//
 var Route = {
   props: {
-    path: String,
-    exact: Boolean,
-    strict: Boolean,
-    sensitive: Boolean,
-    location: Object,
-    component: Object
+    path: {
+      type: [String, Array]
+    },
+    exact: {
+      type: Boolean,
+      "default": true
+    },
+    strict: {
+      type: Boolean,
+      "default": false
+    },
+    sensitive: {
+      type: Boolean,
+      "default": false
+    },
+    location: {
+      type: Object
+    }
   },
-  inject: ['router'],
+  inject: ['$router', '$route'],
   provide: function provide() {
     return {
-      router: {
-        history: this.router.history,
-        route: {
-          location: this.location || this.router.route.location,
-          match: this.match
-        }
+      $route: {
+        match: this.match,
+        location: this.computedLocation
       }
     };
   },
+  created: function created() {
+    if (!this.$router) {
+      throw new Error("You should not use <Route> outside a <Router>");
+    }
+  },
   computed: {
+    computedLocation: function computedLocation() {
+      return this.location || this.$route.location;
+    },
     match: function match() {
-      var location = this.location,
+      var computedLocation = this.computedLocation,
           path = this.path,
           strict = this.strict,
           exact = this.exact,
           sensitive = this.sensitive,
-          router = this.router;
-
-      if (!router) {
-        throw new Error("You should not use <Route> or withRouter() outside a <Router>");
-      }
-
-      var route = router.route;
-      var pathname = (location || route.location).pathname;
-      return matchPath(pathname, {
+          $route = this.$route;
+      var pathname = computedLocation.pathname;
+      return path ? matchPath(pathname, {
         path: path,
         strict: strict,
         exact: exact,
         sensitive: sensitive
-      }, route.match);
+      }) : $route.match;
     },
     childProps: function childProps() {
-      var location = this.location,
-          match = this.match;
-      var _this$router = this.router,
-          history = _this$router.history,
-          route = _this$router.route,
-          staticContext = _this$router.staticContext;
-      var nLocation = this.location || route.location;
-      return _objectSpread({}, this.$attrs, {
+      var history = this.$router.history;
+      var location = this.computedLocation;
+      var match = this.match;
+      return {
         match: match,
-        location: nLocation,
-        history: history,
-        staticContext: staticContext
-      });
+        location: location,
+        history: history
+      };
     }
   }
 };
 
 /* script */
-            const __vue_script__$5 = Route;
-            
+const __vue_script__$5 = Route;
+
 /* template */
 var __vue_render__$5 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _vm.match
-    ? _c(
-        "single",
-        [
-          _vm.component
-            ? _c(
-                _vm.component,
-                _vm._b({ tag: "component" }, "component", _vm.childProps, false)
-              )
-            : _vm._e(),
-          _vm._v(" "),
-          _vm._t("default", null, null, _vm.childProps)
-        ],
-        2
-      )
+    ? _c("single", [_vm._t("default", null, null, _vm.childProps)], 2)
     : _vm._e()
 };
 var __vue_staticRenderFns__$5 = [];
@@ -852,36 +820,13 @@ __vue_render__$5._withStripped = true;
   const __vue_module_identifier__$5 = undefined;
   /* functional template */
   const __vue_is_functional_template__$5 = false;
-  /* component normalizer */
-  function __vue_normalize__$5(
-    template, style, script,
-    scope, functional, moduleIdentifier,
-    createInjector, createInjectorSSR
-  ) {
-    const component = (typeof script === 'function' ? script.options : script) || {};
-
-    // For security concerns, we use only base name in production mode.
-    component.__file = "/Users/season/Documents/pwork/vue-router-lite/src/component/Route.vue";
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    return component
-  }
   /* style inject */
   
   /* style inject SSR */
   
 
   
-  var Route$1 = __vue_normalize__$5(
+  var Route$1 = normalizeComponent_1(
     { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
     __vue_inject_styles__$5,
     __vue_script__$5,
@@ -896,7 +841,7 @@ __vue_render__$5._withStripped = true;
  * Used for conditional rendering in template. 
  */
 var Empty = {
-  render: function render(h) {
+  render: function render() {
     return null;
   }
 };
@@ -909,55 +854,56 @@ var Prompt = {
   props: {
     when: {
       type: Boolean,
-      default: true
+      "default": true
     },
     message: {
       type: [Function, String],
       required: true
     }
   },
-  inject: ['router'],
-  beforeMount: function beforeMount() {
-    if (!this.router) {
+  inject: ['$router', '$route'],
+  created: function created() {
+    if (!this.$router) {
       warning('You should not use <Prompt> outside a <Router>');
     }
 
-    if (this.when) this.enable(this.message);
+    this.lastMessage = null;
+    this.unblock = null;
   },
-  watch: {
-    when: function when(val, old) {
-      if (val) {
-        if (!old && this.message) this.enable(this.message);
-      } else {
-        this.disable();
-      }
-    },
-    message: function message(val) {
-      if (val) {
-        this.enable(this.message);
-      }
+  mounted: function mounted() {
+    if (this.when) this.block();
+  },
+  updated: function updated() {
+    if (!this.when) {
+      if (this.unblock) this.unblock();
+    } else {
+      this.block();
     }
   },
   methods: {
-    enable: function enable(message) {
-      if (this.unblock) this.unblock();
-      this.unblock = this.router.history.block(message);
-    },
-    disable: function disable() {
-      if (this.unblock) {
+    block: function block() {
+      var message = this.message,
+          lastMessage = this.lastMessage;
+
+      if (!this.unblock) {
+        this.unblock = this.$router.history.block(message);
+      } else if (message !== lastMessage) {
         this.unblock();
-        this.unblock = null;
-      }
+        this.unblock = this.$router.history.block(message);
+      } // last message
+
+
+      this.lastMessage = message;
     }
   },
   beforeDestroy: function beforeDestroy() {
-    this.disable();
+    if (this.unblock) this.unblock();
   }
 };
 
 /* script */
-            const __vue_script__$6 = Prompt;
-            
+const __vue_script__$6 = Prompt;
+
 /* template */
 var __vue_render__$6 = function() {
   var _vm = this;
@@ -976,36 +922,13 @@ __vue_render__$6._withStripped = true;
   const __vue_module_identifier__$6 = undefined;
   /* functional template */
   const __vue_is_functional_template__$6 = false;
-  /* component normalizer */
-  function __vue_normalize__$6(
-    template, style, script,
-    scope, functional, moduleIdentifier,
-    createInjector, createInjectorSSR
-  ) {
-    const component = (typeof script === 'function' ? script.options : script) || {};
-
-    // For security concerns, we use only base name in production mode.
-    component.__file = "/Users/season/Documents/pwork/vue-router-lite/src/component/Prompt.vue";
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    return component
-  }
   /* style inject */
   
   /* style inject SSR */
   
 
   
-  var Prompt$1 = __vue_normalize__$6(
+  var Prompt$1 = normalizeComponent_1(
     { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
     __vue_inject_styles__$6,
     __vue_script__$6,
@@ -1016,120 +939,119 @@ __vue_render__$6._withStripped = true;
     undefined
   );
 
-var patternCache$1 = {};
+/**
+ * copy from:
+ * https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/generatePath.js
+ */
+var cache$1 = {};
 var cacheLimit$1 = 10000;
 var cacheCount$1 = 0;
 
-var compileGenerator = function compileGenerator(pattern) {
-  var cacheKey = pattern;
-  var cache = patternCache$1[cacheKey] || (patternCache$1[cacheKey] = {});
-  if (cache[pattern]) return cache[pattern];
-  var compiledGenerator = pathToRegexp.compile(pattern);
+function compilePath$1(path) {
+  if (cache$1[path]) return cache$1[path];
+  var generator = pathToRegexp.compile(path);
 
   if (cacheCount$1 < cacheLimit$1) {
-    cache[pattern] = compiledGenerator;
+    cache$1[path] = generator;
     cacheCount$1++;
   }
 
-  return compiledGenerator;
-};
+  return generator;
+}
 /**
- * Public API for generating a URL pathname from a pattern and parameters.
+ * Public API for generating a URL pathname from a path and parameters.
  */
 
 
-var generatePath = function generatePath() {
-  var pattern = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "/";
+function generatePath() {
+  var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "/";
   var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-  if (pattern === "/") {
-    return pattern;
-  }
-
-  var generator = compileGenerator(pattern);
-  return generator(params);
-};
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  return path === "/" ? path : compilePath$1(path)(params, options);
+}
 
 var Redirect = {
   components: {
     Empty: Empty
   },
   props: {
-    computedMatch: Object,
-    push: {
-      type: Boolean,
-      default: false
-    },
-    from: String,
+    // to path
     to: {
       type: [String, Object],
       required: true
+    },
+    // wheather push
+    push: {
+      type: Boolean,
+      "default": false
     }
   },
-  inject: ['router'],
+  inject: ['$router', '$route'],
   created: function created() {
-    if (!this.router) {
-      warning('You should not use <Redirect> outside a <Router>');
-    }
+    if (!this.$router) {
+      warning('You must not use <Redirect> outside a <Router>.');
+    } // static router
 
-    this.lastTo = this.to;
+
     if (this.isStatic()) this.perform();
   },
   mounted: function mounted() {
+    // not static router
     if (!this.isStatic()) this.perform();
   },
   updated: function updated() {
-    var prevTo = createLocation(this.lastTo);
-    var nextTo = createLocation(this.to);
+    var to = this.computeTo(); // already redirect
 
-    if (locationsAreEqual(prevTo, nextTo)) {
-      warning("You tried to redirect to the same route you're currently on: " + "\"".concat(nextTo.pathname).concat(nextTo.search, "\""));
+    if (locationsAreEqual(this.lastTo, to)) {
       return;
     }
 
     this.perform();
   },
   methods: {
+    // if static router
     isStatic: function isStatic() {
-      return this.router && this.router.staticContext;
+      return this.$router && this.$router.context;
     },
-    computeTo: function computeTo(_ref) {
-      var computedMatch = _ref.computedMatch,
-          to = _ref.to;
+    // to location
+    computeTo: function computeTo() {
+      var _this$$route = this.$route,
+          match = _this$$route.match,
+          location = _this$$route.location; // to
 
-      if (computedMatch) {
-        if (typeof to === "string") {
-          return generatePath(to, computedMatch.params);
+      var p = this.to; // route
+
+      if (match) {
+        if (typeof this.to === 'string') {
+          // to is string
+          p = generatePath(this.to, match.params);
         } else {
-          return _objectSpread({}, to, {
-            pathname: generatePath(to.pathname, computedMatch.params)
+          // to is object
+          p = _objectSpread({}, this.to, {
+            pathname: generatePath(this.to.pathname, match.params)
           });
         }
-      }
+      } // to
 
+
+      var to = createLocation(p);
       return to;
     },
     perform: function perform() {
-      var history = this.router.history;
-      var push = this.push;
-      var to = this.computeTo({
-        computedMatch: this.computedMatch,
-        to: this.to
-      });
-      this.lastTo = this.to;
+      var history = this.$router.history; // history method
 
-      if (push) {
-        history.push(to);
-      } else {
-        history.replace(to);
-      }
+      var method = this.push ? history.push : history.replace;
+      var to = this.computeTo(); // redirect
+
+      this.lastTo = to;
+      method(to);
     }
   }
 };
 
 /* script */
-            const __vue_script__$7 = Redirect;
-            
+const __vue_script__$7 = Redirect;
+
 /* template */
 var __vue_render__$7 = function() {
   var _vm = this;
@@ -1148,36 +1070,13 @@ __vue_render__$7._withStripped = true;
   const __vue_module_identifier__$7 = undefined;
   /* functional template */
   const __vue_is_functional_template__$7 = false;
-  /* component normalizer */
-  function __vue_normalize__$7(
-    template, style, script,
-    scope, functional, moduleIdentifier,
-    createInjector, createInjectorSSR
-  ) {
-    const component = (typeof script === 'function' ? script.options : script) || {};
-
-    // For security concerns, we use only base name in production mode.
-    component.__file = "/Users/season/Documents/pwork/vue-router-lite/src/component/Redirect.vue";
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    return component
-  }
   /* style inject */
   
   /* style inject SSR */
   
 
   
-  var Redirect$1 = __vue_normalize__$7(
+  var Redirect$1 = normalizeComponent_1(
     { render: __vue_render__$7, staticRenderFns: __vue_staticRenderFns__$7 },
     __vue_inject_styles__$7,
     __vue_script__$7,
@@ -1193,80 +1092,154 @@ __vue_render__$7._withStripped = true;
  */
 var Tag = {
   functional: true,
-  render: function render(h, context) {
-    return h(context.props.tag || 'div', context.data, context.children);
+  render: function render(createElement, context) {
+    return createElement(context.props.tag || 'div', context.data, context.children);
   }
 };
 
 //
 
+var isModifiedEvent = function isModifiedEvent(event) {
+  return !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
+}; // 
+
+
+var resolveToLocation = function resolveToLocation(to, currentLocation) {
+  return typeof to === "function" ? to(currentLocation) : to;
+}; // 
+
+var normalizeToLocation = function normalizeToLocation(to, currentLocation) {
+  return typeof to === "string" ? createLocation(to, null, null, currentLocation) : to;
+};
 var Link = {
   components: {
     Tag: Tag
   },
   props: {
+    // type: tag, slot
+    type: {
+      type: String,
+      "default": 'tag'
+    },
     // to path
     to: {
       type: [String, Object],
       required: true
     },
-    // below props not used for slot scope
-    target: String,
-    replace: {
-      type: Boolean,
-      default: false
-    },
+    // tag
     tag: {
       type: String,
-      default: 'a'
+      "default": 'a'
     },
-    className: {
-      type: [String, Object, Array],
-      default: function _default() {}
+    // target
+    target: {
+      type: String,
+      "default": '_self'
     },
-    style: {
-      type: [String, Object, Array],
-      default: function _default() {}
+    // replace or push
+    replace: {
+      type: Boolean,
+      "default": false
+    },
+    // user to check active
+    exact: {
+      type: Boolean,
+      "default": true
+    },
+    // user to check active
+    strict: {
+      type: Boolean,
+      "default": false
+    },
+    // user to check active
+    sensitive: {
+      type: Boolean,
+      "default": false
+    },
+    // active class name
+    activeClassName: {
+      type: String,
+      "default": ''
+    },
+    activeStyle: {
+      type: Object,
+      "default": function _default() {}
+    },
+    isActive: {
+      type: Function
+    },
+    location: {
+      type: Object
     }
   },
-  inject: ['router'],
+  inject: ['$router', '$route'],
   computed: {
-    href: function href() {
-      var history = this.router.history;
-      var location = typeof to === "string" ? createLocation(to, null, null, history.location) : to;
-      var href = history.createHref(location);
-      return href;
+    childProps: function childProps() {
+      var exact = this.exact,
+          strict = this.strict,
+          sensitive = this.sensitive,
+          isActive = this.isActive;
+      var currentLocation = this.location || this.$route.location;
+      var pathToMatch = currentLocation.pathname;
+      var toLocation = normalizeToLocation(resolveToLocation(to, currentLocation), currentLocation);
+      var path = toLocation.pathname; // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
+
+      var escapedPath = path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
+      var match = escapedPath ? matchPath(pathToMatch, {
+        path: escapedPath,
+        exact: exact,
+        strict: strict,
+        sensitive: sensitive
+      }) : null;
+      var active = !!(isActive ? isActive(match, toLocation) : match);
+      var href = toLocation ? history.createHref(toLocation) : '';
+      return {
+        match: match,
+        isActive: isActive,
+        href: href
+      };
     }
   },
   methods: {
     handleClick: function handleClick(event) {
       this.$emit('click', event);
+
+      if (this.target !== '_self' || // et browser handle "target=_blank" etc.
+      event.defaultPrevented || // onClick prevented default
+      event.button === 0 || // ignore everything but left clicks
+      isModifiedEvent(event) // ignore clicks with modifier keys
+      ) {
+          return false;
+        }
+
       event.preventDefault();
-      var history = this.router.history;
+      var history = this.$router.history;
       var replace = this.replace,
           to = this.to;
+      var location = this.location || this.$route.location;
+      var loc = resolveToLocation(to, location);
 
       if (replace) {
-        history.replace(to);
+        history.replace(loc);
       } else {
-        history.push(to);
+        history.push(loc);
       }
     }
   },
-  beforeMount: function beforeMount() {
-    if (!this.to) {
-      throw new Error('You must specify the "to" property');
-    }
-
+  created: function created() {
     if (!this.router) {
       warning('You should not use <Link> outside a <Router>');
+    }
+
+    if (!this.to) {
+      throw new Error('You must specify the "to" property');
     }
   }
 };
 
 /* script */
-            const __vue_script__$8 = Link;
-            
+const __vue_script__$8 = Link;
+
 /* template */
 var __vue_render__$8 = function() {
   var _vm = this;
@@ -1275,24 +1248,40 @@ var __vue_render__$8 = function() {
   return _c(
     "single",
     [
-      _vm._t("default", null, { href: _vm.href, history: _vm.router.history }),
+      _vm.type === "slot"
+        ? _vm._t("default", null, {
+            href: _vm.childProps.href,
+            history: _vm.router.history,
+            match: _vm.childProps.match
+          })
+        : _vm._e(),
       _vm._v(" "),
-      _c(
-        "tag",
-        _vm._b(
-          {
-            class: _vm.className,
-            style: _vm.style,
-            attrs: { tag: _vm.tag, target: _vm.target, href: _vm.href },
-            on: { click: _vm.handleClick }
-          },
-          "tag",
-          _vm.$attrs,
-          false
-        ),
-        [_vm._t("default")],
-        2
-      )
+      _vm.type === "tag"
+        ? _c(
+            "tag",
+            _vm._b(
+              {
+                class: _vm.childProps.active ? _vm.activeClassName : {},
+                style: _vm.childProps.active ? _vm.activeStyle : {},
+                attrs: {
+                  tag: _vm.tag,
+                  target: _vm.target === "_self" ? false : _vm.target,
+                  href: _vm.href
+                },
+                on: {
+                  click: function($event) {
+                    return _vm.handleClick($event)
+                  }
+                }
+              },
+              "tag",
+              _vm.$attrs,
+              false
+            ),
+            [_vm._t("default")],
+            2
+          )
+        : _vm._e()
     ],
     2
   )
@@ -1308,144 +1297,19 @@ __vue_render__$8._withStripped = true;
   const __vue_module_identifier__$8 = undefined;
   /* functional template */
   const __vue_is_functional_template__$8 = false;
-  /* component normalizer */
-  function __vue_normalize__$8(
-    template, style, script,
-    scope, functional, moduleIdentifier,
-    createInjector, createInjectorSSR
-  ) {
-    const component = (typeof script === 'function' ? script.options : script) || {};
-
-    // For security concerns, we use only base name in production mode.
-    component.__file = "/Users/season/Documents/pwork/vue-router-lite/src/component/Link.vue";
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    return component
-  }
   /* style inject */
   
   /* style inject SSR */
   
 
   
-  var Link$1 = __vue_normalize__$8(
+  var Link$1 = normalizeComponent_1(
     { render: __vue_render__$8, staticRenderFns: __vue_staticRenderFns__$8 },
     __vue_inject_styles__$8,
     __vue_script__$8,
     __vue_scope_id__$8,
     __vue_is_functional_template__$8,
     __vue_module_identifier__$8,
-    undefined,
-    undefined
-  );
-
-//
-var NavLink = {
-  components: {
-    Route: Route$1,
-    XLink: Link$1
-  },
-  props: {
-    // to path
-    to: {
-      type: [String, Object],
-      required: true
-    },
-    path: {
-      type: String,
-      required: true
-    },
-    activeClass: String,
-    activeStyle: Object
-  },
-  methods: {
-    getClassName: function getClassName(_ref) {
-      var match = _ref.match;
-      return match ? this.activeClass : '';
-    },
-    getStyle: function getStyle(_ref2) {
-      var match = _ref2.match;
-      return match ? this.activeStyle : {};
-    }
-  }
-};
-
-/* script */
-            const __vue_script__$9 = NavLink;
-            
-/* template */
-var __vue_render__$9 = function() {
-  var _vm = this;
-  var _h = _vm.$createElement;
-  var _c = _vm._self._c || _h;
-  return _c("route", {
-    attrs: { path: _vm.path },
-    scopedSlots: _vm._u([
-      {
-        key: "default",
-        fn: function(scope) {
-          return [_c("x-link", { class: _vm.getClassName(scope) })]
-        }
-      }
-    ])
-  })
-};
-var __vue_staticRenderFns__$9 = [];
-__vue_render__$9._withStripped = true;
-
-  /* style */
-  const __vue_inject_styles__$9 = undefined;
-  /* scoped */
-  const __vue_scope_id__$9 = undefined;
-  /* module identifier */
-  const __vue_module_identifier__$9 = undefined;
-  /* functional template */
-  const __vue_is_functional_template__$9 = false;
-  /* component normalizer */
-  function __vue_normalize__$9(
-    template, style, script,
-    scope, functional, moduleIdentifier,
-    createInjector, createInjectorSSR
-  ) {
-    const component = (typeof script === 'function' ? script.options : script) || {};
-
-    // For security concerns, we use only base name in production mode.
-    component.__file = "/Users/season/Documents/pwork/vue-router-lite/src/component/NavLink.vue";
-
-    if (!component.render) {
-      component.render = template.render;
-      component.staticRenderFns = template.staticRenderFns;
-      component._compiled = true;
-
-      if (functional) component.functional = true;
-    }
-
-    component._scopeId = scope;
-
-    return component
-  }
-  /* style inject */
-  
-  /* style inject SSR */
-  
-
-  
-  var NavLink$1 = __vue_normalize__$9(
-    { render: __vue_render__$9, staticRenderFns: __vue_staticRenderFns__$9 },
-    __vue_inject_styles__$9,
-    __vue_script__$9,
-    __vue_scope_id__$9,
-    __vue_is_functional_template__$9,
-    __vue_module_identifier__$9,
     undefined,
     undefined
   );
@@ -1458,17 +1322,17 @@ var Switch = {
   props: {
     location: Object
   },
-  inject: ['router'],
+  inject: ['$router', '$route'],
   beforeMount: function beforeMount() {
-    if (!this.router) {
+    if (!this.$router) {
       warning('You should not use <Switch> outside a <Router>');
     }
   },
-  render: function render(h) {
-    var _this = this;
-
-    var vnode = this.$slots.default.find(function (vnode) {
+  render: function render() {
+    var location = this.location || this.$route.location;
+    var vnode = this.$slots["default"].find(function (vnode) {
       if (!vnode.componentOptions) return false;
+      if (!vnode.componentOptions.propsData) return false;
       var _vnode$componentOptio = vnode.componentOptions.propsData,
           path = _vnode$componentOptio.path,
           exact = _vnode$componentOptio.exact,
@@ -1478,26 +1342,11 @@ var Switch = {
         exact: exact,
         strict: strict,
         sensitive: sensitive
-      }, _this.router.location);
+      }, location);
     });
     return vnode;
   }
 };
 
-/**
- * wrap Component with Route, 
- * so the Component will have the propeties: location, history, match ...
- */
-
-var withRouter = function withRouter(Component) {
-  return {
-    functional: true,
-    render: function render(h, context) {
-      context.data.props.component = Component;
-      return h(Route$1, context.data, context.children);
-    }
-  };
-};
-
-export { Router$1 as Router, MemoryRouter$1 as MemoryRouter, HashRouter$1 as HashRouvter, BrowserRouter$1 as BrowserRouter, StaticRouter$1 as StaticRouter, Prompt$1 as Prompt, Redirect$1 as Redirect, Route$1 as Route, Link$1 as Link, NavLink$1 as NavLink, Switch, generatePath, matchPath, withRouter };
+export { BrowserRouter$1 as BrowserRouter, HashRouter$1 as HashRouvter, Link$1 as Link, MemoryRouter$1 as MemoryRouter, Prompt$1 as Prompt, Redirect$1 as Redirect, Route$1 as Route, Router$1 as Router, StaticRouter$1 as StaticRouter, Switch, generatePath, matchPath };
 //# sourceMappingURL=router.esm.js.map

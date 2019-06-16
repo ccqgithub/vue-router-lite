@@ -1,13 +1,21 @@
 <template>
   <single>
-    <slot :href="href" :history="router.history" />
+    <slot 
+      v-if="type === 'slot'"
+      v-bind:href="childProps.href" 
+      v-bind:history="router.history"
+      v-bind:match="childProps.match" 
+    />
     
     <tag 
+      v-if="type === 'tag'"
       v-bind="$attrs"
       :tag="tag" 
       :target="target === '_self' ? false : target" 
       :href="href"
-      @click="handleClick"
+      :class="childProps.active ? activeClassName : {}"
+      :style="childProps.active ? activeStyle : {}"
+      @click="handleClick($event)"
     >
       <slot />
     </tag>
@@ -15,22 +23,38 @@
 </template>
 
 <script>
-import { warning } from '../util/utils';
 import { createLocation } from "history";
+import { warning } from '../util/utils';
+import matchPath from '../util/matchPath';
 import Tag from '../util/Tag';
 import Single from '../util/Single';
 
+// 
 const isModifiedEvent = event =>
   !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
-// Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
-const escapedPath = path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
+
+// 
+export const resolveToLocation = (to, currentLocation) =>
+  typeof to === "function" ? to(currentLocation) : to;
+
+// 
+export const normalizeToLocation = (to, currentLocation) => {
+  return typeof to === "string"
+    ? createLocation(to, null, null, currentLocation)
+    : to;
+};
 
 const Link = {
   components: {
-    Tag,
+    Tag
   },
 
   props: {
+    // type: tag, slot
+    type: {
+      type: String,
+      default: 'tag'
+    },
     // to path
     to: {
       type: [String, Object],
@@ -44,51 +68,74 @@ const Link = {
     // target
     target: {
       type: String,
-      default: '_self',
+      default: '_self'
     },
     // replace or push
     replace: {
       type: Boolean,
-      default: false,
-    },
-    // active class name
-    activeClassName: {
-      type: String,
-      default: '',
+      default: false
     },
     // user to check active
     exact: {
       type: Boolean,
-      default: true,
+      default: true
     },
     // user to check active
     strict: {
       type: Boolean,
-      default: false,
+      default: false
     },
     // user to check active
     sensitive: {
       type: Boolean,
-      default: false,
+      default: false
     },
-    // user to check active
-    location: {
+    // active class name
+    activeClassName: {
+      type: String,
+      default: ''
+    },
+    activeStyle: {
       type: Object,
+      default: () => {}
     },
+    isActive: {
+      type: Function
+    },
+    location: {
+      type: Object
+    }
   },
 
   inject: ['$router', '$route'],
 
   computed: {
-    href() {
-      const { to } = this;
-      const location =
-        typeof to === 'string'
-          ? createLocation(to, null, null, this.$route.location)
-          : to;
-      const href = location ? history.createHref(location) : '';
+    childProps() {
+      const { exact, strict, sensitive, isActive } = this;
+      const currentLocation = this.location || this.$route.location;
+      const { pathname: pathToMatch } = currentLocation;
+      const toLocation = normalizeToLocation(
+        resolveToLocation(to, currentLocation),
+        currentLocation
+      );
+      const { pathname: path } = toLocation;
+      // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
+      const escapedPath =
+        path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
 
-      return href;
+      const match = escapedPath
+        ? matchPath(pathToMatch, { path: escapedPath, exact, strict, sensitive })
+        : null;
+      const active = !!(isActive
+        ? isActive(match, toLocation)
+        : match);
+      const href = toLocation ? history.createHref(toLocation) : '';
+
+      return {
+        match,
+        isActive,
+        href
+      };
     }
   },
 
@@ -104,16 +151,18 @@ const Link = {
       ) {
         return false;
       }
-  
+
       event.preventDefault();
-  
+
       const { history } = this.$router;
       const { replace, to } = this;
+      const location = this.location || this.$route.location;
+      const loc = resolveToLocation(to, location);
 
       if (replace) {
-        history.replace(to);
+        history.replace(loc);
       } else {
-        history.push(to);
+        history.push(loc);
       }
     }
   },

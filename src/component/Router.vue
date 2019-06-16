@@ -1,5 +1,5 @@
 <template>
-  <single>
+  <single name="router">
     <slot />
   </single>
 </template>
@@ -10,25 +10,26 @@ import Single from '../util/Single';
 
 const Router = {
   components: {
-    Single,
+    Single
   },
 
   props: {
     // history control
     history: {
       type: Object,
-      required: true,
+      required: true
     },
     // just for static router
     context: {
       type: Object,
-    },
+      default: null
+    }
   },
 
   provide() {
     return {
       $router: this.router,
-      $route: this.route,
+      $route: this.route
     };
   },
 
@@ -36,12 +37,12 @@ const Router = {
     return {
       router: {
         history: this.history,
-        context: this.context,
+        context: this.context
       },
       route: {
         location: this.history.location,
-        match: this.computed(),
-      },
+        match: this.computeMatch(this.history.location.pathname)
+      }
     };
   },
 
@@ -49,6 +50,7 @@ const Router = {
     const { history } = this;
     this.unlisten = history.listen(() => {
       this.route.location = history.location;
+      this.route.match = this.computeMatch(history.location.pathname);
     });
   },
 
@@ -62,14 +64,14 @@ const Router = {
     },
     context(val, oldVal) {
       warning('You cannot change <Router context>');
-    },
+    }
   },
 
   methods: {
     computeMatch(pathname) {
       return { path: "/", url: "/", params: {}, isExact: pathname === "/" };
-    },
-  },
+    }
+  }
 }
 
 export default Router;

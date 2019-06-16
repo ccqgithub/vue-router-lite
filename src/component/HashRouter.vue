@@ -11,36 +11,36 @@ import Router from './Router.vue';
 
 const HashRouter = {
   components: {
-    Router,
+    Router
   },
 
   props: {
     basename: {
       type: String,
-      default: '',
+      default: ''
     },
     hashType: {
       validator(value) {
         return ["hashbang", "noslash", "slash"].indexOf(value) !== -1;
-      },
+      }
     },
     getUserConfirmation: {
       type: Function,
       default(message, callback) {
         callback(window.confirm(message));
-      },
-    },
+      }
+    }
   },
 
   data() {
     let history = createHistory({
       basename: this.basename,
       hashType: this.hashType,
-      getUserConfirmation: this.getUserConfirmation,
+      getUserConfirmation: this.getUserConfirmation
     });
 
     return {
-      history,
+      history
     };
   }
 }

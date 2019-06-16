@@ -1,7 +1,7 @@
 // warning
 export function warning(message) {
   if (!console || !console.warn) return;
-  console.warn(message);
+  console.warn(`[vue-router-lite] ${message}`);
 }
 
 // copyJson

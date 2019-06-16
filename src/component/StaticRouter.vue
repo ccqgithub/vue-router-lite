@@ -18,7 +18,7 @@ const addBasename = (basename, location) => {
 
   return {
     ...location,
-    pathname: addLeadingSlash(basename) + location.pathname,
+    pathname: addLeadingSlash(basename) + location.pathname
   };
 };
 
@@ -31,7 +31,7 @@ const stripBasename = (basename, location) => {
 
   return {
     ...location,
-    pathname: location.pathname.substr(base.length),
+    pathname: location.pathname.substr(base.length)
   };
 };
 
@@ -46,13 +46,13 @@ const noop = () => {};
 
 const StaticRouter = {
   components: {
-    Router,
+    Router
   },
   
   props: {
     basename: {
       type: 'String',
-      default: '',
+      default: ''
     },
     context: {
       type: Object,
@@ -62,8 +62,8 @@ const StaticRouter = {
     },
     location: {
       type: [String, Object],
-      default: '/',
-    },
+      default: '/'
+    }
   },
 
   computed: {
@@ -80,7 +80,7 @@ const StaticRouter = {
         push: (...rest) => this.handlePush(...rest),
         replace: (...rest) => this.handleReplace(...rest), 
         listen: () => noop,
-        block: () => noop,
+        block: () => noop
       };
 
       return { history, context };
@@ -103,7 +103,7 @@ const StaticRouter = {
       context.location = addBasename(basename, createLocation(location));
       context.url = createURL(context.location);
     }
-  },
+  }
 }
 
 export default StaticRouter;

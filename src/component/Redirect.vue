@@ -10,20 +10,20 @@ import Empty from '../util/empty';
 
 const Redirect = {
   components: {
-    Empty,
+    Empty
   },
 
   props: {
     // to path
     to: {
       type: [String, Object],
-      required: true,
+      required: true
     },
     // wheather push
     push: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
 
   inject: ['$router', '$route'],
@@ -75,7 +75,7 @@ const Redirect = {
             ...this.to,
             pathname: generatePath(
               this.to.pathname,
-              match.params,
+              match.params
             )
           };
         }

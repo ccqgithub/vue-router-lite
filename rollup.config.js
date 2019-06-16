@@ -7,9 +7,9 @@ let pkg = require('./package.json');
 let external = [];
 
 // // external dependencies
-// external = external.concat(Object.keys(pkg.dependencies || {}));
+external = external.concat(Object.keys(pkg.dependencies || {}));
 // // external peer dependencies
-// external = external.concat(Object.keys(pkg.peerDependencies || {}));
+external = external.concat(Object.keys(pkg.peerDependencies || {}));
 
 let plugins = [
   vue({

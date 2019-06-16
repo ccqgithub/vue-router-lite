@@ -8,17 +8,17 @@ import Empty from '../util/empty';
 
 const Prompt = {
   components: {
-    Empty,
+    Empty
   },
 
   props: {
     when: {
       type: Boolean,
-      default: true,
+      default: true
     },
     message: {
       type: [Function, String],
-      required: true,
+      required: true
     }
   },
 
@@ -58,7 +58,7 @@ const Prompt = {
 
       // last message
       this.lastMessage = message;
-    },
+    }
   },
 
   beforeDestroy() {
