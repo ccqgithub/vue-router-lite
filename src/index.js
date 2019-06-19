@@ -6,7 +6,7 @@ import StaticRouter from './component/StaticRouter.vue';
 import Route from './component/Route.vue';
 import Prompt from './component/Prompt.vue';
 import Redirect from './component/Redirect.vue';
-import Link from './component/Link.vue';
+import RouterLink from './component/RouterLink.vue';
 import Switch from './util/Switch';
 import generatePath from './util/generatePath';
 import matchPath from './util/matchPath';
@@ -20,7 +20,7 @@ export {
   Prompt,
   Redirect,
   Route,
-  Link,
+  RouterLink,
   Switch,
   generatePath,
   matchPath

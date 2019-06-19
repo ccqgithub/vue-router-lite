@@ -1,5 +1,5 @@
 <template>
-  <router v-bind="childProps">
+  <router :history="history">
     <slot />
   </router>
 </template>
@@ -45,6 +45,8 @@ const staticHandler = (methodName) => () => {
 const noop = () => {};
 
 const StaticRouter = {
+  name: 'StaticRouter',
+
   components: {
     Router
   },
@@ -56,9 +58,7 @@ const StaticRouter = {
     },
     context: {
       type: Object,
-      default() {
-        return {};
-      },
+      default: () => {}
     },
     location: {
       type: [String, Object],
@@ -66,24 +66,24 @@ const StaticRouter = {
     }
   },
 
-  computed: {
-    childProps() {
-      let { basename, context, location } = this;
+  data() {
+    let { basename, context, location } = this;
 
-      const history = {
-        action: "POP",
-        location: stripBasename(basename, createLocation(location)),
-        go: staticHandler("go"),
-        goBack: staticHandler("goBack"),
-        goForward: staticHandler("goForward"),
-        createHref: (...rest) => this.createHref(...rest),
-        push: (...rest) => this.handlePush(...rest),
-        replace: (...rest) => this.handleReplace(...rest), 
-        listen: () => noop,
-        block: () => noop
-      };
+    const history = {
+      action: "POP",
+      location: stripBasename(basename, createLocation(location)),
+      go: staticHandler("go"),
+      goBack: staticHandler("goBack"),
+      goForward: staticHandler("goForward"),
+      createHref: (...rest) => this.createHref(...rest),
+      push: (...rest) => this.handlePush(...rest),
+      replace: (...rest) => this.handleReplace(...rest), 
+      listen: () => noop,
+      block: () => noop
+    };
 
-      return { history, context };
+    return {
+      history
     }
   },
 

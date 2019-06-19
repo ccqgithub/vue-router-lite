@@ -6,13 +6,15 @@ import { warning } from './utils';
 const Single = {
   functional: true,
   render(createElement, context) {
-    if (!context.children.length) return null;
+    const children = context.children.filter(item => !!item.tag);
 
-    if (context.children > 1) {
+    if (!children.length) return null;
+
+    if (children > 1) {
       warning(`The component ${context.props.name || 'Single'} should have only one child!`);
     }
 
-    return context.children[0];
+    return children[0];
   }
 }
 

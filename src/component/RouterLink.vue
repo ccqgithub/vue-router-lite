@@ -1,20 +1,20 @@
 <template>
   <single>
-    <slot 
-      v-if="type === 'slot'"
-      v-bind:href="childProps.href" 
-      v-bind:history="router.history"
-      v-bind:match="childProps.match" 
+    <slot
+      v-if="type === 'slot'" 
+      :href="href"
+      :active="active"
+      :match="match"
+      :history="router.history"
     />
-    
     <tag 
       v-if="type === 'tag'"
       v-bind="$attrs"
       :tag="tag" 
       :target="target === '_self' ? false : target" 
       :href="href"
-      :class="childProps.active ? activeClassName : {}"
-      :style="childProps.active ? activeStyle : {}"
+      :style="active ? activeStyle : {}"
+      :class="active ? activeClassName : {}"
       @click="handleClick($event)"
     >
       <slot />
@@ -23,34 +23,26 @@
 </template>
 
 <script>
-import { createLocation } from "history";
-import { warning } from '../util/utils';
+import { 
+  warning, 
+  resolveToLocation, 
+  normalizeToLocation, 
+  guardEvent 
+} from '../util/utils';
 import matchPath from '../util/matchPath';
 import Tag from '../util/Tag';
 import Single from '../util/Single';
 
-// 
-const isModifiedEvent = event =>
-  !!(event.metaKey || event.altKey || event.ctrlKey || event.shiftKey);
-
-// 
-export const resolveToLocation = (to, currentLocation) =>
-  typeof to === "function" ? to(currentLocation) : to;
-
-// 
-export const normalizeToLocation = (to, currentLocation) => {
-  return typeof to === "string"
-    ? createLocation(to, null, null, currentLocation)
-    : to;
-};
-
-const Link = {
+const RouterLink = {
+  name: 'RouterLink',
+  
   components: {
+    Single,
     Tag
   },
 
   props: {
-    // type: tag, slot
+    // type
     type: {
       type: String,
       default: 'tag'
@@ -95,47 +87,64 @@ const Link = {
       type: String,
       default: ''
     },
+    // active style
     activeStyle: {
       type: Object,
       default: () => {}
     },
+    // is active
     isActive: {
       type: Function
     },
+    // location
     location: {
       type: Object
     }
   },
 
-  inject: ['$router', '$route'],
+  inject: ['router', 'route'],
 
   computed: {
-    childProps() {
-      const { exact, strict, sensitive, isActive } = this;
-      const currentLocation = this.location || this.$route.location;
-      const { pathname: pathToMatch } = currentLocation;
+    // current location
+    currentLocation() {
+      const currentLocation = this.location || this.router.history.location;
+      return currentLocation;
+    },
+    // to location
+    toLocation() {
       const toLocation = normalizeToLocation(
-        resolveToLocation(to, currentLocation),
-        currentLocation
+        resolveToLocation(this.to, this.currentLocation),
+        this.currentLocation
       );
-      const { pathname: path } = toLocation;
+      return toLocation;
+    },
+    // link href
+    href() {
+      const { history } = this.router;
+      const href = this.toLocation ? history.createHref(this.toLocation) : '';
+
+      return href;
+    },
+    // path match with current location
+    match() {
+      const { to, exact, strict, sensitive } = this;
+      const { pathname: pathToMatch } = this.currentLocation;
+      const { pathname: path } = this.toLocation;
       // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
       const escapedPath =
         path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
-
       const match = escapedPath
         ? matchPath(pathToMatch, { path: escapedPath, exact, strict, sensitive })
         : null;
-      const active = !!(isActive
-        ? isActive(match, toLocation)
-        : match);
-      const href = toLocation ? history.createHref(toLocation) : '';
 
-      return {
-        match,
-        isActive,
-        href
-      };
+      return match;
+    },
+    // if link active
+    active() {
+      const active = !!(this.isActive
+        ? this.isActive(this.match, this.toLocation)
+        : this.match);
+      return active;
     }
   },
 
@@ -143,20 +152,11 @@ const Link = {
     handleClick(event) {
       this.$emit('click', event);
 
-      if (
-        this.target !== '_self' || // et browser handle "target=_blank" etc.
-        event.defaultPrevented || // onClick prevented default
-        event.button === 0 || // ignore everything but left clicks
-        isModifiedEvent(event) // ignore clicks with modifier keys
-      ) {
-        return false;
-      }
+      if (!guardEvent(event)) return;
 
-      event.preventDefault();
-
-      const { history } = this.$router;
+      const { history } = this.router;
       const { replace, to } = this;
-      const location = this.location || this.$route.location;
+      const location = this.location || this.router.history.location;
       const loc = resolveToLocation(to, location);
 
       if (replace) {
@@ -178,5 +178,5 @@ const Link = {
   }
 }
 
-export default Link;
+export default RouterLink;
 </script>

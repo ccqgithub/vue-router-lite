@@ -28,7 +28,8 @@ function compilePath(path, options) {
 }
 
 /**
- * Public API for matching a URL pathname to a path.
+ * matching a URL pathname to a path.
+ * pathname: current locations's pathname
  */
 function matchPath(pathname, options = {}) {
   if (typeof options === "string") options = { path: options };

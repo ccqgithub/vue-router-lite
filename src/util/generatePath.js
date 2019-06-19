@@ -23,7 +23,7 @@ function compilePath(path) {
 }
 
 /**
- * Public API for generating a URL pathname from a path and parameters.
+ * generating a URL pathname from a path and parameters.
  */
 function generatePath(path = "/", params = {}, options = {}) {
   return path === "/" ? path : compilePath(path)(params, options);

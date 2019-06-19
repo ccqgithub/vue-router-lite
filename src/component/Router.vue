@@ -1,6 +1,6 @@
 <template>
-  <single name="router">
-    <slot />
+  <single name="Router">
+    <slot :history="history" :location="history.location" :match="route.match"/>
   </single>
 </template>
 
@@ -9,6 +9,8 @@ import { warning } from '../util/utils';
 import Single from '../util/Single';
 
 const Router = {
+  name: 'Router',
+
   components: {
     Single
   },
@@ -28,8 +30,8 @@ const Router = {
 
   provide() {
     return {
-      $router: this.router,
-      $route: this.route
+      router: this.router,
+      route: this.route
     };
   },
 
@@ -40,7 +42,6 @@ const Router = {
         context: this.context
       },
       route: {
-        location: this.history.location,
         match: this.computeMatch(this.history.location.pathname)
       }
     };
@@ -49,7 +50,6 @@ const Router = {
   beforeMount() {
     const { history } = this;
     this.unlisten = history.listen(() => {
-      this.route.location = history.location;
       this.route.match = this.computeMatch(history.location.pathname);
     });
   },
@@ -60,10 +60,10 @@ const Router = {
 
   watch: {
     history(val, oldVal) {
-      warning('You cannot change <Router history>');
+      warning('You cannot change <Router>\'s history!');
     },
     context(val, oldVal) {
-      warning('You cannot change <Router context>');
+      warning('You cannot change <Router>\'s context!');
     }
   },
 

@@ -10,6 +10,8 @@ import { warning } from '../util/utils';
 import Router from './Router.vue';
 
 const HashRouter = {
+  name: 'HashRouter',
+
   components: {
     Router
   },

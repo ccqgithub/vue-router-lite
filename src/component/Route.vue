@@ -1,6 +1,21 @@
 <template>
-  <single v-if="match">
-    <slot v-bind="childProps" />
+  <single name="Route">
+    <keep-alive v-if="keepAlive" v-bind="keepAliveOptions">
+      <slot 
+        :history="router.history"
+        :location="computedLocation" 
+        :match="computedRoute.match" 
+        v-if="computedRoute.match"
+      />
+    </keep-alive>
+    <template v-else>
+      <slot 
+        :history="router.history"
+        :location="computedLocation" 
+        :match="computedRoute.match" 
+        v-if="computedRoute.match"
+      />
+    </template>
   </single>
 </template>
 
@@ -10,13 +25,19 @@ import matchPath from '../util/matchPath';
 import Single from '../util/Single';
 
 const Route = {
+  name: 'Route',
+
+  components: {
+    Single
+  },
+  
   props: {
     path: {
       type: [String, Array]
     },
     exact: {
       type: Boolean,
-      default: true
+      default: false
     },
     strict: {
       type: Boolean,
@@ -24,57 +45,55 @@ const Route = {
     },
     sensitive: {
       type: Boolean,
-      default: false
+      default: true
     },
     location: {
       type: Object
+    },
+    keepAlive: {
+      type: [Boolean, Object]
     }
   },
 
-  inject: ['$router', '$route'],
+  inject: ['router', 'route'],
 
   provide() {
     return {
-      $route: {
-        match: this.match,
-        location: this.computedLocation
-      }
+      route: this.computedRoute
     }
   },
 
   created() {
-    if (!this.$router) {
+    if (!this.router) {
       throw new Error(
-        `You should not use <Route> outside a <Router>`
+        `You should not use <Route> outside a <Router>!`
       );
     }
   },
 
   computed: {
     computedLocation() {
-      return this.location || this.$route.location;
+      const computedLocation = this.location || this.router.history.location;
+      return computedLocation;
     },
-    match() {
-      let { computedLocation, path, strict, exact, sensitive, $route } = this;
-      const pathname = computedLocation.pathname;
+    computedRoute() {
+      const { path, strict, exact, sensitive, route } = this;
+      const pathname = this.computedLocation.pathname;
 
-      return path ? 
+      const match = path ? 
         matchPath(
           pathname,
           { path, strict, exact, sensitive }
-        ) : $route.match;
+        ) : route.match;
+
+      return { match };
     },
-
-    childProps() {
-      const { history } = this.$router;
-      let location = this.computedLocation;
-      let match = this.match;
-
-      return {
-        match,
-        location,
-        history
-      };
+    keepAliveOptions() {
+      if (!this.keepAlive) return { include: [] };
+      if (typeof this.keepAlive === 'boolean') {
+        return {};
+      }
+      return this.keepAlive;
     }
   }
 };
