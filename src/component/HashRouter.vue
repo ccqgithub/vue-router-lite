@@ -1,11 +1,13 @@
 <template>
   <router :history="history">
-    <slot />
+    <template v-slot:default="routerProps">
+      <slot v-bind="routerProps"/>
+    </template>
   </router>
 </template>
 
 <script>
-import { createHashHistory as createHistory } from "history";
+import createHashHistory from '../util/createHashHistory';
 import { assert } from '../util/utils';
 import Router from './Router.vue';
 
@@ -35,7 +37,7 @@ const HashRouter = {
   },
 
   data() {
-    let history = createHistory({
+    let history = createHashHistory({
       basename: this.basename,
       hashType: this.hashType,
       getUserConfirmation: this.getUserConfirmation

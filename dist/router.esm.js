@@ -1,4 +1,5 @@
 import { createLocation, createMemoryHistory, createHashHistory, createBrowserHistory, createPath, locationsAreEqual } from 'history';
+export { createBrowserHistory, createHashHistory, createMemoryHistory } from 'history';
 import pathToRegexp from 'path-to-regexp';
 
 function assert(condition, message) {
@@ -297,12 +298,21 @@ var __vue_render__$1 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
-  return _c(
-    "router",
-    { attrs: { history: _vm.history } },
-    [_vm._t("default")],
-    2
-  )
+  return _c("router", {
+    attrs: { history: _vm.history },
+    scopedSlots: _vm._u(
+      [
+        {
+          key: "default",
+          fn: function(routerProps) {
+            return [_vm._t("default", null, null, routerProps)]
+          }
+        }
+      ],
+      null,
+      true
+    )
+  })
 };
 var __vue_staticRenderFns__$1 = [];
 __vue_render__$1._withStripped = true;
@@ -375,12 +385,21 @@ var __vue_render__$2 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
-  return _c(
-    "router",
-    { attrs: { history: _vm.history } },
-    [_vm._t("default")],
-    2
-  )
+  return _c("router", {
+    attrs: { history: _vm.history },
+    scopedSlots: _vm._u(
+      [
+        {
+          key: "default",
+          fn: function(routerProps) {
+            return [_vm._t("default", null, null, routerProps)]
+          }
+        }
+      ],
+      null,
+      true
+    )
+  })
 };
 var __vue_staticRenderFns__$2 = [];
 __vue_render__$2._withStripped = true;
@@ -583,6 +602,43 @@ var staticHandler = function staticHandler(methodName) {
 
 var noop = function noop() {};
 
+function createStaticHistory(_ref) {
+  var _ref$basename = _ref.basename,
+      basename = _ref$basename === void 0 ? '' : _ref$basename,
+      _ref$context = _ref.context,
+      context = _ref$context === void 0 ? {} : _ref$context,
+      _ref$location = _ref.location,
+      location = _ref$location === void 0 ? '/' : _ref$location;
+  var history = {
+    action: "POP",
+    location: stripBasename(basename, createLocation(location)),
+    go: staticHandler("go"),
+    goBack: staticHandler("goBack"),
+    goForward: staticHandler("goForward"),
+    createHref: function createHref(location) {
+      return addLeadingSlash(basename + createURL(location));
+    },
+    push: function push(location) {
+      context.action = "PUSH";
+      context.location = addBasename(basename, createLocation(location));
+      context.url = createURL(context.location);
+    },
+    replace: function replace(location) {
+      context.action = "REPLACE";
+      context.location = addBasename(basename, createLocation(location));
+      context.url = createURL(context.location);
+    },
+    listen: function listen() {
+      return noop;
+    },
+    block: function block() {
+      return noop;
+    }
+  };
+  return history;
+}
+
+//
 var StaticRouter = {
   name: 'StaticRouter',
   components: {
@@ -603,55 +659,14 @@ var StaticRouter = {
     }
   },
   data: function data() {
-    var _this = this;
-
-    var basename = this.basename,
-        context = this.context,
-        location = this.location;
-    var history = {
-      action: "POP",
-      location: stripBasename(basename, createLocation(location)),
-      go: staticHandler("go"),
-      goBack: staticHandler("goBack"),
-      goForward: staticHandler("goForward"),
-      createHref: function createHref() {
-        return _this.createHref.apply(_this, arguments);
-      },
-      push: function push() {
-        return _this.handlePush.apply(_this, arguments);
-      },
-      replace: function replace() {
-        return _this.handleReplace.apply(_this, arguments);
-      },
-      listen: function listen() {
-        return noop;
-      },
-      block: function block() {
-        return noop;
-      }
-    };
+    var history = createStaticHistory({
+      basename: this.basename,
+      context: this.context,
+      location: this.location
+    });
     return {
       history: history
     };
-  },
-  methods: {
-    createHref: function createHref(path) {
-      return addLeadingSlash(this.basename + createURL(path));
-    },
-    handlePush: function handlePush(location) {
-      var basename = this.basename,
-          context = this.context;
-      context.action = "PUSH";
-      context.location = addBasename(basename, createLocation(location));
-      context.url = createURL(context.location);
-    },
-    handleReplace: function handleReplace(location) {
-      var basename = this.basename,
-          context = this.context;
-      context.action = "REPLACE";
-      context.location = addBasename(basename, createLocation(location));
-      context.url = createURL(context.location);
-    }
   }
 };
 
@@ -663,12 +678,21 @@ var __vue_render__$4 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
-  return _c(
-    "router",
-    { attrs: { history: _vm.history } },
-    [_vm._t("default")],
-    2
-  )
+  return _c("router", {
+    attrs: { history: _vm.history },
+    scopedSlots: _vm._u(
+      [
+        {
+          key: "default",
+          fn: function(routerProps) {
+            return [_vm._t("default", null, null, routerProps)]
+          }
+        }
+      ],
+      null,
+      true
+    )
+  })
 };
 var __vue_staticRenderFns__$4 = [];
 __vue_render__$4._withStripped = true;
@@ -1342,6 +1366,47 @@ __vue_render__$8._withStripped = true;
     undefined
   );
 
+var script = {
+  inject: ['router', 'route'],
+  data: function data() {
+    return {
+      history: this.router,
+      location: this.history.location,
+      match: this.route.match
+    };
+  }
+};
+
+/* script */
+const __vue_script__$9 = script;
+
+/* template */
+
+  /* style */
+  const __vue_inject_styles__$9 = undefined;
+  /* scoped */
+  const __vue_scope_id__$9 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$9 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$9 = undefined;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var RouterRef = normalizeComponent_1(
+    {},
+    __vue_inject_styles__$9,
+    __vue_script__$9,
+    __vue_scope_id__$9,
+    __vue_is_functional_template__$9,
+    __vue_module_identifier__$9,
+    undefined,
+    undefined
+  );
+
 /**
  * render the first matched Route
  */
@@ -1374,5 +1439,5 @@ var MatchFirst = {
   }
 };
 
-export { BrowserRouter$1 as BrowserRouter, HashRouter$1 as HashRouvter, MatchFirst, MemoryRouter$1 as MemoryRouter, Prompt$1 as Prompt, Redirect$1 as Redirect, Route$1 as Route, Router$1 as Router, RouterLink$1 as RouterLink, StaticRouter$1 as StaticRouter, generatePath, matchPath };
+export { BrowserRouter$1 as BrowserRouter, HashRouter$1 as HashRouter, MatchFirst, MemoryRouter$1 as MemoryRouter, Prompt$1 as Prompt, Redirect$1 as Redirect, Route$1 as Route, Router$1 as Router, RouterLink$1 as RouterLink, RouterRef, StaticRouter$1 as StaticRouter, createStaticHistory, generatePath, matchPath };
 //# sourceMappingURL=router.esm.js.map

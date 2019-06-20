@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { createBrowserHistory as createHistory } from "history";
+import createBrowserHistory from '../util/createBrowserHistory';
 import { assert } from '../util/utils';
 import Router from './Router.vue';
 
@@ -40,7 +40,7 @@ const BrowserRouter = {
   },
 
   data() {
-    let history = createHistory({
+    let history = createBrowserHistory({
       basename: this.basename,
       forceRefresh: this.forceRefresh,
       keyLength: this.keyLength,

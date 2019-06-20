@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { BrowserRouter as Router, Route, RouterLink } from 'vue-router-lite'
+import { HashRouter as Router, Route, RouterLink } from 'vue-router-lite'
 
 const Home = { 
   template: `
