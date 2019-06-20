@@ -63,11 +63,6 @@ var Router = {
     history: {
       type: Object,
       required: true
-    },
-    // just for static router
-    context: {
-      type: Object,
-      "default": null
     }
   },
   provide: function provide() {
@@ -79,8 +74,7 @@ var Router = {
   data: function data() {
     return {
       router: {
-        history: this.history,
-        context: this.context
+        history: this.history
       },
       route: {
         match: this.computeMatch(this.history.location.pathname)
@@ -101,9 +95,6 @@ var Router = {
   watch: {
     history: function history(val, oldVal) {
       assert(false, 'You cannot change <Router>\'s history!');
-    },
-    context: function context(val, oldVal) {
-      assert(false, 'You cannot change <Router>\'s context!');
     }
   },
   methods: {
@@ -610,6 +601,8 @@ function createStaticHistory(_ref) {
       _ref$location = _ref.location,
       location = _ref$location === void 0 ? '/' : _ref$location;
   var history = {
+    isStatic: true,
+    context: context,
     action: "POP",
     location: stripBasename(basename, createLocation(location)),
     go: staticHandler("go"),
@@ -1106,7 +1099,7 @@ var Redirect = {
   methods: {
     // if static router
     isStatic: function isStatic() {
-      return this.router && this.router.context;
+      return this.router && this.router.history.isStatic;
     },
     // to location
     computeTo: function computeTo() {

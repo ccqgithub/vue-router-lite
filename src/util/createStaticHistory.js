@@ -37,6 +37,8 @@ const noop = () => {};
 
 function createStaticHistory({ basename = '', context = {}, location = '/' }) {
   const history = {
+    isStatic: true,
+    context: context,
     action: "POP",
     location: stripBasename(basename, createLocation(location)),
     go: staticHandler("go"),

@@ -24,11 +24,6 @@ const Router = {
     history: {
       type: Object,
       required: true
-    },
-    // just for static router
-    context: {
-      type: Object,
-      default: null
     }
   },
 
@@ -42,8 +37,7 @@ const Router = {
   data() {
     return {
       router: {
-        history: this.history,
-        context: this.context
+        history: this.history
       },
       route: {
         match: this.computeMatch(this.history.location.pathname)
@@ -65,9 +59,6 @@ const Router = {
   watch: {
     history(val, oldVal) {
       assert(false, 'You cannot change <Router>\'s history!');
-    },
-    context(val, oldVal) {
-      assert(false, 'You cannot change <Router>\'s context!');
     }
   },
 

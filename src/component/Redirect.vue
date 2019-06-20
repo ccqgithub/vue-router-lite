@@ -57,7 +57,7 @@ const Redirect = {
   methods: {
     // if static router
     isStatic() {
-      return this.router && this.router.context;
+      return this.router && this.router.history.isStatic;
     },
 
     // to location
