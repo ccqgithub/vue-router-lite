@@ -7,10 +7,11 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var history = require('history');
 var pathToRegexp = _interopDefault(require('path-to-regexp'));
 
-function warning(message) {
-  if (!console || !console.warn) return;
-  console.warn("[vue-router-lite] ".concat(message));
-} // copyJson
+function assert(condition, message) {
+  if (!condition) {
+    throw new Error("[vue-router-lite] ".concat(message));
+  }
+}
 
 var resolveToLocation = function resolveToLocation(to, currentLocation) {
   return typeof to === "function" ? to(currentLocation) : to;
@@ -51,11 +52,7 @@ var Single = {
       return !!item.tag;
     });
     if (!children.length) return null;
-
-    if (children > 1) {
-      warning("The component ".concat(context.props.name || 'Single', " should have only one child!"));
-    }
-
+    assert(children.length === 1, "The component ".concat(context.props.name || 'Single', " should have only one child!"));
     return children[0];
   }
 };
@@ -108,10 +105,10 @@ var Router = {
   },
   watch: {
     history: function history(val, oldVal) {
-      warning('You cannot change <Router>\'s history!');
+      assert(false, 'You cannot change <Router>\'s history!');
     },
     context: function context(val, oldVal) {
-      warning('You cannot change <Router>\'s context!');
+      assert(false, 'You cannot change <Router>\'s context!');
     }
   },
   methods: {
@@ -466,12 +463,21 @@ var __vue_render__$3 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
-  return _c(
-    "router",
-    { attrs: { history: _vm.history } },
-    [_vm._t("default")],
-    2
-  )
+  return _c("router", {
+    attrs: { history: _vm.history },
+    scopedSlots: _vm._u(
+      [
+        {
+          key: "default",
+          fn: function(routerProps) {
+            return [_vm._t("default", null, null, routerProps)]
+          }
+        }
+      ],
+      null,
+      true
+    )
+  })
 };
 var __vue_staticRenderFns__$3 = [];
 __vue_render__$3._withStripped = true;
@@ -797,9 +803,6 @@ var Route = {
       type: Boolean,
       "default": true
     },
-    location: {
-      type: Object
-    },
     keepAlive: {
       type: [Boolean, Object]
     }
@@ -811,13 +814,11 @@ var Route = {
     };
   },
   created: function created() {
-    if (!this.router) {
-      throw new Error("You should not use <Route> outside a <Router>!");
-    }
+    assert(this.router, "You should not use <Route> outside a <Router>!");
   },
   computed: {
     computedLocation: function computedLocation() {
-      var computedLocation = this.location || this.router.history.location;
+      var computedLocation = this.router.history.location;
       return computedLocation;
     },
     computedRoute: function computedRoute() {
@@ -945,10 +946,7 @@ var Prompt = {
   },
   inject: ['$router', '$route'],
   created: function created() {
-    if (!this.$router) {
-      warning('You should not use <Prompt> outside a <Router>');
-    }
-
+    assert(this.$router, 'You should not use <Prompt> outside a <Router>');
     this.lastMessage = null;
     this.unblock = null;
   },
@@ -1068,12 +1066,9 @@ var Redirect = {
       "default": false
     }
   },
-  inject: ['$router', '$route'],
+  inject: ['router', 'route'],
   created: function created() {
-    if (!this.$router) {
-      warning('You must not use <Redirect> outside a <Router>.');
-    } // static router
-
+    assert(this.router, 'You must not use <Redirect> outside a <Router>.'); // static router
 
     if (this.isStatic()) this.perform();
   },
@@ -1093,13 +1088,12 @@ var Redirect = {
   methods: {
     // if static router
     isStatic: function isStatic() {
-      return this.$router && this.$router.context;
+      return this.router && this.router.context;
     },
     // to location
     computeTo: function computeTo() {
-      var _this$$route = this.$route,
-          match = _this$$route.match,
-          location = _this$$route.location; // to
+      var match = this.route.match;
+      var location = this.router.history.location; // to
 
       var p = this.to; // route
 
@@ -1120,7 +1114,7 @@ var Redirect = {
       return to;
     },
     perform: function perform() {
-      var history = this.$router.history; // history method
+      var history = this.router.history; // history method
 
       var method = this.push ? history.push : history.replace;
       var to = this.computeTo(); // redirect
@@ -1183,39 +1177,28 @@ var Tag = {
 var RouterLink = {
   name: 'RouterLink',
   components: {
-    Single: Single,
     Tag: Tag
   },
   props: {
-    // type
-    type: {
-      type: String,
-      "default": 'tag'
-    },
     // to path
     to: {
       type: [String, Object],
       required: true
-    },
-    // tag
-    tag: {
-      type: String,
-      "default": 'a'
-    },
-    // target
-    target: {
-      type: String,
-      "default": '_self'
     },
     // replace or push
     replace: {
       type: Boolean,
       "default": false
     },
+    // tag
+    tag: {
+      type: String,
+      "default": 'a'
+    },
     // user to check active
     exact: {
       type: Boolean,
-      "default": true
+      "default": false
     },
     // user to check active
     strict: {
@@ -1225,32 +1208,29 @@ var RouterLink = {
     // user to check active
     sensitive: {
       type: Boolean,
-      "default": false
+      "default": true
     },
     // active class name
-    activeClassName: {
+    activeClass: {
       type: String,
-      "default": ''
+      "default": 'router-link-active'
     },
-    // active style
-    activeStyle: {
-      type: Object,
-      "default": function _default() {}
+    // active class name
+    exactActiveClass: {
+      type: String,
+      "default": 'router-link-exact-active'
     },
-    // is active
-    isActive: {
-      type: Function
-    },
-    // location
-    location: {
-      type: Object
+    // navitage event
+    event: {
+      type: String,
+      "default": 'click'
     }
   },
   inject: ['router', 'route'],
   computed: {
     // current location
     currentLocation: function currentLocation() {
-      var currentLocation = this.location || this.router.history.location;
+      var currentLocation = this.router.history.location;
       return currentLocation;
     },
     // to location
@@ -1282,10 +1262,12 @@ var RouterLink = {
       }) : null;
       return match;
     },
-    // if link active
-    active: function active() {
-      var active = !!(this.isActive ? this.isActive(this.match, this.toLocation) : this.match);
-      return active;
+    classNames: function classNames() {
+      var classNames = '';
+      if (!this.match) return classNames;
+      classNames += " ".concat(this.activeClass);
+      if (this.match.exact) classNames += " ".concat(this.exactActiveClass);
+      return classNames;
     }
   },
   methods: {
@@ -1295,8 +1277,7 @@ var RouterLink = {
       var history = this.router.history;
       var replace = this.replace,
           to = this.to;
-      var location = this.location || this.router.history.location;
-      var loc = resolveToLocation(to, location);
+      var loc = resolveToLocation(to, this.currentLocation);
 
       if (replace) {
         history.replace(loc);
@@ -1306,13 +1287,7 @@ var RouterLink = {
     }
   },
   created: function created() {
-    if (!this.router) {
-      warning('You should not use <Link> outside a <Router>');
-    }
-
-    if (!this.to) {
-      throw new Error('You must specify the "to" property');
-    }
+    assert(this.router, 'You should not use <RouterLink> outside a <Router>');
   }
 };
 
@@ -1325,44 +1300,23 @@ var __vue_render__$8 = function() {
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c(
-    "single",
-    [
-      _vm.type === "slot"
-        ? _vm._t("default", null, {
-            href: _vm.href,
-            active: _vm.active,
-            match: _vm.match,
-            history: _vm.router.history
-          })
-        : _vm._e(),
-      _vm._v(" "),
-      _vm.type === "tag"
-        ? _c(
-            "tag",
-            _vm._b(
-              {
-                class: _vm.active ? _vm.activeClassName : {},
-                style: _vm.active ? _vm.activeStyle : {},
-                attrs: {
-                  tag: _vm.tag,
-                  target: _vm.target === "_self" ? false : _vm.target,
-                  href: _vm.href
-                },
-                on: {
-                  click: function($event) {
-                    return _vm.handleClick($event)
-                  }
-                }
-              },
-              "tag",
-              _vm.$attrs,
-              false
-            ),
-            [_vm._t("default")],
-            2
-          )
-        : _vm._e()
-    ],
+    "tag",
+    _vm._b(
+      {
+        class: _vm.classNames,
+        attrs: { tag: _vm.tag, href: _vm.href },
+        on: _vm._d({}, [
+          _vm.event,
+          function($event) {
+            return _vm.handleClick($event)
+          }
+        ])
+      },
+      "tag",
+      _vm.$attrs,
+      false
+    ),
+    [_vm._t("default")],
     2
   )
 };
@@ -1398,18 +1352,13 @@ __vue_render__$8._withStripped = true;
  * render the first matched Route
  */
 
-var Switch = {
-  props: {
-    location: Object
-  },
-  inject: ['$router', '$route'],
+var MatchFirst = {
+  inject: ['router', 'route'],
   beforeMount: function beforeMount() {
-    if (!this.$router) {
-      warning('You should not use <Switch> outside a <Router>');
-    }
+    assert(this.router, "You should not use <MatchFirst> outside a <Router>'");
   },
   render: function render() {
-    var location = this.location || this.$route.location;
+    var location = this.router.history.location;
     var vnode = this.$slots["default"].find(function (vnode) {
       if (!vnode.componentOptions) return false;
       if (!vnode.componentOptions.propsData) return false;
@@ -1417,12 +1366,15 @@ var Switch = {
           path = _vnode$componentOptio.path,
           exact = _vnode$componentOptio.exact,
           strict = _vnode$componentOptio.strict,
-          sensitive = _vnode$componentOptio.sensitive;
-      return matchPath(path, {
+          sensitive = _vnode$componentOptio.sensitive; // no path on route
+
+      if (typeof path === 'undefined') return true;
+      return !!matchPath(location.pathname, {
+        path: path,
         exact: exact,
         strict: strict,
         sensitive: sensitive
-      }, location);
+      });
     });
     return vnode;
   }
@@ -1430,6 +1382,7 @@ var Switch = {
 
 exports.BrowserRouter = BrowserRouter$1;
 exports.HashRouvter = HashRouter$1;
+exports.MatchFirst = MatchFirst;
 exports.MemoryRouter = MemoryRouter$1;
 exports.Prompt = Prompt$1;
 exports.Redirect = Redirect$1;
@@ -1437,7 +1390,6 @@ exports.Route = Route$1;
 exports.Router = Router$1;
 exports.RouterLink = RouterLink$1;
 exports.StaticRouter = StaticRouter$1;
-exports.Switch = Switch;
 exports.generatePath = generatePath;
 exports.matchPath = matchPath;
 //# sourceMappingURL=router.common.js.map

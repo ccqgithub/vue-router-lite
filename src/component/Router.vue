@@ -1,11 +1,15 @@
 <template>
   <single name="Router">
-    <slot :history="history" :location="history.location" :match="route.match"/>
+    <slot 
+      :history="history" 
+      :location="history.location" 
+      :match="route.match"
+    />
   </single>
 </template>
 
 <script>
-import { warning } from '../util/utils';
+import { assert } from '../util/utils';
 import Single from '../util/Single';
 
 const Router = {
@@ -60,10 +64,10 @@ const Router = {
 
   watch: {
     history(val, oldVal) {
-      warning('You cannot change <Router>\'s history!');
+      assert(false, 'You cannot change <Router>\'s history!');
     },
     context(val, oldVal) {
-      warning('You cannot change <Router>\'s context!');
+      assert(false, 'You cannot change <Router>\'s context!');
     }
   },
 

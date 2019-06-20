@@ -1,12 +1,14 @@
 <template>
   <router :history="history">
-    <slot />
+    <template v-slot:default="routerProps">
+      <slot v-bind="routerProps"/>
+    </template>
   </router>
 </template>
 
 <script>
 import { createBrowserHistory as createHistory } from "history";
-import { warning } from '../util/utils';
+import { assert } from '../util/utils';
 import Router from './Router.vue';
 
 const BrowserRouter = {

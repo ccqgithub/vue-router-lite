@@ -4,7 +4,7 @@
 
 <script>
 import { createLocation, locationsAreEqual } from "history";
-import { warning } from '../util/utils';
+import { assert } from '../util/utils';
 import generatePath from "../util/generatePath";
 import Empty from '../util/empty';
 
@@ -26,12 +26,13 @@ const Redirect = {
     }
   },
 
-  inject: ['$router', '$route'],
+  inject: ['router', 'route'],
 
   created() {
-    if (!this.$router) {
-      warning('You must not use <Redirect> outside a <Router>.');
-    }
+    assert(
+      this.router,
+      'You must not use <Redirect> outside a <Router>.'
+    );
 
     // static router
     if (this.isStatic()) this.perform();
@@ -56,12 +57,13 @@ const Redirect = {
   methods: {
     // if static router
     isStatic() {
-      return this.$router && this.$router.context;
+      return this.router && this.router.context;
     },
 
     // to location
     computeTo() {
-      const { match, location } = this.$route;
+      const { match } = this.route;
+      const { location } = this.router.history;
       // to
       let p = this.to;
       // route
@@ -88,7 +90,7 @@ const Redirect = {
     },
 
     perform() {
-      const { history } = this.$router;
+      const { history } = this.router;
 
       // history method
       const method = this.push

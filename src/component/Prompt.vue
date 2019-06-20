@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { warning } from '../util/utils';
+import { assert } from '../util/utils';
 import Empty from '../util/empty';
 
 const Prompt = {
@@ -25,9 +25,10 @@ const Prompt = {
   inject: ['$router', '$route'],
 
   created() {
-    if (!this.$router) {
-      warning('You should not use <Prompt> outside a <Router>');
-    }
+    assert(
+      this.$router,
+      'You should not use <Prompt> outside a <Router>'
+    );
 
     this.lastMessage = null;
     this.unblock = null;

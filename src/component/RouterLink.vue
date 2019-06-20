@@ -1,76 +1,52 @@
 <template>
-  <single>
-    <slot
-      v-if="type === 'slot'" 
-      :href="href"
-      :active="active"
-      :match="match"
-      :history="router.history"
-    />
-    <tag 
-      v-if="type === 'tag'"
-      v-bind="$attrs"
-      :tag="tag" 
-      :target="target === '_self' ? false : target" 
-      :href="href"
-      :style="active ? activeStyle : {}"
-      :class="active ? activeClassName : {}"
-      @click="handleClick($event)"
-    >
-      <slot />
-    </tag>
-  </single>
+  <tag
+    v-bind="$attrs"
+    :tag="tag"
+    :href="href"
+    :class="classNames"
+    @[event]="handleClick($event)"
+  >
+    <slot />
+  </tag>
 </template>
 
 <script>
 import { 
-  warning, 
+  assert, 
   resolveToLocation, 
   normalizeToLocation, 
   guardEvent 
 } from '../util/utils';
 import matchPath from '../util/matchPath';
 import Tag from '../util/Tag';
-import Single from '../util/Single';
 
 const RouterLink = {
   name: 'RouterLink',
   
   components: {
-    Single,
     Tag
   },
 
   props: {
-    // type
-    type: {
-      type: String,
-      default: 'tag'
-    },
     // to path
     to: {
       type: [String, Object],
       required: true
-    },
-    // tag
-    tag: {
-      type: String,
-      default: 'a'
-    },
-    // target
-    target: {
-      type: String,
-      default: '_self'
     },
     // replace or push
     replace: {
       type: Boolean,
       default: false
     },
+    // tag
+    tag: {
+      type: String,
+      default: 'a'
+    },
     // user to check active
     exact: {
       type: Boolean,
-      default: true
+      default: false
     },
     // user to check active
     strict: {
@@ -80,25 +56,22 @@ const RouterLink = {
     // user to check active
     sensitive: {
       type: Boolean,
-      default: false
+      default: true
     },
     // active class name
-    activeClassName: {
+    activeClass: {
       type: String,
-      default: ''
+      default: 'router-link-active'
     },
-    // active style
-    activeStyle: {
-      type: Object,
-      default: () => {}
+    // active class name
+    exactActiveClass: {
+      type: String,
+      default: 'router-link-exact-active'
     },
-    // is active
-    isActive: {
-      type: Function
-    },
-    // location
-    location: {
-      type: Object
+    // navitage event
+    event: {
+      type: String,
+      default: 'click'
     }
   },
 
@@ -107,7 +80,7 @@ const RouterLink = {
   computed: {
     // current location
     currentLocation() {
-      const currentLocation = this.location || this.router.history.location;
+      const currentLocation = this.router.history.location;
       return currentLocation;
     },
     // to location
@@ -139,12 +112,14 @@ const RouterLink = {
 
       return match;
     },
-    // if link active
-    active() {
-      const active = !!(this.isActive
-        ? this.isActive(this.match, this.toLocation)
-        : this.match);
-      return active;
+    classNames() {
+      let classNames = '';
+      if (!this.match) return classNames;
+
+      classNames += ` ${this.activeClass}`;
+      if (this.match.exact) classNames += ` ${this.exactActiveClass}`;
+      
+      return classNames;
     }
   },
 
@@ -156,8 +131,7 @@ const RouterLink = {
 
       const { history } = this.router;
       const { replace, to } = this;
-      const location = this.location || this.router.history.location;
-      const loc = resolveToLocation(to, location);
+      const loc = resolveToLocation(to, this.currentLocation);
 
       if (replace) {
         history.replace(loc);
@@ -168,13 +142,10 @@ const RouterLink = {
   },
 
   created() {
-    if (!this.router) {
-      warning('You should not use <Link> outside a <Router>');
-    }
-
-    if (!this.to) {
-      throw new Error('You must specify the "to" property');
-    }
+    assert(
+      this.router,
+      'You should not use <RouterLink> outside a <Router>'
+    );
   }
 }
 

@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { warning } from '../util/utils';
+import { assert } from '../util/utils';
 import matchPath from '../util/matchPath';
 import Single from '../util/Single';
 
@@ -47,9 +47,6 @@ const Route = {
       type: Boolean,
       default: true
     },
-    location: {
-      type: Object
-    },
     keepAlive: {
       type: [Boolean, Object]
     }
@@ -64,16 +61,15 @@ const Route = {
   },
 
   created() {
-    if (!this.router) {
-      throw new Error(
-        `You should not use <Route> outside a <Router>!`
-      );
-    }
+    assert(
+      this.router,
+      `You should not use <Route> outside a <Router>!`
+    );
   },
 
   computed: {
     computedLocation() {
-      const computedLocation = this.location || this.router.history.location;
+      const computedLocation = this.router.history.location;
       return computedLocation;
     },
     computedRoute() {

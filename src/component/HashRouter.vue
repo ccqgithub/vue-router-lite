@@ -6,7 +6,7 @@
 
 <script>
 import { createHashHistory as createHistory } from "history";
-import { warning } from '../util/utils';
+import { assert } from '../util/utils';
 import Router from './Router.vue';
 
 const HashRouter = {

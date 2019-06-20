@@ -1,4 +1,4 @@
-import { warning } from './utils';
+import { assert } from './utils';
 
 /**
  * render the single child or empty
@@ -10,9 +10,10 @@ const Single = {
 
     if (!children.length) return null;
 
-    if (children > 1) {
-      warning(`The component ${context.props.name || 'Single'} should have only one child!`);
-    }
+    assert(
+      children.length === 1, 
+      `The component ${context.props.name || 'Single'} should have only one child!`
+    );
 
     return children[0];
   }
