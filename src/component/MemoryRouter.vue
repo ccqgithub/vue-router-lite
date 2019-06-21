@@ -1,5 +1,5 @@
 <template>
-  <router :history="history">
+  <router :history="history" :component="component">
     <template v-slot:default="routerProps">
       <slot v-bind="routerProps"/>
     </template>
@@ -33,6 +33,9 @@ const MemoryRouter = {
     },
     getUserConfirmation: {
       type: Function
+    },
+    component: {
+      type: Object
     }
   },
 

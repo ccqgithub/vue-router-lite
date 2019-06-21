@@ -77,13 +77,16 @@ const Topics = {
 }
 
 const App = {
-  data: () => ({ n: 0 }),
+  data: () => {
+    return {
+      Topics,
+      About,
+      Home
+    }
+  },
   components: {
     Route, 
-    RouterLink,
-    Home,
-    About,
-    Topics
+    RouterLink
   },
   template: `
     <div id="app">
@@ -102,17 +105,9 @@ const App = {
 
       <hr />
       
-      <route exact path="/">
-        <home />
-      </route>
-      <route path="/about">
-        <about />
-      </route>
-      <route path="/topics">
-        <template v-slot:default="{ match }">
-          <topics :match="match" />
-        </template>
-      </route>
+      <route exact path="/" :component="Home" />
+      <route path="/about" :component="About" />
+      <route path="/topics" :component="Topics" />
     </div>
   `,
 

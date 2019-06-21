@@ -1,5 +1,5 @@
 <template>
-  <router :history="history">
+  <router :history="history" :component="component">
     <template v-slot:default="routerProps">
       <slot v-bind="routerProps"/>
     </template>
@@ -36,6 +36,9 @@ const BrowserRouter = {
       default(message, callback) {
         callback(window.confirm(message));
       }
+    },
+    component: {
+      type: Object
     }
   },
 

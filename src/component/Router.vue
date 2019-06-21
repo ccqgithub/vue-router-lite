@@ -1,5 +1,12 @@
 <template>
-  <single name="Router">
+  <component 
+    v-if="component" 
+    :is="component"
+    :history="history" 
+    :location="history.location" 
+    :match="route.match"
+  />
+  <single v-else name="Router">
     <slot 
       :history="history" 
       :location="history.location" 
@@ -24,6 +31,9 @@ const Router = {
     history: {
       type: Object,
       required: true
+    },
+    component: {
+      type: Object
     }
   },
 

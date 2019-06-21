@@ -63,6 +63,9 @@ var Router = {
     history: {
       type: Object,
       required: true
+    },
+    component: {
+      type: Object
     }
   },
   provide: function provide() {
@@ -202,18 +205,27 @@ var __vue_render__ = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
-  return _c(
-    "single",
-    { attrs: { name: "Router" } },
-    [
-      _vm._t("default", null, {
-        history: _vm.history,
-        location: _vm.history.location,
-        match: _vm.route.match
+  return _vm.component
+    ? _c(_vm.component, {
+        tag: "component",
+        attrs: {
+          history: _vm.history,
+          location: _vm.history.location,
+          match: _vm.route.match
+        }
       })
-    ],
-    2
-  )
+    : _c(
+        "single",
+        { attrs: { name: "Router" } },
+        [
+          _vm._t("default", null, {
+            history: _vm.history,
+            location: _vm.history.location,
+            match: _vm.route.match
+          })
+        ],
+        2
+      )
 };
 var __vue_staticRenderFns__ = [];
 __vue_render__._withStripped = true;
@@ -266,6 +278,9 @@ var MemoryRouter = {
     },
     getUserConfirmation: {
       type: Function
+    },
+    component: {
+      type: Object
     }
   },
   data: function data() {
@@ -290,7 +305,7 @@ var __vue_render__$1 = function() {
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("router", {
-    attrs: { history: _vm.history },
+    attrs: { history: _vm.history, component: _vm.component },
     scopedSlots: _vm._u(
       [
         {
@@ -354,6 +369,9 @@ var HashRouter = {
       "default": function _default(message, callback) {
         callback(window.confirm(message));
       }
+    },
+    component: {
+      type: Object
     }
   },
   data: function data() {
@@ -377,7 +395,7 @@ var __vue_render__$2 = function() {
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("router", {
-    attrs: { history: _vm.history },
+    attrs: { history: _vm.history, component: _vm.component },
     scopedSlots: _vm._u(
       [
         {
@@ -444,6 +462,9 @@ var BrowserRouter = {
       "default": function _default(message, callback) {
         callback(window.confirm(message));
       }
+    },
+    component: {
+      type: Object
     }
   },
   data: function data() {
@@ -468,7 +489,7 @@ var __vue_render__$3 = function() {
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("router", {
-    attrs: { history: _vm.history },
+    attrs: { history: _vm.history, component: _vm.component },
     scopedSlots: _vm._u(
       [
         {
@@ -653,6 +674,9 @@ var StaticRouter = {
     location: {
       type: [String, Object],
       "default": '/'
+    },
+    component: {
+      type: Object
     }
   },
   data: function data() {
@@ -676,7 +700,7 @@ var __vue_render__$4 = function() {
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("router", {
-    attrs: { history: _vm.history },
+    attrs: { history: _vm.history, component: _vm.component },
     scopedSlots: _vm._u(
       [
         {
@@ -824,6 +848,9 @@ var Route = {
     forceRender: {
       type: Boolean,
       "default": false
+    },
+    component: {
+      type: Object
     }
   },
   inject: ['router', 'route'],
@@ -884,21 +911,65 @@ var __vue_render__$5 = function() {
     { attrs: { name: "Route" } },
     [
       _vm.keepAlive
-        ? _c(
-            "keep-alive",
-            _vm._b({}, "keep-alive", _vm.keepAliveOptions, false),
-            [
-              _vm.computedRoute.match || _vm.forceRender
-                ? _vm._t("default", null, {
+        ? [
+            _vm.component
+              ? _c(
+                  "keep-alive",
+                  _vm._b({}, "keep-alive", _vm.keepAliveOptions, false),
+                  [
+                    _vm.computedRoute.match || _vm.forceRender
+                      ? _c(
+                          _vm.component,
+                          _vm._b(
+                            {
+                              tag: "component",
+                              attrs: {
+                                history: _vm.router.history,
+                                location: _vm.computedLocation,
+                                match: _vm.computedRoute.match
+                              }
+                            },
+                            "component",
+                            _vm.$attrs,
+                            false
+                          )
+                        )
+                      : _vm._e()
+                  ],
+                  1
+                )
+              : _c(
+                  "keep-alive",
+                  _vm._b({}, "keep-alive", _vm.keepAliveOptions, false),
+                  [
+                    _vm.computedRoute.match || _vm.forceRender
+                      ? _vm._t(
+                          "default",
+                          null,
+                          {
+                            history: _vm.router.history,
+                            location: _vm.computedLocation,
+                            match: _vm.computedRoute.match
+                          },
+                          _vm.$attrs
+                        )
+                      : _vm._e()
+                  ],
+                  2
+                )
+          ]
+        : [
+            _vm.computedRoute.match || _vm.forceRender
+              ? _c(_vm.component, {
+                  tag: "component",
+                  attrs: {
                     history: _vm.router.history,
                     location: _vm.computedLocation,
                     match: _vm.computedRoute.match
-                  })
-                : _vm._e()
-            ],
-            2
-          )
-        : [
+                  }
+                })
+              : _vm._e(),
+            _vm._v(" "),
             _vm.computedRoute.match || _vm.forceRender
               ? _vm._t("default", null, {
                   history: _vm.router.history,

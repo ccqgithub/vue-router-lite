@@ -1,19 +1,45 @@
 <template>
   <single name="Route">
-    <keep-alive v-if="keepAlive" v-bind="keepAliveOptions">
-      <slot 
-        :history="router.history"
-        :location="computedLocation" 
-        :match="computedRoute.match" 
-        v-if="computedRoute.match || forceRender"
-      />
-    </keep-alive>
+    <!-- keep alive -->
+    <template v-if="keepAlive">
+      <!-- component -->
+      <keep-alive v-if="component" v-bind="keepAliveOptions">
+        <component 
+          v-if="computedRoute.match || forceRender"
+          v-bind="$attrs"
+          :is="component"
+          :history="router.history"
+          :location="computedLocation" 
+          :match="computedRoute.match"
+        ></component>
+      </keep-alive>
+      <!-- slot -->
+      <keep-alive v-else v-bind="keepAliveOptions">
+        <slot 
+          v-if="computedRoute.match || forceRender"
+          v-bind="$attrs"
+          :history="router.history"
+          :location="computedLocation" 
+          :match="computedRoute.match" 
+        />
+      </keep-alive>
+    </template>
+    <!-- not keep alive -->
     <template v-else>
+      <!-- component -->
+      <component 
+        v-if="computedRoute.match || forceRender"
+        :is="component"
+        :history="router.history"
+        :location="computedLocation" 
+        :match="computedRoute.match"
+      ></component>
+      <!-- slot -->
       <slot 
+        v-if="computedRoute.match || forceRender"
         :history="router.history"
         :location="computedLocation" 
         :match="computedRoute.match" 
-        v-if="computedRoute.match || forceRender"
       />
     </template>
   </single>
@@ -53,6 +79,9 @@ const Route = {
     forceRender: {
       type: Boolean,
       default: false
+    },
+    component: {
+      type: Object
     }
   },
 
