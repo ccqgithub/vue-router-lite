@@ -570,10 +570,14 @@ var addLeadingSlash = function addLeadingSlash(path) {
   return path.charAt(0) === "/" ? path : "/" + path;
 };
 
+var removeTailSlash = function removeTailSlash(path) {
+  return path.replace(/\/+$/, '');
+};
+
 var addBasename = function addBasename(basename, location) {
   if (!basename) return location;
   return _objectSpread({}, location, {
-    pathname: addLeadingSlash(basename) + location.pathname
+    pathname: removeTailSlash(addLeadingSlash(basename)) + addLeadingSlash(location.pathname)
   });
 };
 
@@ -582,7 +586,7 @@ var stripBasename = function stripBasename(basename, location) {
   var base = addLeadingSlash(basename);
   if (location.pathname.indexOf(base) !== 0) return location;
   return _objectSpread({}, location, {
-    pathname: location.pathname.substr(base.length)
+    pathname: addLeadingSlash(location.pathname.substr(base.length))
   });
 };
 
@@ -614,7 +618,7 @@ function createStaticHistory(_ref) {
     goBack: staticHandler("goBack"),
     goForward: staticHandler("goForward"),
     createHref: function createHref(location) {
-      return addLeadingSlash(basename + createURL(location));
+      return addLeadingSlash(removeTailSlash(basename) + createURL(location));
     },
     push: function push(location) {
       context.action = "PUSH";
@@ -644,7 +648,7 @@ var StaticRouter = {
   },
   props: {
     basename: {
-      type: 'String',
+      type: String,
       "default": ''
     },
     context: {
@@ -821,6 +825,10 @@ var Route = {
     },
     keepAlive: {
       type: [Boolean, Object]
+    },
+    forceRender: {
+      type: Boolean,
+      "default": false
     }
   },
   inject: ['router', 'route'],
@@ -885,7 +893,7 @@ var __vue_render__$5 = function() {
             "keep-alive",
             _vm._b({}, "keep-alive", _vm.keepAliveOptions, false),
             [
-              _vm.computedRoute.match
+              _vm.computedRoute.match || _vm.forceRender
                 ? _vm._t("default", null, {
                     history: _vm.router.history,
                     location: _vm.computedLocation,
@@ -896,7 +904,7 @@ var __vue_render__$5 = function() {
             2
           )
         : [
-            _vm.computedRoute.match
+            _vm.computedRoute.match || _vm.forceRender
               ? _vm._t("default", null, {
                   history: _vm.router.history,
                   location: _vm.computedLocation,
@@ -960,20 +968,22 @@ var Prompt = {
       required: true
     }
   },
-  inject: ['$router', '$route'],
+  inject: ['router', 'route'],
   created: function created() {
-    assert(this.$router, 'You should not use <Prompt> outside a <Router>');
+    assert(this.router, 'You should not use <Prompt> outside a <Router>');
     this.lastMessage = null;
     this.unblock = null;
   },
   mounted: function mounted() {
     if (this.when) this.block();
   },
-  updated: function updated() {
-    if (!this.when) {
-      if (this.unblock) this.unblock();
-    } else {
-      this.block();
+  watch: {
+    when: function when(val, oldVal) {
+      if (!val) {
+        if (this.unblock) this.unblock();
+      } else {
+        this.block();
+      }
     }
   },
   methods: {
@@ -982,10 +992,10 @@ var Prompt = {
           lastMessage = this.lastMessage;
 
       if (!this.unblock) {
-        this.unblock = this.$router.history.block(message);
+        this.unblock = this.router.history.block(message);
       } else if (message !== lastMessage) {
         this.unblock();
-        this.unblock = this.$router.history.block(message);
+        this.unblock = this.router.history.block(message);
       } // last message
 
 
@@ -1092,7 +1102,7 @@ var Redirect = {
     // not static router
     if (!this.isStatic()) this.perform();
   },
-  updated: function updated() {
+  beforeUpdate: function beforeUpdate() {
     var to = this.computeTo(); // already redirect
 
     if (history.locationsAreEqual(this.lastTo, to)) {
@@ -1332,7 +1342,14 @@ var __vue_render__$8 = function() {
       _vm.$attrs,
       false
     ),
-    [_vm._t("default")],
+    [
+      _vm._t("default", null, {
+        href: _vm.href,
+        match: _vm.match,
+        history: _vm.router.history,
+        location: _vm.router.history.location
+      })
+    ],
     2
   )
 };

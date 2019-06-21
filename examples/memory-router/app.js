@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { HashRouter as Router, Route, RouterLink } from 'vue-router-lite'
+import { MemoryRouter as Router, Route, RouterLink } from 'vue-router-lite'
 
 const Home = { 
   template: `
@@ -87,7 +87,7 @@ const App = {
   },
   template: `
     <div id="app">
-      <h1>Basic: BrowserRouter</h1>
+      <h1>MemoryRouter</h1>
       <ul>
         <li>
           <router-link to="/">Home</router-link>
@@ -127,7 +127,7 @@ new Vue({
     Router
   },
   template: `
-    <router basename="/hash-router/">
+    <router basename="/memory-router/">
       <app />
     </router>
   `

@@ -43,7 +43,7 @@ const Redirect = {
     if (!this.isStatic()) this.perform();
   },
 
-  updated() {
+  beforeUpdate() {
     const to = this.computeTo();
 
     // already redirect

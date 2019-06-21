@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { HashRouter as Router, Route, RouterLink } from 'vue-router-lite'
+import { StaticRouter as Router, Route, RouterLink } from 'vue-router-lite'
 
 const Home = { 
   template: `
@@ -51,13 +51,25 @@ const Topics = {
       <h2>Topics</h2>
       <ul>
         <li>
-          <router-link :to="match.url + '/rendering'">Rendering</router-link>
+          <router-link :to="match.url + '/rendering'">
+            <template v-slot:default="{ href }">
+              Rendering: {{href}}
+            </template>
+          </router-link>
         </li>
         <li>
-          <router-link :to="match.url + '/components'">Components</router-link>
+          <router-link :to="match.url + '/components'">
+            <template v-slot:default="{ href }">
+              Components: {{href}}
+            </template>
+          </router-link>
         </li>
         <li>
-          <router-link :to="match.url + '/props-v-state'">Props v. State</router-link>
+          <router-link :to="match.url + '/props-v-state'">
+            <template v-slot:default="{ href }">
+              Props v. State: {{href}}
+            </template>
+          </router-link>
         </li>
       </ul>
 
@@ -87,16 +99,29 @@ const App = {
   },
   template: `
     <div id="app">
-      <h1>Basic: BrowserRouter</h1>
+      <h1>StaticRouter</h1>
+      <div>StaticRouter can not click to navigate, copy the href to address bar.</div>
       <ul>
         <li>
-          <router-link to="/">Home</router-link>
+          <router-link to="/">
+            <template v-slot:default="{ href }">
+              Home: {{href}}
+            </template>
+          </router-link>
         </li>
         <li>
-          <router-link to="/about">About</router-link>
+          <router-link to="/about">
+            <template v-slot:default="{ href }">
+              About: {{href}}
+            </template>
+          </router-link>
         </li>
         <li>
-          <router-link to="/topics">Topics</router-link>
+          <router-link to="/topics">
+            <template v-slot:default="{ href }">
+              Topics: {{href}}
+            </template>
+          </router-link>
         </li>
       </ul>
 
@@ -126,8 +151,16 @@ new Vue({
     App,
     Router
   },
+  data() {
+    return {
+      context: {},
+      location: {
+        pathname: window.location.pathname
+      }
+    }
+  },
   template: `
-    <router basename="/hash-router/">
+    <router basename="/static-router/" :location="location" :context="context">
       <app />
     </router>
   `

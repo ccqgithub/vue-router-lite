@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { HashRouter as Router, Route, RouterLink } from 'vue-router-lite'
+import { Router, Route, RouterLink, createBrowserHistory } from 'vue-router-lite'
 
 const Home = { 
   template: `
@@ -87,7 +87,8 @@ const App = {
   },
   template: `
     <div id="app">
-      <h1>Basic: BrowserRouter</h1>
+      <h1>Control History: Router</h1>
+      <div>Redirect to topics after 5 seconds.</div>
       <ul>
         <li>
           <router-link to="/">Home</router-link>
@@ -121,14 +122,27 @@ const App = {
   }
 }
 
+const history = createBrowserHistory({
+  basename: '/control-history/'
+})
+
 new Vue({
   components: {
     App,
     Router
   },
+  data() {
+    return {
+      history
+    }
+  },
   template: `
-    <router basename="/hash-router/">
+    <router :history="history">
       <app />
     </router>
   `
 }).$mount('#app')
+
+setTimeout(() => {
+  history.push('/topics/rendering');
+}, 5000);

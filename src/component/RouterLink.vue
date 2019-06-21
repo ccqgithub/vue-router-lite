@@ -6,7 +6,12 @@
     :class="classNames"
     @[event]="handleClick($event)"
   >
-    <slot />
+    <slot 
+      :href="href" 
+      :match="match" 
+      :history="router.history" 
+      :location="router.history.location" 
+    />
   </tag>
 </template>
 

@@ -22,11 +22,11 @@ const Prompt = {
     }
   },
 
-  inject: ['$router', '$route'],
+  inject: ['router', 'route'],
 
   created() {
     assert(
-      this.$router,
+      this.router,
       'You should not use <Prompt> outside a <Router>'
     );
 
@@ -38,11 +38,13 @@ const Prompt = {
     if(this.when) this.block(); 
   },
 
-  updated() {
-    if (!this.when) {
-      if (this.unblock) this.unblock()
-    } else {
-      this.block();
+  watch: {
+    when(val, oldVal) {
+      if (!val) {
+        if (this.unblock) this.unblock()
+      } else {
+        this.block();
+      }
     }
   },
 
@@ -51,10 +53,10 @@ const Prompt = {
       let { message, lastMessage } = this;
 
       if (!this.unblock) {
-        this.unblock = this.$router.history.block(message);
+        this.unblock = this.router.history.block(message);
       } else if (message !== lastMessage) {
         this.unblock();
-        this.unblock = this.$router.history.block(message);
+        this.unblock = this.router.history.block(message);
       }
 
       // last message

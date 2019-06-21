@@ -5,7 +5,7 @@
         :history="router.history"
         :location="computedLocation" 
         :match="computedRoute.match" 
-        v-if="computedRoute.match"
+        v-if="computedRoute.match || forceRender"
       />
     </keep-alive>
     <template v-else>
@@ -13,7 +13,7 @@
         :history="router.history"
         :location="computedLocation" 
         :match="computedRoute.match" 
-        v-if="computedRoute.match"
+        v-if="computedRoute.match || forceRender"
       />
     </template>
   </single>
@@ -49,6 +49,10 @@ const Route = {
     },
     keepAlive: {
       type: [Boolean, Object]
+    },
+    forceRender: {
+      type: Boolean,
+      default: false
     }
   },
 
@@ -75,7 +79,6 @@ const Route = {
     computedRoute() {
       const { path, strict, exact, sensitive, route } = this;
       const pathname = this.computedLocation.pathname;
-
       const match = path ? 
         matchPath(
           pathname,

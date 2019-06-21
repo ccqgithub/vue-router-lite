@@ -4,12 +4,16 @@ const addLeadingSlash = (path) => {
   return path.charAt(0) === "/" ? path : "/" + path;
 };
 
+const removeTailSlash = (path) => {
+  return path.replace(/\/+$/, '');
+}
+
 const addBasename = (basename, location) => {
   if (!basename) return location;
 
   return {
     ...location,
-    pathname: addLeadingSlash(basename) + location.pathname
+    pathname: removeTailSlash(addLeadingSlash(basename)) + addLeadingSlash(location.pathname)
   };
 };
 
@@ -22,7 +26,7 @@ const stripBasename = (basename, location) => {
 
   return {
     ...location,
-    pathname: location.pathname.substr(base.length)
+    pathname: addLeadingSlash(location.pathname.substr(base.length))
   };
 };
 
@@ -45,7 +49,7 @@ function createStaticHistory({ basename = '', context = {}, location = '/' }) {
     goBack: staticHandler("goBack"),
     goForward: staticHandler("goForward"),
     createHref: (location) => {
-      return addLeadingSlash(basename + createURL(location))
+      return addLeadingSlash(removeTailSlash(basename) + createURL(location))
     },
     push: (location) => {
       context.action = "PUSH";

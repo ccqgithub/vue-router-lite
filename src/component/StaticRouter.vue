@@ -20,7 +20,7 @@ const StaticRouter = {
   
   props: {
     basename: {
-      type: 'String',
+      type: String,
       default: ''
     },
     context: {
