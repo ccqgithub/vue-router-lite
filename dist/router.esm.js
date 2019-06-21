@@ -1260,6 +1260,9 @@ __vue_render__$7._withStripped = true;
  */
 var Tag = {
   functional: true,
+  props: {
+    tag: String
+  },
   render: function render(createElement, context) {
     return createElement(context.props.tag || 'div', context.data, context.children);
   }
@@ -1504,9 +1507,12 @@ var MatchFirst = {
       if (!vnode.componentOptions.propsData) return false;
       var _vnode$componentOptio = vnode.componentOptions.propsData,
           path = _vnode$componentOptio.path,
-          exact = _vnode$componentOptio.exact,
-          strict = _vnode$componentOptio.strict,
-          sensitive = _vnode$componentOptio.sensitive; // no path on route
+          _vnode$componentOptio2 = _vnode$componentOptio.exact,
+          exact = _vnode$componentOptio2 === void 0 ? false : _vnode$componentOptio2,
+          _vnode$componentOptio3 = _vnode$componentOptio.strict,
+          strict = _vnode$componentOptio3 === void 0 ? false : _vnode$componentOptio3,
+          _vnode$componentOptio4 = _vnode$componentOptio.sensitive,
+          sensitive = _vnode$componentOptio4 === void 0 ? true : _vnode$componentOptio4; // no path on route
 
       if (typeof path === 'undefined') return true;
       return !!matchPath(location.pathname, {

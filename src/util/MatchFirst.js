@@ -19,7 +19,8 @@ const MatchFirst = {
     const vnode = this.$slots.default.find((vnode) => {
       if (!vnode.componentOptions) return false;
       if (!vnode.componentOptions.propsData) return false;
-      const { path, exact, strict, sensitive } = vnode.componentOptions.propsData;
+      const { path, exact = false, strict = false, sensitive = true } = vnode.componentOptions.propsData;
+
       // no path on route
       if (typeof path === 'undefined') return true;
 

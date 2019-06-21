@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { BrowserRouter as Router, Route, RouterLink } from 'vue-router-lite'
+import { BrowserRouter as Router, Route, RouterLink, MatchFirst } from 'vue-router-lite'
 
 const Home = {
   template: `
@@ -25,7 +25,7 @@ const Parent = {
   },
   data () {
     return {
-      transitionName: 'slide-left',
+      // transitionName: 'slide-left',
       components: {
         Default,
         Foo,
@@ -44,11 +44,9 @@ const Parent = {
   template: `
     <div class="parent">
       <h2>Parent</h2>
-      <transition-group :name="transitionName">
-        <route :path="match.url" exact :component="Default" key="default" />
-        <route :path="match.url + '/foo'" :component="Foo" key="foo" />
-        <route :path="match.url + '/bar'" :component="Bar" key="bar" />
-      </transition-group>
+      <route :path="match.url" exact :component="components.Default" key="default" />
+      <route :path="match.url + '/foo'" :component="components.Foo" key="foo" />
+      <route :path="match.url + '/bar'" :component="components.Bar" key="bar" />
     </div>
   `
 }
@@ -56,7 +54,8 @@ const Parent = {
 const App = {
   components: {
     RouterLink,
-    Route
+    Route,
+    MatchFirst
   },
   props: {
     history: Object
@@ -66,9 +65,6 @@ const App = {
       Home,
       Parent
     }
-  },
-  created() {
-    console.log('----')
   },
   computed: {
     transitionName() {
@@ -87,10 +83,12 @@ const App = {
         <li><router-link to="/parent/foo">/parent/foo</router-link></li>
         <li><router-link to="/parent/bar">/parent/bar</router-link></li>
       </ul>
-      <transition-group :name="transitionName" tag="div">
-        <route path="/" :component="Home" key="home" exact />
-        <route path="/parent" :component="Parent" key="parent" />
-      </transition-group>
+      <transition :name="transitionName">
+        <match-first>
+          <route path="/" :component="Home" key="home" exact />
+          <route path="/parent" :component="Parent" key="parent" />
+        </match-first>
+      </transition>
     </div>
   `
 };
