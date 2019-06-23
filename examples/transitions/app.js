@@ -17,35 +17,45 @@ const Bar = { template: '<div class="bar">bar</div>' }
 const Parent = {
   props: {
     history: Object,
-    match: Object
+    match: Object,
+    location: Object
   },
   components: {
     RouterLink,
     Route,
+    MatchFirst,
     Default,
     Foo,
     Bar
   },
-  computed: {
-    transitionName() {
-      if (this.history.action === 'REPLACE') return 'fade';
-      if (this.history.action === 'PUSH') return 'slide-left';
-      if (this.history.action === 'POP') return 'slide-right';
-      return 'fade';
+  data () {
+    return {
+      transitionName: 'slide-left'
+    }
+  },
+  watch: {
+    location(val, oldVal) {
+      const toDepth = val.pathname.split('/').length
+      const fromDepth = oldVal.pathname.split('/').length
+      this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
     }
   },
   template: `
     <div class="parent">
       <h2>Parent</h2>
-      <route :path="match.url" exact key="default" v-slot="props">
-        <default v-bind="props"/>
-      </route>
-      <route :path="match.url + '/foo'" key="foo" v-slot="props">
-        <foo v-bind="props"/>
-      </route>
-      <route :path="match.url + '/bar'" key="bar" v-slot="props">
-        <bar v-bind="props"/>
-      </route>
+      <transition :name="transitionName">
+        <match-first>
+          <route :path="match.url" exact key="default" v-slot="props">
+            <default class="child-view" v-bind="props"/>
+          </route>
+          <route :path="match.url + '/foo'" key="foo" v-slot="props">
+            <foo class="child-view" v-bind="props"/>
+          </route>
+          <route :path="match.url + '/bar'" key="bar" v-slot="props">
+            <bar class="child-view" v-bind="props"/>
+          </route>
+        </match-first>
+      </transition>
     </div>
   `
 }
@@ -61,14 +71,6 @@ const App = {
   props: {
     history: Object
   },
-  computed: {
-    transitionName() {
-      if (this.history.action === 'REPLACE') return 'fade';
-      if (this.history.action === 'PUSH') return 'slide-left';
-      if (this.history.action === 'POP') return 'slide-right';
-      return 'fade';
-    }
-  },
   template: `
     <div id="app">
       <h1>Transitions</h1>
@@ -78,13 +80,16 @@ const App = {
         <li><router-link to="/parent/foo">/parent/foo</router-link></li>
         <li><router-link to="/parent/bar">/parent/bar</router-link></li>
       </ul>
-      <transition :name="transitionName">
+      <div class="pages">
+
+      </div>
+      <transition name="fade" mode="out-in">
         <match-first>
           <route path="/" key="home" exact v-slot="props">
-            <home v-bind="props"/>
+            <home class="page" v-bind="props"/>
           </route>
           <route path="/parent" key="parent" v-slot="props">
-            <parent v-bind="props"/>
+            <parent class="page" v-bind="props"/>
           </route>
         </match-first>
       </transition>

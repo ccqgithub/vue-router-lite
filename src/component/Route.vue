@@ -22,10 +22,6 @@ const Route = {
       type: Boolean,
       default: true
     },
-    keepAlive: {
-      type: [Boolean, Object],
-      default: false
-    },
     forceRender: {
       type: Boolean,
       default: false
@@ -36,7 +32,13 @@ const Route = {
 
   provide() {
     return {
-      route: this.computedRoute
+      route: { match: this.match }
+    }
+  },
+
+  data() {
+    return {
+      match: this.computedMatch()
     }
   },
 
@@ -52,43 +54,44 @@ const Route = {
       this.router,
       `You should not use <route> outside a <router>.`
     );
+
+    // new match
+    let newMatch = this.computedMatch();
+    if (!this.match || !newMatch) {
+      // old match is false or newMatch is false
+      this.match = newMatch;
+    } else {
+      Object.keys(newMatch).forEach(key => {
+        this.match[key] = newMatch[key];
+      });
+    }
   },
 
-  computed: {
-    computedLocation() {
+  methods: {
+    computedMatch() {
       const computedLocation = this.router.history.location;
-      return computedLocation;
-    },
-    computedRoute() {
       const { path, strict, exact, sensitive, route } = this;
-      const pathname = this.computedLocation.pathname;
+      const pathname = computedLocation.pathname;
       const match = path ? 
         matchPath(
           pathname,
           { path, strict, exact, sensitive }
         ) : route.match;
 
-      return { match };
-    },
-    keepAliveOptions() {
-      if (!this.keepAlive) return { include: [] };
-      if (typeof this.keepAlive === 'boolean') {
-        return {};
-      }
-      return this.keepAlive;
+      return match;
     }
   },
 
   render(createElement) {
-    const { router, computedRoute, forceRender, keepAlive, keepAliveOptions, $scopedSlots, name } = this;
+    const { router, match, forceRender, $scopedSlots, name } = this;
     const { history } = router;
 
-    if (!computedRoute.match && !forceRender) return null;
+    if (!match && !forceRender) return null;
 
     let children = $scopedSlots.default({
+      match,
       history,
-      location: history.location,
-      match: computedRoute.match
+      location: history.location
     });
     children = children.filter(isNotTextNode);
 
@@ -96,12 +99,6 @@ const Route = {
       children.length === 1, 
       `<${name}> can only be used on a single child element.`
     );
-
-    if (keepAlive) {
-      return createElement('keep-alive', keepAliveOptions, [
-        children[0]
-      ]);
-    }
 
     return children[0];
   }

@@ -802,97 +802,76 @@ var Route = {
       type: Boolean,
       "default": true
     },
-    keepAlive: {
-      type: [Boolean, Object],
-      "default": false
-    },
     forceRender: {
       type: Boolean,
       "default": false
-    },
-    component: {
-      type: [Object, String]
     }
   },
   inject: ['router', 'route'],
   provide: function provide() {
     return {
-      route: this.computedRoute
+      route: {
+        match: this.match
+      }
+    };
+  },
+  data: function data() {
+    return {
+      match: this.computedMatch()
     };
   },
   created: function created() {
     assert(this.router, "You should not use <route> outside a <router>.");
   },
   beforeUpdate: function beforeUpdate() {
-    assert(this.router, "You should not use <route> outside a <router>.");
+    var _this = this;
+
+    assert(this.router, "You should not use <route> outside a <router>."); // new match
+
+    var newMatch = this.computedMatch();
+
+    if (!this.match || !newMatch) {
+      // old match is false or newMatch is false
+      this.match = newMatch;
+    } else {
+      Object.keys(newMatch).forEach(function (key) {
+        _this.match[key] = newMatch[key];
+      });
+    }
   },
-  computed: {
-    computedLocation: function computedLocation() {
+  methods: {
+    computedMatch: function computedMatch() {
       var computedLocation = this.router.history.location;
-      return computedLocation;
-    },
-    computedRoute: function computedRoute() {
       var path = this.path,
           strict = this.strict,
           exact = this.exact,
           sensitive = this.sensitive,
           route = this.route;
-      var pathname = this.computedLocation.pathname;
+      var pathname = computedLocation.pathname;
       var match = path ? matchPath(pathname, {
         path: path,
         strict: strict,
         exact: exact,
         sensitive: sensitive
       }) : route.match;
-      return {
-        match: match
-      };
-    },
-    keepAliveOptions: function keepAliveOptions() {
-      if (!this.keepAlive) return {
-        include: []
-      };
-
-      if (typeof this.keepAlive === 'boolean') {
-        return {};
-      }
-
-      return this.keepAlive;
+      return match;
     }
   },
   render: function render(createElement) {
     var router = this.router,
-        computedRoute = this.computedRoute,
+        match = this.match,
         forceRender = this.forceRender,
-        keepAlive = this.keepAlive,
-        keepAliveOptions = this.keepAliveOptions,
         $scopedSlots = this.$scopedSlots,
         name = this.name;
     var history = router.history;
-    if (!computedRoute.match && !forceRender) return null;
-
-    if (this.component) {
-      return createElement(this.component, {
-        props: _objectSpread({}, this.$attrs, {
-          history: history,
-          location: history.location,
-          match: computedRoute.match
-        })
-      });
-    }
-
-    var children = $scopedSlots["default"](_objectSpread({}, this.$attrs, {
+    if (!match && !forceRender) return null;
+    var children = $scopedSlots["default"]({
+      match: match,
       history: history,
-      location: history.location,
-      match: computedRoute.match
-    }));
+      location: history.location
+    });
     children = children.filter(isNotTextNode);
     assert(children.length === 1, "<".concat(name, "> can only be used on a single child element."));
-
-    if (keepAlive) {
-      return createElement('keep-alive', keepAliveOptions, [children[0]]);
-    }
-
     return children[0];
   }
 };
@@ -1430,6 +1409,7 @@ var script$2 = {
   render: function render(createElement, context) {
     var router = context.injections.router;
     assert(router, "You should not use <match-first> outside a <router>'");
+    var vnodeKey = '';
     var location = router.history.location;
     var children = context.slots()["default"].filter(isNotTextNode);
     var vnode = children.find(function (vnode) {
@@ -1443,8 +1423,9 @@ var script$2 = {
           strict = _propsData$strict === void 0 ? false : _propsData$strict,
           _propsData$sensitive = propsData.sensitive,
           sensitive = _propsData$sensitive === void 0 ? true : _propsData$sensitive,
-          _propsData$key = propsData.key;
- // no path on route
+          _propsData$key = propsData.key,
+          key = _propsData$key === void 0 ? '' : _propsData$key;
+      vnodeKey = key || "path-".concat(path, "--exact-").concat(exact, "--strict-").concat(strict, "--sensitive=").concat(sensitive); // no path on route
 
       if (!path) return true;
       var match = matchPath(location.pathname, {
@@ -1455,7 +1436,7 @@ var script$2 = {
       });
       return !!match;
     });
-    vnode.key = location.pathname;
+    vnode.key = vnodeKey;
     return vnode;
   }
 };
