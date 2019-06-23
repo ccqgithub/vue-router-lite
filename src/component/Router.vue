@@ -1,30 +1,8 @@
-<template>
-  <component 
-    v-if="component" 
-    :is="component"
-    :history="history" 
-    :location="history.location" 
-    :match="route.match"
-  />
-  <single v-else name="Router">
-    <slot 
-      :history="history" 
-      :location="history.location" 
-      :match="route.match"
-    />
-  </single>
-</template>
-
 <script>
-import { assert } from '../util/utils';
-import Single from '../util/Single';
+import { assert, isNotTextNode } from '../util/utils';
 
 const Router = {
-  name: 'Router',
-
-  components: {
-    Single
-  },
+  name: 'router',
 
   props: {
     // history control
@@ -32,8 +10,10 @@ const Router = {
       type: Object,
       required: true
     },
-    component: {
-      type: Object
+    // name for debug
+    name: {
+      type: String,
+      default: 'router'
     }
   },
 
@@ -55,7 +35,7 @@ const Router = {
     };
   },
 
-  beforeMount() {
+  created() {
     const { history } = this;
     this.unlisten = history.listen(() => {
       this.route.match = this.computeMatch(history.location.pathname);
@@ -68,14 +48,29 @@ const Router = {
 
   watch: {
     history(val, oldVal) {
-      assert(false, 'You cannot change <Router>\'s history!');
+      assert(false, `You cannot change <router>\'s history!`);
     }
   },
-
   methods: {
     computeMatch(pathname) {
       return { path: "/", url: "/", params: {}, isExact: pathname === "/" };
     }
+  },
+  render(createElement) {
+    let children = this.$scopedSlots.default({
+      history: this.history,
+      location: this.history.location,
+      match: this.route.match
+    });
+
+    children = children.filter(isNotTextNode);
+  
+    assert(
+      children.length === 1, 
+      `<${this.name}> can only be used on a single child element.`
+    );
+
+    return children[0];
   }
 }
 

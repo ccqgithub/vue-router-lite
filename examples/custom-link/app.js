@@ -28,13 +28,11 @@ const OldSchoolMenuLink = {
     activeOnlyWhenExact: Boolean,
   },
   template: `
-    <route :path="to" :exact="activeOnlyWhenExact" force-render>
-      <template v-slot:default="{ match }">
-        <div :class="{ active: !!match }">
-          {{ match ? '> ' : '' }}
-          <router-link :to="to">{{ label }}</router-link>
-        </div>
-      </template>
+    <route :path="to" :exact="activeOnlyWhenExact" force-render v-slot:default="{ match }">
+      <div :class="{ active: !!match }">
+        {{ match ? '> ' : '' }}
+        <router-link :to="to">{{ label }}</router-link>
+      </div>
     </route>
   `
 }

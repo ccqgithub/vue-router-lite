@@ -1,65 +1,14 @@
-<template>
-  <single name="Route">
-    <!-- keep alive -->
-    <template v-if="keepAlive">
-      <!-- component -->
-      <keep-alive v-if="component" v-bind="keepAliveOptions">
-        <component 
-          v-if="computedRoute.match || forceRender"
-          v-bind="$attrs"
-          :is="component"
-          :history="router.history"
-          :location="computedLocation" 
-          :match="computedRoute.match"
-        ></component>
-      </keep-alive>
-      <!-- slot -->
-      <keep-alive v-else v-bind="keepAliveOptions">
-        <slot 
-          v-if="computedRoute.match || forceRender"
-          v-bind="$attrs"
-          :history="router.history"
-          :location="computedLocation" 
-          :match="computedRoute.match" 
-        />
-      </keep-alive>
-    </template>
-    <!-- not keep alive -->
-    <template v-else>
-      <!-- component -->
-      <component 
-        v-if="computedRoute.match || forceRender"
-        :is="component"
-        :history="router.history"
-        :location="computedLocation" 
-        :match="computedRoute.match"
-      ></component>
-      <!-- slot -->
-      <slot 
-        v-if="computedRoute.match || forceRender"
-        :history="router.history"
-        :location="computedLocation" 
-        :match="computedRoute.match" 
-      />
-    </template>
-  </single>
-</template>
-
 <script>
-import { assert } from '../util/utils';
+import { assert, isNotTextNode } from '../util/utils';
 import matchPath from '../util/matchPath';
-import Single from '../util/Single';
 
 const Route = {
-  name: 'Route',
-
-  components: {
-    Single
-  },
+  name: 'route',
   
   props: {
     path: {
-      type: [String, Array]
+      type: [String, Array],
+      default: ''
     },
     exact: {
       type: Boolean,
@@ -74,14 +23,12 @@ const Route = {
       default: true
     },
     keepAlive: {
-      type: [Boolean, Object]
+      type: [Boolean, Object],
+      default: false
     },
     forceRender: {
       type: Boolean,
       default: false
-    },
-    component: {
-      type: Object
     }
   },
 
@@ -96,7 +43,14 @@ const Route = {
   created() {
     assert(
       this.router,
-      `You should not use <Route> outside a <Router>!`
+      `You should not use <route> outside a <router>.`
+    );
+  },
+
+  beforeUpdate() {
+    assert(
+      this.router,
+      `You should not use <route> outside a <router>.`
     );
   },
 
@@ -123,6 +77,33 @@ const Route = {
       }
       return this.keepAlive;
     }
+  },
+
+  render(createElement) {
+    const { router, computedRoute, forceRender, keepAlive, keepAliveOptions, $scopedSlots, name } = this;
+    const { history } = router;
+
+    if (!computedRoute.match && !forceRender) return null;
+
+    let children = $scopedSlots.default({
+      history,
+      location: history.location,
+      match: computedRoute.match
+    });
+    children = children.filter(isNotTextNode);
+
+    assert(
+      children.length === 1, 
+      `<${name}> can only be used on a single child element.`
+    );
+
+    if (keepAlive) {
+      return createElement('keep-alive', keepAliveOptions, [
+        children[0]
+      ]);
+    }
+
+    return children[0];
   }
 };
 

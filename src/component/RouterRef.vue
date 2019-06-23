@@ -1,5 +1,6 @@
 <script>
 export default {
+  name: 'router-ref',
   inject: ['router', 'route'],
   data() {
     return {
@@ -7,6 +8,9 @@ export default {
       location: this.history.location,
       match: this.route.match
     };
+  },
+  render() {
+    return null;
   }
 }
 </script>

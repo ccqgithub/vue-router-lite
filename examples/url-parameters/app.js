@@ -51,16 +51,12 @@ const App = {
 
       <hr />
       
-      <route path="/:id">
-        <template v-slot:default="{ match }">
-          <child :id="match.params.id" />
-        </template>
+      <route path="/:id" v-slot:default="{ match }">
+        <child :id="match.params.id" />
       </route>
 
-      <route path="/:id(netflix|yahoo)">
-        <template v-slot:default="{ match }">
-          <child-regex :id="match.params.id" />
-        </template>
+      <route path="/:id(netflix|yahoo)" v-slot:default="{ match }">
+        <child-regex :id="match.params.id" />
       </route>
     </div>
   `,

@@ -51,32 +51,24 @@ const Topics = {
       <h2>Topics</h2>
       <ul>
         <li>
-          <router-link :to="match.url + '/rendering'">
-            <template v-slot:default="{ href }">
-              Rendering: {{href}}
-            </template>
+          <router-link :to="match.url + '/rendering'" v-slot:default="{ href }">
+            Rendering: {{href}}
           </router-link>
         </li>
         <li>
-          <router-link :to="match.url + '/components'">
-            <template v-slot:default="{ href }">
-              Components: {{href}}
-            </template>
+          <router-link :to="match.url + '/components'" v-slot:default="{ href }">
+            Components: {{href}}
           </router-link>
         </li>
         <li>
-          <router-link :to="match.url + '/props-v-state'">
-            <template v-slot:default="{ href }">
-              Props v. State: {{href}}
-            </template>
+          <router-link :to="match.url + '/props-v-state'" v-slot:default="{ href }">
+            Props v. State: {{href}}
           </router-link>
         </li>
       </ul>
 
-      <route :path="match.path + '/:topicId'">
-        <template v-slot:default="{ match }">
-          <topic :topic-id="match.params.topicId" />
-        </template>
+      <route :path="match.path + '/:topicId'" v-slot:default="{ match }">
+        <topic :topic-id="match.params.topicId" />
       </route>
       <route
         exact
@@ -103,24 +95,18 @@ const App = {
       <div>StaticRouter can not click to navigate, copy the href to address bar.</div>
       <ul>
         <li>
-          <router-link to="/">
-            <template v-slot:default="{ href }">
-              Home: {{href}}
-            </template>
+          <router-link to="/" v-slot:default="{ href }">
+            Home: {{href}}
           </router-link>
         </li>
         <li>
-          <router-link to="/about">
-            <template v-slot:default="{ href }">
-              About: {{href}}
-            </template>
+          <router-link to="/about" v-slot:default="{ href }">
+            About: {{href}}
           </router-link>
         </li>
         <li>
-          <router-link to="/topics">
-            <template v-slot:default="{ href }">
-              Topics: {{href}}
-            </template>
+          <router-link to="/topics" v-slot:default="{ href }">
+            Topics: {{href}}
           </router-link>
         </li>
       </ul>
@@ -133,10 +119,8 @@ const App = {
       <route path="/about">
         <about />
       </route>
-      <route path="/topics">
-        <template v-slot:default="{ match }">
-          <topics :match="match" />
-        </template>
+      <route path="/topics" v-slot:default="{ match }">
+        <topics :match="match" />
       </route>
     </div>
   `,

@@ -1,8 +1,6 @@
 <template>
-  <router :history="history" :component="component">
-    <template v-slot:default="routerProps">
-      <slot v-bind="routerProps"/>
-    </template>
+  <router :history="history" name="static-router" v-slot="routerProps">
+    <slot v-bind="routerProps"/>
   </router>
 </template>
 
@@ -12,7 +10,7 @@ import createStaticHistory from "../util/createStaticHistory";
 import Router from "./Router.vue";
 
 const StaticRouter = {
-  name: 'StaticRouter',
+  name: 'static-router',
 
   components: {
     Router
@@ -30,9 +28,6 @@ const StaticRouter = {
     location: {
       type: [String, Object],
       default: '/'
-    },
-    component: {
-      type: Object
     }
   },
 

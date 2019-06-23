@@ -61,10 +61,11 @@ const Topics = {
         </li>
       </ul>
 
-      <route :path="match.path + '/:topicId'">
-        <template v-slot:default="{ match }">
-          <topic :topic-id="match.params.topicId" />
-        </template>
+      <route 
+        :path="match.path + '/:topicId'" 
+        v-slot="{ match }"
+      >
+        <topic :topic-id="match.params.topicId" />
       </route>
       <route
         exact
@@ -79,14 +80,15 @@ const Topics = {
 const App = {
   data: () => {
     return {
-      Topics,
-      About,
-      Home
+      //
     }
   },
   components: {
     Route, 
-    RouterLink
+    RouterLink,
+    Topics,
+    About,
+    Home
   },
   template: `
     <div id="app">
@@ -105,9 +107,15 @@ const App = {
 
       <hr />
       
-      <route exact path="/" :component="Home" />
-      <route path="/about" :component="About" />
-      <route path="/topics" :component="Topics" />
+      <route exact path="/" v-slot="props">
+        <home v-bind="props"/>
+      </route>
+      <route path="/about" v-slot="props">
+        <about v-bind="props"/>
+      </route>
+      <route path="/topics" v-slot="props">
+        <topics v-bind="props"/>
+      </route>
     </div>
   `,
 

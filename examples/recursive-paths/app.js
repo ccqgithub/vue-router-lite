@@ -42,10 +42,8 @@ const Person = {
           <router-link :to="match.url + '/' + id">{{ find(id).name }}</router-link>
         </li>
       </ul>
-      <route :path="match.url + '/:id'" >
-        <template v-slot:default="{ match }">
-          <person :match="match" />
-        </template>
+      <route :path="match.url + '/:id'" v-slot:default="{ match }">
+        <person :match="match" />
       </route>
     </div>
   ` 

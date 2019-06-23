@@ -1,8 +1,6 @@
 <template>
-  <router :history="history" :component="component">
-    <template v-slot:default="routerProps">
-      <slot v-bind="routerProps"/>
-    </template>
+  <router :history="history" name="browser-router" v-slot="routerProps">
+    <slot v-bind="routerProps"/>
   </router>
 </template>
 
@@ -12,7 +10,7 @@ import { assert } from '../util/utils';
 import Router from './Router.vue';
 
 const BrowserRouter = {
-  name: 'BrowserRouter',
+  name: 'browser-router',
 
   components: {
     Router
@@ -36,9 +34,6 @@ const BrowserRouter = {
       default(message, callback) {
         callback(window.confirm(message));
       }
-    },
-    component: {
-      type: Object
     }
   },
 

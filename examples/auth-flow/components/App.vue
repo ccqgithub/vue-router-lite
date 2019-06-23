@@ -17,34 +17,29 @@
         <router-link to="/dashboard2">Dashboard2</router-link>
         (authenticated)
       </li>
+      <li>
+        <router-link to="/">Ohter</router-link>
+      </li>
     </ul>
 
     <match-first>
-      <route path="/dashboard">
-        <template v-slot:default="{ match, location, history }">
-          <check-login :logged-in="loggedIn">
-            <dashboard :match="match" :location="location" :history="history" />
-          </check-login>
-        </template>
+      <route path="/dashboard" v-slot:default="{ match, location, history }">
+        <check-login :logged-in="loggedIn">
+          <dashboard :match="match" :location="location" :history="history" />
+        </check-login>
       </route>
 
-      <route path="/dashboard2">
-        <template v-slot:default="{ match, location, history }">
-          <dashboard v-if="loggedIn" :match="match" :location="location" :history="history" />
-          <redirect v-else to="/"></redirect>
-        </template>
+      <route path="/dashboard2" v-slot:default="{ match, location, history }">
+        <dashboard v-if="loggedIn" :match="match" :location="location" :history="history" />
+        <redirect v-else to="/"></redirect>
       </route>
 
-      <route path="/about">
-        <template v-slot:default="{ match, location, history }">
-          <about :match="match" :location="location" :history="history" />
-        </template>
+      <route path="/about" v-slot:default="{ match, location, history }">
+        <about :match="match" :location="location" :history="history" />
       </route>
 
-      <route path="/login">
-        <template v-slot:default="{ match, location, history }">
-          <login :match="match" :location="location" :history="history" />
-        </template>
+      <route path="/login" v-slot:default="{ match, location, history }">
+        <login :match="match" :location="location" :history="history" />
       </route>
 
       <route>

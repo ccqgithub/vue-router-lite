@@ -16,7 +16,7 @@ export default {
         }
       )
     }
-    return this.$slots.default
+    return this.$slots.default[0];
   }
 }
 </script>

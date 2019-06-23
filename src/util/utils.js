@@ -50,3 +50,11 @@ export const guardEvent = (e) => {
   }
   return true;
 }
+
+export function isAsyncPlaceholder(node) {
+  return node.isComment && node.asyncFactory;
+}
+
+export function isNotTextNode(c) { 
+  return c.tag || isAsyncPlaceholder(c); 
+};

@@ -61,15 +61,10 @@ const Topics = {
         </li>
       </ul>
 
-      <route :path="match.path + '/:topicId'">
-        <template v-slot:default="{ match }">
-          <topic :topic-id="match.params.topicId" />
-        </template>
+      <route :path="match.path + '/:topicId'" v-slot="{ match }">
+        <topic :topic-id="match.params.topicId" />
       </route>
-      <route
-        exact
-        :path="match.path"
-      >
+      <route exact :path="match.path">
         <h3>Please select a topic.</h3>
       </route>
     </div>
@@ -108,10 +103,8 @@ const App = {
       <route path="/about">
         <about />
       </route>
-      <route path="/topics">
-        <template v-slot:default="{ match }">
-          <topics :match="match" />
-        </template>
+      <route path="/topics" v-slot:default="{ match }">
+        <topics :match="match" />
       </route>
     </div>
   `,
@@ -127,7 +120,7 @@ new Vue({
     Router
   },
   template: `
-    <router basename="/hash-router/">
+    <router basename="/">
       <app />
     </router>
   `

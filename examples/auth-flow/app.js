@@ -10,10 +10,8 @@ new Vue({
     Router
   },
   template: `
-    <router basename="/auth-flow/">
-      <template v-slot:default="{ match, location, history }">
-        <app :match="match" :location="location" :history="history" />
-      </template>
+    <router basename="/auth-flow/" v-slot="{ match, location, history }">
+      <app :match="match" :location="location" :history="history" />
     </router>
   `
 }).$mount('#app')

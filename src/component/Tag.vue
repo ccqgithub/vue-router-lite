@@ -1,7 +1,6 @@
-/**
- * custom tag element
- */
-const Tag = {
+<script>
+export default {
+  name: 'tag',
   functional: true,
   props: {
     tag: String
@@ -10,5 +9,4 @@ const Tag = {
     return createElement(context.props.tag || 'div', context.data, context.children);
   }
 }
-
-export default Tag;
+</script>

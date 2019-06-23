@@ -4,8 +4,8 @@ import { BrowserRouter as Router, Route, RouterLink, Redirect, MatchFirst } from
 const Home = { 
   template: `
     <p>
-      A <code>&lt;MatchFirst></code> renders the first child <code>&lt;Route></code>{{" "}}
-      that matches. A <code>&lt;Route></code> with no <code>path</code> always
+      A <code>&lt;match-first></code> renders the first child <code>&lt;route></code>{{" "}}
+      that matches. A <code>&lt;route></code> with no <code>path</code> always
       matches.
     </p>
   ` 
@@ -74,10 +74,8 @@ const App = {
           <route path="/will-match">
             <will-match />
           </route>
-          <route>
-            <template v-slot:default="{ location }">
-              <no-match :location="location" />
-            </template>
+          <route v-slot:default="{ location }">
+            <no-match :location="location" />
           </route>
         </match-first>
       </div>

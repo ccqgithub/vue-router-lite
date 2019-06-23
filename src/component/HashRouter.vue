@@ -1,8 +1,6 @@
 <template>
-  <router :history="history" :component="component">
-    <template v-slot:default="routerProps">
-      <slot v-bind="routerProps"/>
-    </template>
+  <router :history="history" name="hash-router" v-slot="routerProps">
+    <slot v-bind="routerProps"/>
   </router>
 </template>
 
@@ -12,7 +10,7 @@ import { assert } from '../util/utils';
 import Router from './Router.vue';
 
 const HashRouter = {
-  name: 'HashRouter',
+  name: 'hash-router',
 
   components: {
     Router
@@ -33,9 +31,6 @@ const HashRouter = {
       default(message, callback) {
         callback(window.confirm(message));
       }
-    },
-    component: {
-      type: Object
     }
   },
 

@@ -1,15 +1,8 @@
-<template>
-  <empty />
-</template>
-
 <script>
 import { assert } from '../util/utils';
-import Empty from '../util/empty';
 
 const Prompt = {
-  components: {
-    Empty
-  },
+  name: 'prompt',
 
   props: {
     when: {
@@ -27,11 +20,18 @@ const Prompt = {
   created() {
     assert(
       this.router,
-      'You should not use <Prompt> outside a <Router>'
+      'You should not use <prompt> outside a <router>'
     );
 
     this.lastMessage = null;
     this.unblock = null;
+  },
+
+  beforeUpdate() {
+    assert(
+      this.router,
+      'You should not use <prompt> outside a <router>'
+    );
   },
 
   mounted() {
@@ -66,6 +66,10 @@ const Prompt = {
 
   beforeDestroy() {
     if (this.unblock) this.unblock();
+  },
+
+  render() {
+    return null;
   }
 }
 

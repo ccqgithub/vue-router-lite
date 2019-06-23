@@ -8,7 +8,8 @@ import Prompt from './component/Prompt.vue';
 import Redirect from './component/Redirect.vue';
 import RouterLink from './component/RouterLink.vue';
 import RouterRef from './component/RouterRef.vue';
-import MatchFirst from './util/MatchFirst';
+import MatchFirst from './component/MatchFirst.vue';
+
 import generatePath from './util/generatePath';
 import matchPath from './util/matchPath';
 import createBrowserHistory from './util/createBrowserHistory';
@@ -28,6 +29,7 @@ export {
   RouterLink,
   RouterRef,
   MatchFirst,
+  
   generatePath,
   matchPath,
   createBrowserHistory,

@@ -1,17 +1,10 @@
-<template>
-  <empty />
-</template>
-
 <script>
 import { createLocation, locationsAreEqual } from "history";
 import { assert } from '../util/utils';
 import generatePath from "../util/generatePath";
-import Empty from '../util/empty';
 
 const Redirect = {
-  components: {
-    Empty
-  },
+  name: 'redirect',
 
   props: {
     // to path
@@ -31,7 +24,7 @@ const Redirect = {
   created() {
     assert(
       this.router,
-      'You must not use <Redirect> outside a <Router>.'
+      'You must not use <redirect> outside a <router>.'
     );
 
     // static router
@@ -44,6 +37,11 @@ const Redirect = {
   },
 
   beforeUpdate() {
+    assert(
+      this.router,
+      'You must not use <redirect> outside a <router>.'
+    );
+
     const to = this.computeTo();
 
     // already redirect
@@ -103,6 +101,10 @@ const Redirect = {
       this.lastTo = to;
       method(to);
     }
+  },
+
+  render() {
+    return null;
   }
 }
 

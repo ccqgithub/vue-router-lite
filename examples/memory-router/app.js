@@ -61,10 +61,8 @@ const Topics = {
         </li>
       </ul>
 
-      <route :path="match.path + '/:topicId'">
-        <template v-slot:default="{ match }">
-          <topic :topic-id="match.params.topicId" />
-        </template>
+      <route :path="match.path + '/:topicId'" v-slot:default="{ match }">>
+        <topic :topic-id="match.params.topicId" />
       </route>
       <route
         exact
@@ -108,10 +106,8 @@ const App = {
       <route path="/about">
         <about />
       </route>
-      <route path="/topics">
-        <template v-slot:default="{ match }">
-          <topics :match="match" />
-        </template>
+      <route path="/topics" v-slot:default="{ match }">
+        <topics :match="match" />
       </route>
     </div>
   `,

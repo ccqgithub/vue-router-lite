@@ -70,8 +70,10 @@ const App = {
             :key="index"
             :path="route.path"
             :exact="route.exact"
-            :component="route.sidebar"
-          />
+            v-slot="props"
+          >
+            <component :is="route.sidebar" v-bind="props"></component>
+          </route>
         </div>
 
         <div :style="{ flex: 1, padding: '10px' }">
@@ -80,8 +82,10 @@ const App = {
             :key="index"
             :path="route.path"
             :exact="route.exact"
-            :component="route.main"
-          />
+            v-slot="props"
+          >
+            <component :is="route.main" v-bind="props"></component>
+          </route>
         </div>
       </div>
     </div>

@@ -40,37 +40,25 @@ var guardEvent = function guardEvent(e) {
 
   return true;
 };
+function isAsyncPlaceholder(node) {
+  return node.isComment && node.asyncFactory;
+}
+function isNotTextNode(c) {
+  return c.tag || isAsyncPlaceholder(c);
+}
 
-/**
- * render the single child or empty
- */
-
-var Single = {
-  functional: true,
-  render: function render(createElement, context) {
-    var children = context.children.filter(function (item) {
-      return !!item.tag;
-    });
-    if (!children.length) return null;
-    assert(children.length === 1, "The component ".concat(context.props.name || 'Single', " should have only one child!"));
-    return children[0];
-  }
-};
-
-//
 var Router = {
-  name: 'Router',
-  components: {
-    Single: Single
-  },
+  name: 'router',
   props: {
     // history control
     history: {
       type: Object,
       required: true
     },
-    component: {
-      type: Object
+    // name for debug
+    name: {
+      type: String,
+      "default": 'router'
     }
   },
   provide: function provide() {
@@ -89,7 +77,7 @@ var Router = {
       }
     };
   },
-  beforeMount: function beforeMount() {
+  created: function created() {
     var _this = this;
 
     var history = this.history;
@@ -102,7 +90,7 @@ var Router = {
   },
   watch: {
     history: function history(val, oldVal) {
-      assert(false, 'You cannot change <Router>\'s history!');
+      assert(false, "You cannot change <router>'s history!");
     }
   },
   methods: {
@@ -114,6 +102,16 @@ var Router = {
         isExact: pathname === "/"
       };
     }
+  },
+  render: function render(createElement) {
+    var children = this.$scopedSlots["default"]({
+      history: this.history,
+      location: this.history.location,
+      match: this.route.match
+    });
+    children = children.filter(isNotTextNode);
+    assert(children.length === 1, "<".concat(this.name, "> can only be used on a single child element."));
+    return children[0];
   }
 };
 
@@ -206,34 +204,6 @@ var normalizeComponent_1 = normalizeComponent;
 const __vue_script__ = Router;
 
 /* template */
-var __vue_render__ = function() {
-  var _vm = this;
-  var _h = _vm.$createElement;
-  var _c = _vm._self._c || _h;
-  return _vm.component
-    ? _c(_vm.component, {
-        tag: "component",
-        attrs: {
-          history: _vm.history,
-          location: _vm.history.location,
-          match: _vm.route.match
-        }
-      })
-    : _c(
-        "single",
-        { attrs: { name: "Router" } },
-        [
-          _vm._t("default", null, {
-            history: _vm.history,
-            location: _vm.history.location,
-            match: _vm.route.match
-          })
-        ],
-        2
-      )
-};
-var __vue_staticRenderFns__ = [];
-__vue_render__._withStripped = true;
 
   /* style */
   const __vue_inject_styles__ = undefined;
@@ -242,7 +212,7 @@ __vue_render__._withStripped = true;
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
-  const __vue_is_functional_template__ = false;
+  const __vue_is_functional_template__ = undefined;
   /* style inject */
   
   /* style inject SSR */
@@ -250,7 +220,7 @@ __vue_render__._withStripped = true;
 
   
   var Router$1 = normalizeComponent_1(
-    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
+    {},
     __vue_inject_styles__,
     __vue_script__,
     __vue_scope_id__,
@@ -262,7 +232,7 @@ __vue_render__._withStripped = true;
 
 //
 var MemoryRouter = {
-  name: 'MemoryRouter',
+  name: 'memory-router',
   components: {
     Router: Router$1
   },
@@ -283,9 +253,6 @@ var MemoryRouter = {
     },
     getUserConfirmation: {
       type: Function
-    },
-    component: {
-      type: Object
     }
   },
   data: function data() {
@@ -305,12 +272,12 @@ var MemoryRouter = {
 const __vue_script__$1 = MemoryRouter;
 
 /* template */
-var __vue_render__$1 = function() {
+var __vue_render__ = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("router", {
-    attrs: { history: _vm.history, component: _vm.component },
+    attrs: { history: _vm.history, name: "memory-router" },
     scopedSlots: _vm._u(
       [
         {
@@ -325,8 +292,8 @@ var __vue_render__$1 = function() {
     )
   })
 };
-var __vue_staticRenderFns__$1 = [];
-__vue_render__$1._withStripped = true;
+var __vue_staticRenderFns__ = [];
+__vue_render__._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$1 = undefined;
@@ -343,7 +310,7 @@ __vue_render__$1._withStripped = true;
 
   
   var MemoryRouter$1 = normalizeComponent_1(
-    { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
+    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
     __vue_inject_styles__$1,
     __vue_script__$1,
     __vue_scope_id__$1,
@@ -355,7 +322,7 @@ __vue_render__$1._withStripped = true;
 
 //
 var HashRouter = {
-  name: 'HashRouter',
+  name: 'hash-router',
   components: {
     Router: Router$1
   },
@@ -374,9 +341,6 @@ var HashRouter = {
       "default": function _default(message, callback) {
         callback(window.confirm(message));
       }
-    },
-    component: {
-      type: Object
     }
   },
   data: function data() {
@@ -395,12 +359,12 @@ var HashRouter = {
 const __vue_script__$2 = HashRouter;
 
 /* template */
-var __vue_render__$2 = function() {
+var __vue_render__$1 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("router", {
-    attrs: { history: _vm.history, component: _vm.component },
+    attrs: { history: _vm.history, name: "hash-router" },
     scopedSlots: _vm._u(
       [
         {
@@ -415,8 +379,8 @@ var __vue_render__$2 = function() {
     )
   })
 };
-var __vue_staticRenderFns__$2 = [];
-__vue_render__$2._withStripped = true;
+var __vue_staticRenderFns__$1 = [];
+__vue_render__$1._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$2 = undefined;
@@ -433,7 +397,7 @@ __vue_render__$2._withStripped = true;
 
   
   var HashRouter$1 = normalizeComponent_1(
-    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
+    { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
     __vue_inject_styles__$2,
     __vue_script__$2,
     __vue_scope_id__$2,
@@ -445,7 +409,7 @@ __vue_render__$2._withStripped = true;
 
 //
 var BrowserRouter = {
-  name: 'BrowserRouter',
+  name: 'browser-router',
   components: {
     Router: Router$1
   },
@@ -467,9 +431,6 @@ var BrowserRouter = {
       "default": function _default(message, callback) {
         callback(window.confirm(message));
       }
-    },
-    component: {
-      type: Object
     }
   },
   data: function data() {
@@ -489,12 +450,12 @@ var BrowserRouter = {
 const __vue_script__$3 = BrowserRouter;
 
 /* template */
-var __vue_render__$3 = function() {
+var __vue_render__$2 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("router", {
-    attrs: { history: _vm.history, component: _vm.component },
+    attrs: { history: _vm.history, name: "browser-router" },
     scopedSlots: _vm._u(
       [
         {
@@ -509,8 +470,8 @@ var __vue_render__$3 = function() {
     )
   })
 };
-var __vue_staticRenderFns__$3 = [];
-__vue_render__$3._withStripped = true;
+var __vue_staticRenderFns__$2 = [];
+__vue_render__$2._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$3 = undefined;
@@ -527,7 +488,7 @@ __vue_render__$3._withStripped = true;
 
   
   var BrowserRouter$1 = normalizeComponent_1(
-    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
+    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
     __vue_inject_styles__$3,
     __vue_script__$3,
     __vue_scope_id__$3,
@@ -663,7 +624,7 @@ function createStaticHistory(_ref) {
 
 //
 var StaticRouter = {
-  name: 'StaticRouter',
+  name: 'static-router',
   components: {
     Router: Router$1
   },
@@ -679,9 +640,6 @@ var StaticRouter = {
     location: {
       type: [String, Object],
       "default": '/'
-    },
-    component: {
-      type: Object
     }
   },
   data: function data() {
@@ -700,12 +658,12 @@ var StaticRouter = {
 const __vue_script__$4 = StaticRouter;
 
 /* template */
-var __vue_render__$4 = function() {
+var __vue_render__$3 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
   return _c("router", {
-    attrs: { history: _vm.history, component: _vm.component },
+    attrs: { history: _vm.history, name: "static-router" },
     scopedSlots: _vm._u(
       [
         {
@@ -720,8 +678,8 @@ var __vue_render__$4 = function() {
     )
   })
 };
-var __vue_staticRenderFns__$4 = [];
-__vue_render__$4._withStripped = true;
+var __vue_staticRenderFns__$3 = [];
+__vue_render__$3._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$4 = undefined;
@@ -738,7 +696,7 @@ __vue_render__$4._withStripped = true;
 
   
   var StaticRouter$1 = normalizeComponent_1(
-    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
     __vue_inject_styles__$4,
     __vue_script__$4,
     __vue_scope_id__$4,
@@ -825,15 +783,12 @@ function matchPath(pathname) {
   }, null);
 }
 
-//
 var Route = {
-  name: 'Route',
-  components: {
-    Single: Single
-  },
+  name: 'route',
   props: {
     path: {
-      type: [String, Array]
+      type: [String, Array],
+      "default": ''
     },
     exact: {
       type: Boolean,
@@ -848,14 +803,15 @@ var Route = {
       "default": true
     },
     keepAlive: {
-      type: [Boolean, Object]
+      type: [Boolean, Object],
+      "default": false
     },
     forceRender: {
       type: Boolean,
       "default": false
     },
     component: {
-      type: Object
+      type: [Object, String]
     }
   },
   inject: ['router', 'route'],
@@ -865,7 +821,10 @@ var Route = {
     };
   },
   created: function created() {
-    assert(this.router, "You should not use <Route> outside a <Router>!");
+    assert(this.router, "You should not use <route> outside a <router>.");
+  },
+  beforeUpdate: function beforeUpdate() {
+    assert(this.router, "You should not use <route> outside a <router>.");
   },
   computed: {
     computedLocation: function computedLocation() {
@@ -900,6 +859,41 @@ var Route = {
 
       return this.keepAlive;
     }
+  },
+  render: function render(createElement) {
+    var router = this.router,
+        computedRoute = this.computedRoute,
+        forceRender = this.forceRender,
+        keepAlive = this.keepAlive,
+        keepAliveOptions = this.keepAliveOptions,
+        $scopedSlots = this.$scopedSlots,
+        name = this.name;
+    var history = router.history;
+    if (!computedRoute.match && !forceRender) return null;
+
+    if (this.component) {
+      return createElement(this.component, {
+        props: _objectSpread({}, this.$attrs, {
+          history: history,
+          location: history.location,
+          match: computedRoute.match
+        })
+      });
+    }
+
+    var children = $scopedSlots["default"](_objectSpread({}, this.$attrs, {
+      history: history,
+      location: history.location,
+      match: computedRoute.match
+    }));
+    children = children.filter(isNotTextNode);
+    assert(children.length === 1, "<".concat(name, "> can only be used on a single child element."));
+
+    if (keepAlive) {
+      return createElement('keep-alive', keepAliveOptions, [children[0]]);
+    }
+
+    return children[0];
   }
 };
 
@@ -907,88 +901,6 @@ var Route = {
 const __vue_script__$5 = Route;
 
 /* template */
-var __vue_render__$5 = function() {
-  var _vm = this;
-  var _h = _vm.$createElement;
-  var _c = _vm._self._c || _h;
-  return _c(
-    "single",
-    { attrs: { name: "Route" } },
-    [
-      _vm.keepAlive
-        ? [
-            _vm.component
-              ? _c(
-                  "keep-alive",
-                  _vm._b({}, "keep-alive", _vm.keepAliveOptions, false),
-                  [
-                    _vm.computedRoute.match || _vm.forceRender
-                      ? _c(
-                          _vm.component,
-                          _vm._b(
-                            {
-                              tag: "component",
-                              attrs: {
-                                history: _vm.router.history,
-                                location: _vm.computedLocation,
-                                match: _vm.computedRoute.match
-                              }
-                            },
-                            "component",
-                            _vm.$attrs,
-                            false
-                          )
-                        )
-                      : _vm._e()
-                  ],
-                  1
-                )
-              : _c(
-                  "keep-alive",
-                  _vm._b({}, "keep-alive", _vm.keepAliveOptions, false),
-                  [
-                    _vm.computedRoute.match || _vm.forceRender
-                      ? _vm._t(
-                          "default",
-                          null,
-                          {
-                            history: _vm.router.history,
-                            location: _vm.computedLocation,
-                            match: _vm.computedRoute.match
-                          },
-                          _vm.$attrs
-                        )
-                      : _vm._e()
-                  ],
-                  2
-                )
-          ]
-        : [
-            _vm.computedRoute.match || _vm.forceRender
-              ? _c(_vm.component, {
-                  tag: "component",
-                  attrs: {
-                    history: _vm.router.history,
-                    location: _vm.computedLocation,
-                    match: _vm.computedRoute.match
-                  }
-                })
-              : _vm._e(),
-            _vm._v(" "),
-            _vm.computedRoute.match || _vm.forceRender
-              ? _vm._t("default", null, {
-                  history: _vm.router.history,
-                  location: _vm.computedLocation,
-                  match: _vm.computedRoute.match
-                })
-              : _vm._e()
-          ]
-    ],
-    2
-  )
-};
-var __vue_staticRenderFns__$5 = [];
-__vue_render__$5._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$5 = undefined;
@@ -997,7 +909,7 @@ __vue_render__$5._withStripped = true;
   /* module identifier */
   const __vue_module_identifier__$5 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$5 = false;
+  const __vue_is_functional_template__$5 = undefined;
   /* style inject */
   
   /* style inject SSR */
@@ -1005,7 +917,7 @@ __vue_render__$5._withStripped = true;
 
   
   var Route$1 = normalizeComponent_1(
-    { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+    {},
     __vue_inject_styles__$5,
     __vue_script__$5,
     __vue_scope_id__$5,
@@ -1015,20 +927,8 @@ __vue_render__$5._withStripped = true;
     undefined
   );
 
-/**
- * Used for conditional rendering in template. 
- */
-var Empty = {
-  render: function render() {
-    return null;
-  }
-};
-
-//
 var Prompt = {
-  components: {
-    Empty: Empty
-  },
+  name: 'prompt',
   props: {
     when: {
       type: Boolean,
@@ -1041,9 +941,12 @@ var Prompt = {
   },
   inject: ['router', 'route'],
   created: function created() {
-    assert(this.router, 'You should not use <Prompt> outside a <Router>');
+    assert(this.router, 'You should not use <prompt> outside a <router>');
     this.lastMessage = null;
     this.unblock = null;
+  },
+  beforeUpdate: function beforeUpdate() {
+    assert(this.router, 'You should not use <prompt> outside a <router>');
   },
   mounted: function mounted() {
     if (this.when) this.block();
@@ -1075,6 +978,9 @@ var Prompt = {
   },
   beforeDestroy: function beforeDestroy() {
     if (this.unblock) this.unblock();
+  },
+  render: function render() {
+    return null;
   }
 };
 
@@ -1082,14 +988,6 @@ var Prompt = {
 const __vue_script__$6 = Prompt;
 
 /* template */
-var __vue_render__$6 = function() {
-  var _vm = this;
-  var _h = _vm.$createElement;
-  var _c = _vm._self._c || _h;
-  return _c("empty")
-};
-var __vue_staticRenderFns__$6 = [];
-__vue_render__$6._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$6 = undefined;
@@ -1098,7 +996,7 @@ __vue_render__$6._withStripped = true;
   /* module identifier */
   const __vue_module_identifier__$6 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$6 = false;
+  const __vue_is_functional_template__$6 = undefined;
   /* style inject */
   
   /* style inject SSR */
@@ -1106,7 +1004,7 @@ __vue_render__$6._withStripped = true;
 
   
   var Prompt$1 = normalizeComponent_1(
-    { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
+    {},
     __vue_inject_styles__$6,
     __vue_script__$6,
     __vue_scope_id__$6,
@@ -1148,9 +1046,7 @@ function generatePath() {
 }
 
 var Redirect = {
-  components: {
-    Empty: Empty
-  },
+  name: 'redirect',
   props: {
     // to path
     to: {
@@ -1165,7 +1061,7 @@ var Redirect = {
   },
   inject: ['router', 'route'],
   created: function created() {
-    assert(this.router, 'You must not use <Redirect> outside a <Router>.'); // static router
+    assert(this.router, 'You must not use <redirect> outside a <router>.'); // static router
 
     if (this.isStatic()) this.perform();
   },
@@ -1174,6 +1070,7 @@ var Redirect = {
     if (!this.isStatic()) this.perform();
   },
   beforeUpdate: function beforeUpdate() {
+    assert(this.router, 'You must not use <redirect> outside a <router>.');
     var to = this.computeTo(); // already redirect
 
     if (history.locationsAreEqual(this.lastTo, to)) {
@@ -1219,6 +1116,9 @@ var Redirect = {
       this.lastTo = to;
       method(to);
     }
+  },
+  render: function render() {
+    return null;
   }
 };
 
@@ -1226,14 +1126,6 @@ var Redirect = {
 const __vue_script__$7 = Redirect;
 
 /* template */
-var __vue_render__$7 = function() {
-  var _vm = this;
-  var _h = _vm.$createElement;
-  var _c = _vm._self._c || _h;
-  return _c("empty")
-};
-var __vue_staticRenderFns__$7 = [];
-__vue_render__$7._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$7 = undefined;
@@ -1242,7 +1134,7 @@ __vue_render__$7._withStripped = true;
   /* module identifier */
   const __vue_module_identifier__$7 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$7 = false;
+  const __vue_is_functional_template__$7 = undefined;
   /* style inject */
   
   /* style inject SSR */
@@ -1250,7 +1142,7 @@ __vue_render__$7._withStripped = true;
 
   
   var Redirect$1 = normalizeComponent_1(
-    { render: __vue_render__$7, staticRenderFns: __vue_staticRenderFns__$7 },
+    {},
     __vue_inject_styles__$7,
     __vue_script__$7,
     __vue_scope_id__$7,
@@ -1260,10 +1152,8 @@ __vue_render__$7._withStripped = true;
     undefined
   );
 
-/**
- * custom tag element
- */
-var Tag = {
+var script = {
+  name: 'tag',
   functional: true,
   props: {
     tag: String
@@ -1273,9 +1163,39 @@ var Tag = {
   }
 };
 
+/* script */
+const __vue_script__$8 = script;
+
+/* template */
+
+  /* style */
+  const __vue_inject_styles__$8 = undefined;
+  /* scoped */
+  const __vue_scope_id__$8 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$8 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$8 = undefined;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var Tag = normalizeComponent_1(
+    {},
+    __vue_inject_styles__$8,
+    __vue_script__$8,
+    __vue_scope_id__$8,
+    __vue_is_functional_template__$8,
+    __vue_module_identifier__$8,
+    undefined,
+    undefined
+  );
+
 //
 var RouterLink = {
-  name: 'RouterLink',
+  name: 'router-link',
   components: {
     Tag: Tag
   },
@@ -1387,15 +1307,18 @@ var RouterLink = {
     }
   },
   created: function created() {
-    assert(this.router, 'You should not use <RouterLink> outside a <Router>');
+    assert(this.router, 'You should not use <router-link> outside a <router>');
+  },
+  beforeUpdate: function beforeUpdate() {
+    assert(this.router, 'You should not use <router-link> outside a <router>');
   }
 };
 
 /* script */
-const __vue_script__$8 = RouterLink;
+const __vue_script__$9 = RouterLink;
 
 /* template */
-var __vue_render__$8 = function() {
+var __vue_render__$4 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1427,49 +1350,8 @@ var __vue_render__$8 = function() {
     2
   )
 };
-var __vue_staticRenderFns__$8 = [];
-__vue_render__$8._withStripped = true;
-
-  /* style */
-  const __vue_inject_styles__$8 = undefined;
-  /* scoped */
-  const __vue_scope_id__$8 = undefined;
-  /* module identifier */
-  const __vue_module_identifier__$8 = undefined;
-  /* functional template */
-  const __vue_is_functional_template__$8 = false;
-  /* style inject */
-  
-  /* style inject SSR */
-  
-
-  
-  var RouterLink$1 = normalizeComponent_1(
-    { render: __vue_render__$8, staticRenderFns: __vue_staticRenderFns__$8 },
-    __vue_inject_styles__$8,
-    __vue_script__$8,
-    __vue_scope_id__$8,
-    __vue_is_functional_template__$8,
-    __vue_module_identifier__$8,
-    undefined,
-    undefined
-  );
-
-var script = {
-  inject: ['router', 'route'],
-  data: function data() {
-    return {
-      history: this.router,
-      location: this.history.location,
-      match: this.route.match
-    };
-  }
-};
-
-/* script */
-const __vue_script__$9 = script;
-
-/* template */
+var __vue_staticRenderFns__$4 = [];
+__vue_render__$4._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$9 = undefined;
@@ -1478,15 +1360,15 @@ const __vue_script__$9 = script;
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$9 = undefined;
+  const __vue_is_functional_template__$9 = false;
   /* style inject */
   
   /* style inject SSR */
   
 
   
-  var RouterRef = normalizeComponent_1(
-    {},
+  var RouterLink$1 = normalizeComponent_1(
+    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
     __vue_inject_styles__$9,
     __vue_script__$9,
     __vue_scope_id__$9,
@@ -1496,40 +1378,117 @@ const __vue_script__$9 = script;
     undefined
   );
 
-/**
- * render the first matched Route
- */
-
-var MatchFirst = {
+var script$1 = {
+  name: 'router-ref',
   inject: ['router', 'route'],
-  beforeMount: function beforeMount() {
-    assert(this.router, "You should not use <MatchFirst> outside a <Router>'");
+  data: function data() {
+    return {
+      history: this.router,
+      location: this.history.location,
+      match: this.route.match
+    };
   },
   render: function render() {
-    var location = this.router.history.location;
-    var vnode = this.$slots["default"].find(function (vnode) {
-      if (!vnode.componentOptions) return false;
-      if (!vnode.componentOptions.propsData) return false;
-      var _vnode$componentOptio = vnode.componentOptions.propsData,
-          path = _vnode$componentOptio.path,
-          _vnode$componentOptio2 = _vnode$componentOptio.exact,
-          exact = _vnode$componentOptio2 === void 0 ? false : _vnode$componentOptio2,
-          _vnode$componentOptio3 = _vnode$componentOptio.strict,
-          strict = _vnode$componentOptio3 === void 0 ? false : _vnode$componentOptio3,
-          _vnode$componentOptio4 = _vnode$componentOptio.sensitive,
-          sensitive = _vnode$componentOptio4 === void 0 ? true : _vnode$componentOptio4; // no path on route
+    return null;
+  }
+};
 
-      if (typeof path === 'undefined') return true;
-      return !!matchPath(location.pathname, {
+/* script */
+const __vue_script__$a = script$1;
+
+/* template */
+
+  /* style */
+  const __vue_inject_styles__$a = undefined;
+  /* scoped */
+  const __vue_scope_id__$a = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$a = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$a = undefined;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var RouterRef = normalizeComponent_1(
+    {},
+    __vue_inject_styles__$a,
+    __vue_script__$a,
+    __vue_scope_id__$a,
+    __vue_is_functional_template__$a,
+    __vue_module_identifier__$a,
+    undefined,
+    undefined
+  );
+
+var script$2 = {
+  name: 'match-first',
+  functional: true,
+  inject: ['router', 'route'],
+  render: function render(createElement, context) {
+    var router = context.injections.router;
+    assert(router, "You should not use <match-first> outside a <router>'");
+    var location = router.history.location;
+    var children = context.slots()["default"].filter(isNotTextNode);
+    var vnode = children.find(function (vnode) {
+      if (!vnode.componentOptions) return false;
+      var propsData = vnode.componentOptions.propsData || {};
+      var _propsData$path = propsData.path,
+          path = _propsData$path === void 0 ? '' : _propsData$path,
+          _propsData$exact = propsData.exact,
+          exact = _propsData$exact === void 0 ? false : _propsData$exact,
+          _propsData$strict = propsData.strict,
+          strict = _propsData$strict === void 0 ? false : _propsData$strict,
+          _propsData$sensitive = propsData.sensitive,
+          sensitive = _propsData$sensitive === void 0 ? true : _propsData$sensitive,
+          _propsData$key = propsData.key;
+ // no path on route
+
+      if (!path) return true;
+      var match = matchPath(location.pathname, {
         path: path,
         exact: exact,
         strict: strict,
         sensitive: sensitive
       });
+      return !!match;
     });
+    vnode.key = location.pathname;
     return vnode;
   }
 };
+
+/* script */
+const __vue_script__$b = script$2;
+
+/* template */
+
+  /* style */
+  const __vue_inject_styles__$b = undefined;
+  /* scoped */
+  const __vue_scope_id__$b = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$b = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$b = undefined;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var MatchFirst = normalizeComponent_1(
+    {},
+    __vue_inject_styles__$b,
+    __vue_script__$b,
+    __vue_scope_id__$b,
+    __vue_is_functional_template__$b,
+    __vue_module_identifier__$b,
+    undefined,
+    undefined
+  );
 
 Object.defineProperty(exports, 'createBrowserHistory', {
   enumerable: true,

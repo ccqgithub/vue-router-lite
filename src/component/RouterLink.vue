@@ -23,10 +23,10 @@ import {
   guardEvent 
 } from '../util/utils';
 import matchPath from '../util/matchPath';
-import Tag from '../util/Tag';
+import Tag from './Tag.vue';
 
 const RouterLink = {
-  name: 'RouterLink',
+  name: 'router-link',
   
   components: {
     Tag
@@ -149,7 +149,14 @@ const RouterLink = {
   created() {
     assert(
       this.router,
-      'You should not use <RouterLink> outside a <Router>'
+      'You should not use <router-link> outside a <router>'
+    );
+  },
+
+  beforeUpdate() {
+    assert(
+      this.router,
+      'You should not use <router-link> outside a <router>'
     );
   }
 }

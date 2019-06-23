@@ -1,8 +1,6 @@
 <template>
-  <router :history="history" :component="component">
-    <template v-slot:default="routerProps">
-      <slot v-bind="routerProps"/>
-    </template>
+  <router :history="history" name="memory-router" v-slot="routerProps">
+    <slot v-bind="routerProps"/>
   </router>
 </template>
 
@@ -12,7 +10,7 @@ import { assert } from '../util/utils';
 import Router from './Router.vue';
 
 const MemoryRouter = {
-  name: 'MemoryRouter',
+  name: 'memory-router',
 
   components: {
     Router
@@ -33,9 +31,6 @@ const MemoryRouter = {
     },
     getUserConfirmation: {
       type: Function
-    },
-    component: {
-      type: Object
     }
   },
 

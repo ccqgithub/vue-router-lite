@@ -21,17 +21,10 @@ const Parent = {
   },
   components: {
     RouterLink,
-    Route
-  },
-  data () {
-    return {
-      // transitionName: 'slide-left',
-      components: {
-        Default,
-        Foo,
-        Bar
-      }
-    }
+    Route,
+    Default,
+    Foo,
+    Bar
   },
   computed: {
     transitionName() {
@@ -44,9 +37,15 @@ const Parent = {
   template: `
     <div class="parent">
       <h2>Parent</h2>
-      <route :path="match.url" exact :component="components.Default" key="default" />
-      <route :path="match.url + '/foo'" :component="components.Foo" key="foo" />
-      <route :path="match.url + '/bar'" :component="components.Bar" key="bar" />
+      <route :path="match.url" exact key="default" v-slot="props">
+        <default v-bind="props"/>
+      </route>
+      <route :path="match.url + '/foo'" key="foo" v-slot="props">
+        <foo v-bind="props"/>
+      </route>
+      <route :path="match.url + '/bar'" key="bar" v-slot="props">
+        <bar v-bind="props"/>
+      </route>
     </div>
   `
 }
@@ -55,16 +54,12 @@ const App = {
   components: {
     RouterLink,
     Route,
-    MatchFirst
+    MatchFirst,
+    Home,
+    Parent
   },
   props: {
     history: Object
-  },
-  data() {
-    return {
-      Home,
-      Parent
-    }
   },
   computed: {
     transitionName() {
@@ -85,8 +80,12 @@ const App = {
       </ul>
       <transition :name="transitionName">
         <match-first>
-          <route path="/" :component="Home" key="home" exact />
-          <route path="/parent" :component="Parent" key="parent" />
+          <route path="/" key="home" exact v-slot="props">
+            <home v-bind="props"/>
+          </route>
+          <route path="/parent" key="parent" v-slot="props">
+            <parent v-bind="props"/>
+          </route>
         </match-first>
       </transition>
     </div>
@@ -95,14 +94,12 @@ const App = {
 
 new Vue({
   components: {
-    Router
-  },
-  data() {
-    return {
-      App
-    }
+    Router,
+    App
   },
   template: `
-    <router basename="/transitions/" :component="App" />
+    <router basename="/transitions/" v-slot="props">
+      <app v-bind="props"/>
+    </router>
   `
 }).$mount('#app')
