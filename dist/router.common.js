@@ -815,32 +815,17 @@ var Route = {
       }
     };
   },
-  data: function data() {
-    return {
-      match: this.computedMatch()
-    };
-  },
   created: function created() {
     assert(this.router, "You should not use <route> outside a <router>.");
+    this.cacheMatch = null;
   },
   beforeUpdate: function beforeUpdate() {
-    var _this = this;
-
-    assert(this.router, "You should not use <route> outside a <router>."); // new match
-
-    var newMatch = this.computedMatch();
-
-    if (!this.match || !newMatch) {
-      // old match is false or newMatch is false
-      this.match = newMatch;
-    } else {
-      Object.keys(newMatch).forEach(function (key) {
-        _this.match[key] = newMatch[key];
-      });
-    }
+    assert(this.router, "You should not use <route> outside a <router>.");
   },
-  methods: {
-    computedMatch: function computedMatch() {
+  computed: {
+    match: function match() {
+      var _this = this;
+
       var computedLocation = this.router.history.location;
       var path = this.path,
           strict = this.strict,
@@ -853,8 +838,17 @@ var Route = {
         strict: strict,
         exact: exact,
         sensitive: sensitive
-      }) : route.match;
-      return match;
+      }) : route.match; // cache
+
+      if (!this.cacheMatch || !match) {
+        this.cacheMatch = match;
+      } else {
+        Object.keys(match).forEach(function (key) {
+          _this.cacheMatch[key] = match[key];
+        });
+      }
+
+      return this.cacheMatch;
     }
   },
   render: function render(createElement) {
@@ -870,8 +864,9 @@ var Route = {
       history: history,
       location: history.location
     });
-    children = children.filter(isNotTextNode);
-    assert(children.length === 1, "<".concat(name, "> can only be used on a single child element."));
+    children = (children || []).filter(isNotTextNode);
+    assert(children.length <= 1, "<".concat(name, "> can only be used on a single child element."));
+    if (!children.length) return null;
     return children[0];
   }
 };

@@ -36,17 +36,13 @@ const Route = {
     }
   },
 
-  data() {
-    return {
-      match: this.computedMatch()
-    }
-  },
-
   created() {
     assert(
       this.router,
       `You should not use <route> outside a <router>.`
     );
+
+    this.cacheMatch = null;
   },
 
   beforeUpdate() {
@@ -54,21 +50,10 @@ const Route = {
       this.router,
       `You should not use <route> outside a <router>.`
     );
-
-    // new match
-    let newMatch = this.computedMatch();
-    if (!this.match || !newMatch) {
-      // old match is false or newMatch is false
-      this.match = newMatch;
-    } else {
-      Object.keys(newMatch).forEach(key => {
-        this.match[key] = newMatch[key];
-      });
-    }
   },
 
-  methods: {
-    computedMatch() {
+  computed: {
+    match() {
       const computedLocation = this.router.history.location;
       const { path, strict, exact, sensitive, route } = this;
       const pathname = computedLocation.pathname;
@@ -78,7 +63,16 @@ const Route = {
           { path, strict, exact, sensitive }
         ) : route.match;
 
-      return match;
+      // cache
+      if (!this.cacheMatch || !match) {
+        this.cacheMatch = match;
+      } else {
+        Object.keys(match).forEach(key => {
+          this.cacheMatch[key] = match[key];
+        })
+      }
+
+      return this.cacheMatch;
     }
   },
 
@@ -93,12 +87,14 @@ const Route = {
       history,
       location: history.location
     });
-    children = children.filter(isNotTextNode);
+    children = (children || []).filter(isNotTextNode);
 
     assert(
-      children.length === 1, 
+      children.length <= 1, 
       `<${name}> can only be used on a single child element.`
     );
+
+    if (!children.length) return null;
 
     return children[0];
   }
