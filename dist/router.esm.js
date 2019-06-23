@@ -1425,8 +1425,9 @@ var script$2 = {
         sensitive: sensitive
       });
       return !!match;
-    });
-    vnode.key = vnodeKey;
+    }); // key
+
+    if (vnode) vnode.key = vnodeKey;
     return vnode;
   }
 };

@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { BrowserRouter as Router, Route, RouterLink } from 'vue-router-lite'
+import { BrowserRouter as Router, Route, RouterLink, MatchFirst } from 'vue-router-lite'
 
 const Home = { 
   template: `
@@ -93,6 +93,7 @@ const App = {
   components: {
     Route, 
     RouterLink,
+    MatchFirst,
     Topics,
     About,
     Home
@@ -118,12 +119,13 @@ const App = {
         <home v-bind="props"/>
       </route>
 
-      
-      <route path="/about" v-slot="props" force-render>
-        <keep-alive>
-          <about v-bind="props" v-if="props.match" />
-        </keep-alive>
-      </route>
+      <keep-alive>
+        <match-first>
+        <route path="/about" v-slot="props">
+          <about v-bind="props"/>
+        </route>
+        </match-first>
+      </keep-alive>
       
       <route path="/topics" v-slot="props" force-render>
         <keep-alive>
