@@ -64,10 +64,13 @@ var Router = {
   },
   data: function data() {
     return {
+      // add provide's properties in data, to make provide reactivity 
       router: {
         history: this.history
       },
+      // add provide's properties in data, to make provide reactivity 
       route: {
+        location: this.history.location,
         match: this.computeMatch(this.history.location.pathname)
       }
     };
@@ -77,6 +80,7 @@ var Router = {
 
     var history = this.history;
     this.unlisten = history.listen(function () {
+      _this.route.location = history.location;
       _this.route.match = _this.computeMatch(history.location.pathname);
     });
   },
@@ -101,11 +105,11 @@ var Router = {
   render: function render(createElement) {
     var children = this.$scopedSlots["default"]({
       history: this.history,
-      location: this.history.location,
+      location: this.route.location,
       match: this.route.match
     });
     children = children.filter(isNotTextNode);
-    assert(children.length === 1, "<".concat(this.name, "> can only be used on a single child element."));
+    assert(children.length === 1, "<".concat(this.name, "> must only be used on a single child element."));
     return children[0];
   }
 };
@@ -800,14 +804,15 @@ var Route = {
     forceRender: {
       type: Boolean,
       "default": false
+    },
+    location: {
+      type: Object
     }
   },
   inject: ['router', 'route'],
   provide: function provide() {
     return {
-      route: {
-        match: this.match
-      }
+      route: this.route
     };
   },
   created: function created() {
@@ -817,11 +822,32 @@ var Route = {
   beforeUpdate: function beforeUpdate() {
     assert(this.router, "You should not use <route> outside a <router>.");
   },
-  computed: {
-    match: function match() {
+  watch: {
+    route: {
+      handler: function handler() {
+        this.computedRoute.location = this.computeLocation();
+        this.computedRoute.match = this.computeMatch();
+      },
+      deep: true
+    }
+  },
+  data: function data() {
+    return {
+      // add provide's properties in data, to make provide reactivity 
+      computedRoute: {
+        location: this.computeLocation(),
+        match: this.computeMatch()
+      }
+    };
+  },
+  methods: {
+    computeLocation: function computeLocation() {
+      return this.location || this.route.location;
+    },
+    computeMatch: function computeMatch() {
       var _this = this;
 
-      var computedLocation = this.router.history.location;
+      var computedLocation = this.computeLocation();
       var path = this.path,
           strict = this.strict,
           exact = this.exact,
@@ -848,16 +874,18 @@ var Route = {
   },
   render: function render(createElement) {
     var router = this.router,
-        match = this.match,
+        computedRoute = this.computedRoute,
         forceRender = this.forceRender,
         $scopedSlots = this.$scopedSlots,
         name = this.name;
     var history = router.history;
+    var match = computedRoute.match,
+        location = computedRoute.location;
     if (!match && !forceRender) return null;
     var children = $scopedSlots["default"]({
       match: match,
       history: history,
-      location: history.location
+      location: location
     });
     children = (children || []).filter(isNotTextNode);
     assert(children.length <= 1, "<".concat(name, "> can only be used on a single child element."));
@@ -1055,8 +1083,7 @@ var Redirect = {
     },
     // to location
     computeTo: function computeTo() {
-      var match = this.route.match;
-      var location = this.router.history.location; // to
+      var match = this.route.match; // to
 
       var p = this.to; // route
 
@@ -1213,13 +1240,17 @@ var RouterLink = {
     event: {
       type: String,
       "default": 'click'
+    },
+    // location
+    location: {
+      type: Object
     }
   },
   inject: ['router', 'route'],
   computed: {
     // current location
     currentLocation: function currentLocation() {
-      var currentLocation = this.router.history.location;
+      var currentLocation = this.location || this.route.location;
       return currentLocation;
     },
     // to location
@@ -1352,8 +1383,8 @@ var script$1 = {
   inject: ['router', 'route'],
   data: function data() {
     return {
-      history: this.router,
-      location: this.history.location,
+      history: this.router.history,
+      location: this.route.location,
       match: this.route.match
     };
   },
@@ -1395,12 +1426,17 @@ const __vue_script__$a = script$1;
 var script$2 = {
   name: 'match-first',
   functional: true,
+  props: {
+    location: Object
+  },
   inject: ['router', 'route'],
   render: function render(createElement, context) {
-    var router = context.injections.router;
+    var _context$injections = context.injections,
+        router = _context$injections.router,
+        route = _context$injections.route;
     assert(router, "You should not use <match-first> outside a <router>'");
     var vnodeKey = '';
-    var location = router.history.location;
+    var location = context.props.location || route.location;
     var children = context.slots()["default"].filter(isNotTextNode);
     var vnode = children.find(function (vnode) {
       if (!vnode.componentOptions) return false;

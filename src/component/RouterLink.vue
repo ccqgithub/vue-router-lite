@@ -77,6 +77,10 @@ const RouterLink = {
     event: {
       type: String,
       default: 'click'
+    },
+    // location
+    location: {
+      type: Object
     }
   },
 
@@ -85,7 +89,7 @@ const RouterLink = {
   computed: {
     // current location
     currentLocation() {
-      const currentLocation = this.router.history.location;
+      const currentLocation = this.location || this.route.location;
       return currentLocation;
     },
     // to location

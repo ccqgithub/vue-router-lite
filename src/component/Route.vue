@@ -25,6 +25,9 @@ const Route = {
     forceRender: {
       type: Boolean,
       default: false
+    },
+    location: {
+      type: Object
     }
   },
 
@@ -32,7 +35,7 @@ const Route = {
 
   provide() {
     return {
-      route: { match: this.match }
+      route: this.route
     }
   },
 
@@ -52,9 +55,32 @@ const Route = {
     );
   },
 
-  computed: {
-    match() {
-      const computedLocation = this.router.history.location;
+  watch: {
+    route: {
+      handler() {
+        this.computedRoute.location = this.computeLocation();
+        this.computedRoute.match = this.computeMatch();
+      },
+      deep: true
+    }
+  },
+
+  data() {
+    return {
+      // add provide's properties in data, to make provide reactivity 
+      computedRoute: {
+        location: this.computeLocation(),
+        match: this.computeMatch()
+      }
+    }
+  },
+
+  methods: {
+    computeLocation() {
+      return this.location || this.route.location;
+    },
+    computeMatch() {
+      const computedLocation = this.computeLocation();
       const { path, strict, exact, sensitive, route } = this;
       const pathname = computedLocation.pathname;
       const match = path ? 
@@ -77,16 +103,13 @@ const Route = {
   },
 
   render(createElement) {
-    const { router, match, forceRender, $scopedSlots, name } = this;
+    const { router, computedRoute, forceRender, $scopedSlots, name } = this;
     const { history } = router;
+    const { match, location } = computedRoute;
 
     if (!match && !forceRender) return null;
 
-    let children = $scopedSlots.default({
-      match,
-      history,
-      location: history.location
-    });
+    let children = $scopedSlots.default({ match, history, location });
     children = (children || []).filter(isNotTextNode);
 
     assert(

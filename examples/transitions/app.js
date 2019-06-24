@@ -35,10 +35,17 @@ const Parent = {
   },
   watch: {
     location(val, oldVal) {
+      console.log('update location')
       const toDepth = val.pathname.split('/').length
       const fromDepth = oldVal.pathname.split('/').length
       this.transitionName = toDepth < fromDepth ? 'slide-right' : 'slide-left'
+    },
+    transitionName() {
+      console.log('update transitionName')
     }
+  },
+  beforeUpdate() {
+    console.log('update parent')
   },
   template: `
     <div class="parent">

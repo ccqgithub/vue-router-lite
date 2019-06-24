@@ -26,10 +26,13 @@ const Router = {
 
   data() {
     return {
+      // add provide's properties in data, to make provide reactivity 
       router: {
         history: this.history
       },
+      // add provide's properties in data, to make provide reactivity 
       route: {
+        location: this.history.location,
         match: this.computeMatch(this.history.location.pathname)
       }
     };
@@ -38,6 +41,7 @@ const Router = {
   created() {
     const { history } = this;
     this.unlisten = history.listen(() => {
+      this.route.location = history.location;
       this.route.match = this.computeMatch(history.location.pathname);
     });
   },
@@ -59,7 +63,7 @@ const Router = {
   render(createElement) {
     let children = this.$scopedSlots.default({
       history: this.history,
-      location: this.history.location,
+      location: this.route.location,
       match: this.route.match
     });
 
@@ -67,7 +71,7 @@ const Router = {
   
     assert(
       children.length === 1, 
-      `<${this.name}> can only be used on a single child element.`
+      `<${this.name}> must only be used on a single child element.`
     );
 
     return children[0];

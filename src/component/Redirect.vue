@@ -61,7 +61,6 @@ const Redirect = {
     // to location
     computeTo() {
       const { match } = this.route;
-      const { location } = this.router.history;
       // to
       let p = this.to;
       // route

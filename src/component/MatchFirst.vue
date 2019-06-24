@@ -5,9 +5,12 @@ import matchPath from "../util/matchPath";
 export default {
   name: 'match-first',
   functional: true,
+  props: {
+    location: Object
+  },
   inject: ['router', 'route'],
   render(createElement, context) {
-    const { router } = context.injections;
+    const { router, route } = context.injections;
 
     assert(
       router, 
@@ -15,7 +18,7 @@ export default {
     );
 
     let vnodeKey = '';
-    const location = router.history.location;
+    const location = context.props.location || route.location;
     const children = context.slots().default.filter(isNotTextNode);
     const vnode = children.find((vnode) => {
       if (!vnode.componentOptions) return false;

@@ -115,23 +115,21 @@ const App = {
 
       <hr />
       
+      <match-first>
       <route exact path="/" v-slot="props">
         <home v-bind="props"/>
       </route>
 
-      <keep-alive>
-        <match-first>
-        <route path="/about" v-slot="props">
-          <about v-bind="props"/>
-        </route>
-        </match-first>
-      </keep-alive>
+      <route path="/about" v-slot="props">
+        <about v-bind="props"/>
+      </route>
       
       <route path="/topics" v-slot="props" force-render>
         <keep-alive>
           <topics v-bind="props" v-if="props.match" />
         </keep-alive>
       </route>
+      </match-first>
     </div>
   `,
 
