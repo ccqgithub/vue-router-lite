@@ -815,30 +815,45 @@ var Route = {
       route: this.route
     };
   },
-  created: function created() {
-    assert(this.router, "You should not use <route> outside a <router>.");
-    this.cacheMatch = null;
-  },
-  beforeUpdate: function beforeUpdate() {
-    assert(this.router, "You should not use <route> outside a <router>.");
-  },
-  watch: {
-    route: {
-      handler: function handler() {
-        this.computedRoute.location = this.computeLocation();
-        this.computedRoute.match = this.computeMatch();
-      },
-      deep: true
-    }
-  },
   data: function data() {
     return {
+      isActive: true,
       // add provide's properties in data, to make provide reactivity 
       computedRoute: {
         location: this.computeLocation(),
         match: this.computeMatch()
       }
     };
+  },
+  watch: {
+    route: {
+      handler: function handler() {
+        if (!this.isActive) return;
+        this.computedRoute.location = this.computeLocation();
+        this.computedRoute.match = this.computeMatch();
+      },
+      deep: true
+    }
+  },
+  created: function created() {
+    assert(this.router, "You should not use <route> outside a <router>.");
+    this.cacheMatch = null; // use for keepalive
+
+    this.cache = Object.create(null);
+  },
+  destroyed: function destroyed() {
+    this.clearCache();
+  },
+  beforeUpdate: function beforeUpdate() {
+    assert(this.router, "You should not use <route> outside a <router>.");
+  },
+  activated: function activated() {
+    this.isActive = true;
+    this.computedRoute.location = this.computeLocation();
+    this.computedRoute.match = this.computeMatch();
+  },
+  deactivated: function deactivated() {
+    this.isActive = false;
   },
   methods: {
     computeLocation: function computeLocation() {
@@ -870,6 +885,12 @@ var Route = {
       }
 
       return this.cacheMatch;
+    },
+    clearCache: function clearCache() {
+      for (var key in this.cache) {
+        this.cache[key].componentInstance.$destroy();
+        this.cache[key] = null;
+      }
     }
   },
   render: function render(createElement) {
@@ -877,10 +898,17 @@ var Route = {
         computedRoute = this.computedRoute,
         forceRender = this.forceRender,
         $scopedSlots = this.$scopedSlots,
-        name = this.name;
+        name = this.name,
+        cache = this.cache;
     var history = router.history;
     var match = computedRoute.match,
         location = computedRoute.location;
+    var isKeepAlive = this.$vnode.data.keepAlive; // no keep alive
+
+    if (!isKeepAlive) {
+      this.clearCache();
+    }
+
     if (!match && !forceRender) return null;
     var children = $scopedSlots["default"]({
       match: match,
@@ -888,9 +916,24 @@ var Route = {
       location: location
     });
     children = (children || []).filter(isNotTextNode);
-    assert(children.length <= 1, "<".concat(name, "> can only be used on a single child element."));
     if (!children.length) return null;
-    return children[0];
+    assert(children.length === 1, "<".concat(name, "> can only be used on a single child element."));
+    var vnode = children[0];
+    var componentOptions = vnode && vnode.componentOptions; // is keepAlive and is component
+
+    if (isKeepAlive && componentOptions) {
+      var key = vnode.key == null ? componentOptions.Ctor.cid + (componentOptions.tag ? "::" + componentOptions.tag : '') : vnode.key;
+
+      if (cache[key]) {
+        vnode.componentInstance = cache[key].componentInstance;
+      } else {
+        cache[key] = vnode;
+      }
+
+      vnode.data.keepAlive = true;
+    }
+
+    return vnode;
   }
 };
 

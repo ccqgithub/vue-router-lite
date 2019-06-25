@@ -39,6 +39,28 @@ const Route = {
     }
   },
 
+  data() {
+    return {
+      isActive: true,
+      // add provide's properties in data, to make provide reactivity 
+      computedRoute: {
+        location: this.computeLocation(),
+        match: this.computeMatch()
+      }
+    }
+  },
+
+  watch: {
+    route: {
+      handler() {
+        if (!this.isActive) return;
+        this.computedRoute.location = this.computeLocation();
+        this.computedRoute.match = this.computeMatch();
+      },
+      deep: true
+    }
+  },
+
   created() {
     assert(
       this.router,
@@ -46,6 +68,12 @@ const Route = {
     );
 
     this.cacheMatch = null;
+    // use for keepalive
+    this.cache = Object.create(null);
+  },
+
+  destroyed () {
+    this.clearCache();
   },
 
   beforeUpdate() {
@@ -55,24 +83,14 @@ const Route = {
     );
   },
 
-  watch: {
-    route: {
-      handler() {
-        this.computedRoute.location = this.computeLocation();
-        this.computedRoute.match = this.computeMatch();
-      },
-      deep: true
-    }
+  activated() {
+    this.isActive = true;
+    this.computedRoute.location = this.computeLocation();
+    this.computedRoute.match = this.computeMatch();
   },
 
-  data() {
-    return {
-      // add provide's properties in data, to make provide reactivity 
-      computedRoute: {
-        location: this.computeLocation(),
-        match: this.computeMatch()
-      }
-    }
+  deactivated() {
+    this.isActive = false;
   },
 
   methods: {
@@ -99,27 +117,55 @@ const Route = {
       }
 
       return this.cacheMatch;
+    },
+    clearCache() {
+      for (let key in this.cache) {
+        this.cache[key].componentInstance.$destroy();
+        this.cache[key] = null;
+      }
     }
   },
 
   render(createElement) {
-    const { router, computedRoute, forceRender, $scopedSlots, name } = this;
+    const { router, computedRoute, forceRender, $scopedSlots, name, cache } = this;
     const { history } = router;
     const { match, location } = computedRoute;
+    const isKeepAlive = this.$vnode.data.keepAlive;
+
+    // no keep alive
+    if (!isKeepAlive) {
+      this.clearCache();
+    }
 
     if (!match && !forceRender) return null;
 
     let children = $scopedSlots.default({ match, history, location });
     children = (children || []).filter(isNotTextNode);
 
-    assert(
-      children.length <= 1, 
-      `<${name}> can only be used on a single child element.`
-    );
-
     if (!children.length) return null;
 
-    return children[0];
+    assert(
+      children.length === 1, 
+      `<${name}> can only be used on a single child element.`
+    );
+    
+    const vnode = children[0];
+    const componentOptions = vnode && vnode.componentOptions;
+
+    // is keepAlive and is component
+    if (isKeepAlive && componentOptions) {
+      const key = vnode.key == null
+        ? componentOptions.Ctor.cid + (componentOptions.tag ? ("::" + (componentOptions.tag)) : '')
+        : vnode.key;
+      if (cache[key]) {
+        vnode.componentInstance = cache[key].componentInstance;
+      } else {
+        cache[key] = vnode;
+      }
+      vnode.data.keepAlive = true;
+    }
+    
+    return vnode;
   }
 };
 

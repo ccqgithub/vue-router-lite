@@ -9,35 +9,35 @@ const Home = {
   ` 
 }
 
-const About = { 
+const Alive = { 
   template: `
     <div>
-      <h2>About</h2>
+      <h2>Alive Component</h2>
       <div><input /></div>
     </div>
   ` 
 }
 
-const Topic = {
+const AliveChild = {
   props: {
-    topicId: {
+    id: {
       type: String,
       required: true
     }
   },
   template: `
     <div>
-      <h3>{{ topicId }}</h3>
+      <h3>Keep Alive Child: {{ id }}</h3>
       <div><input /></div>
     </div>
   `
 }
 
-const Topics = {
+const NestAlive = {
   components: {
     RouterLink,
-    Topic,
-    Route
+    Route,
+    AliveChild
   },
   props: {
     match: {
@@ -45,21 +45,18 @@ const Topics = {
       required: true
     }
   },
-  mounted() {
-    // console.log(this.match)
-  },
   template: `
     <div>
-      <h2>Topics</h2>
+      <h2>Alive Parent</h2>
       <ul>
         <li>
-          <router-link :to="match.url + '/rendering'">Rendering</router-link>
+          <router-link :to="match.url + '/a'">Keep Alive Child A</router-link>
         </li>
         <li>
-          <router-link :to="match.url + '/components'">Components</router-link>
+          <router-link :to="match.url + '/b'">Keep Alive Child B</router-link>
         </li>
         <li>
-          <router-link :to="match.url + '/props-v-state'">Props v. State</router-link>
+          <router-link :to="match.url + '/c'">Not Keep Alive Child C</router-link>
         </li>
       </ul>
 
@@ -67,19 +64,39 @@ const Topics = {
 
       <hr />
 
+      <keep-alive>
+        <route 
+          :path="match.path + '/:id(a|b)'" 
+          v-slot="{ match }"
+        >
+          <alive-child 
+            :id="match.params.id" 
+            :key="match.params.id" 
+          />
+        </route>
+      </keep-alive>
+
       <route 
-        :path="match.path + '/:topicId'" 
+        :path="match.path + '/:id(c)'" 
         v-slot="{ match }"
       >
-        <topic :topic-id="match.params.topicId" :key="match.params.topicId" />
+        <alive-child 
+          :id="match.params.id" 
+          :key="match.params.id" 
+        />
       </route>
-      <route
-        exact
-        :path="match.path"
-        v-slot="props"
-      >
-        <h3 v-if="props.match">Please select a topic. <input /></h3>
-      </route>
+
+      <keep-alive>
+        <route
+          exact
+          :path="match.path"
+          v-slot="props"
+        >
+          <h3 v-if="props.match">
+            this is not a component, so can not keep alive. <input />
+          </h3>
+        </route>
+      </keep-alive>
     </div>
   `
 }
@@ -94,9 +111,9 @@ const App = {
     Route, 
     RouterLink,
     MatchFirst,
-    Topics,
-    About,
-    Home
+    Home,
+    Alive,
+    NestAlive
   },
   template: `
     <div id="app">
@@ -106,30 +123,33 @@ const App = {
           <router-link to="/">Home</router-link>
         </li>
         <li>
-          <router-link to="/about">About</router-link>
+          <router-link to="/alive">Keep Alive Route</router-link>
         </li>
         <li>
-          <router-link to="/topics">Topics</router-link>
+          <router-link to="/nest-alive">Keep Alive Nest Alive</router-link>
+        </li>
+        <li>
+          <router-link to="/nest-alive/c">Keep Alive Child C</router-link>
         </li>
       </ul>
 
       <hr />
       
-      <match-first>
-      <route exact path="/" v-slot="props">
-        <home v-bind="props"/>
-      </route>
+      <keep-alive>
+        <match-first>
+          <route exact path="/" v-slot="props">
+            <home v-bind="props"/>
+          </route>
 
-      <route path="/about" v-slot="props">
-        <about v-bind="props"/>
-      </route>
-      
-      <route path="/topics" v-slot="props" force-render>
-        <keep-alive>
-          <topics v-bind="props" v-if="props.match" />
-        </keep-alive>
-      </route>
-      </match-first>
+          <route path="/alive" v-slot="props">
+            <alive v-bind="props"/>
+          </route>
+          
+          <route path="/nest-alive" v-slot="props">
+            <nest-alive v-bind="props" />
+          </route>
+        </match-first>
+      </keep-alive>
     </div>
   `,
 
