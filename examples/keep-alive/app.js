@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { BrowserRouter as Router, Route, RouterLink, MatchFirst } from 'vue-router-lite'
+import { BrowserRouter as Router, Route, RouterLink, RouteSwitch } from 'vue-router-lite'
 
 const Home = { 
   template: `
@@ -110,7 +110,7 @@ const App = {
   components: {
     Route, 
     RouterLink,
-    MatchFirst,
+    RouteSwitch,
     Home,
     Alive,
     NestAlive
@@ -136,7 +136,7 @@ const App = {
       <hr />
       
       <keep-alive>
-        <match-first>
+        <route-switch>
           <route exact path="/" v-slot="props">
             <home v-bind="props"/>
           </route>
@@ -148,7 +148,7 @@ const App = {
           <route path="/nest-alive" v-slot="props">
             <nest-alive v-bind="props" />
           </route>
-        </match-first>
+        </route-switch>
       </keep-alive>
     </div>
   `,

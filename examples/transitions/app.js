@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { BrowserRouter as Router, Route, RouterLink, MatchFirst } from 'vue-router-lite'
+import { BrowserRouter as Router, Route, RouterLink, RouteSwitch } from 'vue-router-lite'
 
 const Home = {
   template: `
@@ -23,7 +23,7 @@ const Parent = {
   components: {
     RouterLink,
     Route,
-    MatchFirst,
+    RouteSwitch,
     Default,
     Foo,
     Bar
@@ -51,7 +51,7 @@ const Parent = {
     <div class="parent">
       <h2>Parent</h2>
       <transition :name="transitionName">
-        <match-first>
+        <route-switch>
           <route :path="match.url" exact key="default" v-slot="props">
             <default class="child-view" v-bind="props"/>
           </route>
@@ -61,7 +61,7 @@ const Parent = {
           <route :path="match.url + '/bar'" key="bar" v-slot="props">
             <bar class="child-view" v-bind="props"/>
           </route>
-        </match-first>
+        </route-switch>
       </transition>
     </div>
   `
@@ -71,7 +71,7 @@ const App = {
   components: {
     RouterLink,
     Route,
-    MatchFirst,
+    RouteSwitch,
     Home,
     Parent
   },
@@ -91,14 +91,14 @@ const App = {
 
       </div>
       <transition name="fade" mode="out-in">
-        <match-first>
+        <route-switch>
           <route path="/" key="home" exact v-slot="props">
             <home class="page" v-bind="props"/>
           </route>
           <route path="/parent" key="parent" v-slot="props">
             <parent class="page" v-bind="props"/>
           </route>
-        </match-first>
+        </route-switch>
       </transition>
     </div>
   `

@@ -22,7 +22,7 @@
       </li>
     </ul>
 
-    <match-first>
+    <route-switch>
       <route path="/dashboard" v-slot:default="{ match, location, history }">
         <check-login :logged-in="loggedIn">
           <dashboard :match="match" :location="location" :history="history" />
@@ -45,12 +45,12 @@
       <route>
         <p>You are logged {{ loggedIn ? 'in' : 'out' }}</p>
       </route>
-    </match-first>
+    </route-switch>
   </div>
 </template>
 
 <script>
-import { Route, RouterLink, MatchFirst, Redirect } from 'vue-router-lite'
+import { Route, RouterLink, RouteSwitch, Redirect } from 'vue-router-lite'
 import auth from '../auth'
 import About from './About.vue'
 import Dashboard from './Dashboard.vue'
@@ -64,7 +64,7 @@ export default {
     About,
     Dashboard,
     Login,
-    MatchFirst,
+    RouteSwitch,
     CheckLogin,
     Redirect
   },

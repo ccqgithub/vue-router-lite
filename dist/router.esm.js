@@ -782,6 +782,460 @@ function matchPath(pathname) {
   }, null);
 }
 
+var script = {
+  name: 'tag',
+  functional: true,
+  props: {
+    tag: String
+  },
+  render: function render(createElement, context) {
+    return createElement(context.props.tag || 'div', context.data, context.children);
+  }
+};
+
+/* script */
+const __vue_script__$5 = script;
+
+/* template */
+
+  /* style */
+  const __vue_inject_styles__$5 = undefined;
+  /* scoped */
+  const __vue_scope_id__$5 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$5 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$5 = undefined;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var Tag = normalizeComponent_1(
+    {},
+    __vue_inject_styles__$5,
+    __vue_script__$5,
+    __vue_scope_id__$5,
+    __vue_is_functional_template__$5,
+    __vue_module_identifier__$5,
+    undefined,
+    undefined
+  );
+
+//
+var RouterLink = {
+  name: 'router-link',
+  components: {
+    Tag: Tag
+  },
+  props: {
+    // to path
+    to: {
+      type: [String, Object],
+      required: true
+    },
+    // replace or push
+    replace: {
+      type: Boolean,
+      "default": false
+    },
+    // tag
+    tag: {
+      type: String,
+      "default": 'a'
+    },
+    // user to check active
+    exact: {
+      type: Boolean,
+      "default": false
+    },
+    // user to check active
+    strict: {
+      type: Boolean,
+      "default": false
+    },
+    // user to check active
+    sensitive: {
+      type: Boolean,
+      "default": true
+    },
+    // active class name
+    activeClass: {
+      type: String,
+      "default": 'router-link-active'
+    },
+    // active class name
+    exactActiveClass: {
+      type: String,
+      "default": 'router-link-exact-active'
+    },
+    // navitage event
+    event: {
+      type: String,
+      "default": 'click'
+    },
+    // location
+    location: {
+      type: Object
+    }
+  },
+  inject: ['router', 'route'],
+  computed: {
+    // current location
+    currentLocation: function currentLocation() {
+      var currentLocation = this.location || this.route.location;
+      return currentLocation;
+    },
+    // to location
+    toLocation: function toLocation() {
+      var toLocation = normalizeToLocation(resolveToLocation(this.to, this.currentLocation), this.currentLocation);
+      return toLocation;
+    },
+    // link href
+    href: function href() {
+      var history = this.router.history;
+      var href = this.toLocation ? history.createHref(this.toLocation) : '';
+      return href;
+    },
+    // path match with current location
+    match: function match() {
+      var to = this.to,
+          exact = this.exact,
+          strict = this.strict,
+          sensitive = this.sensitive;
+      var pathToMatch = this.currentLocation.pathname;
+      var path = this.toLocation.pathname; // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
+
+      var escapedPath = path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
+      var match = escapedPath ? matchPath(pathToMatch, {
+        path: escapedPath,
+        exact: exact,
+        strict: strict,
+        sensitive: sensitive
+      }) : null;
+      return match;
+    },
+    classNames: function classNames() {
+      var classNames = '';
+      if (!this.match) return classNames;
+      classNames += " ".concat(this.activeClass);
+      if (this.match.exact) classNames += " ".concat(this.exactActiveClass);
+      return classNames;
+    }
+  },
+  methods: {
+    handleClick: function handleClick(event) {
+      this.$emit('click', event);
+      if (!guardEvent(event)) return;
+      var history = this.router.history;
+      var replace = this.replace,
+          to = this.to;
+      var loc = resolveToLocation(to, this.currentLocation);
+
+      if (replace) {
+        history.replace(loc);
+      } else {
+        history.push(loc);
+      }
+    }
+  },
+  created: function created() {
+    assert(this.router, 'You should not use <router-link> outside a <router>');
+  },
+  beforeUpdate: function beforeUpdate() {
+    assert(this.router, 'You should not use <router-link> outside a <router>');
+  }
+};
+
+/* script */
+const __vue_script__$6 = RouterLink;
+
+/* template */
+var __vue_render__$4 = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c(
+    "tag",
+    _vm._b(
+      {
+        class: _vm.classNames,
+        attrs: { tag: _vm.tag, href: _vm.href },
+        on: _vm._d({}, [
+          _vm.event,
+          function($event) {
+            return _vm.handleClick($event)
+          }
+        ])
+      },
+      "tag",
+      _vm.$attrs,
+      false
+    ),
+    [
+      _vm._t("default", null, {
+        href: _vm.href,
+        match: _vm.match,
+        history: _vm.router.history,
+        location: _vm.router.history.location
+      })
+    ],
+    2
+  )
+};
+var __vue_staticRenderFns__$4 = [];
+__vue_render__$4._withStripped = true;
+
+  /* style */
+  const __vue_inject_styles__$6 = undefined;
+  /* scoped */
+  const __vue_scope_id__$6 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$6 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$6 = false;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var RouterLink$1 = normalizeComponent_1(
+    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+    __vue_inject_styles__$6,
+    __vue_script__$6,
+    __vue_scope_id__$6,
+    __vue_is_functional_template__$6,
+    __vue_module_identifier__$6,
+    undefined,
+    undefined
+  );
+
+var Prompt = {
+  name: 'prompt',
+  props: {
+    when: {
+      type: Boolean,
+      "default": true
+    },
+    message: {
+      type: [Function, String],
+      required: true
+    }
+  },
+  inject: ['router', 'route'],
+  created: function created() {
+    assert(this.router, 'You should not use <prompt> outside a <router>');
+    this.lastMessage = null;
+    this.unblock = null;
+  },
+  beforeUpdate: function beforeUpdate() {
+    assert(this.router, 'You should not use <prompt> outside a <router>');
+  },
+  mounted: function mounted() {
+    if (this.when) this.block();
+  },
+  watch: {
+    when: function when(val, oldVal) {
+      if (!val) {
+        if (this.unblock) this.unblock();
+      } else {
+        this.block();
+      }
+    }
+  },
+  methods: {
+    block: function block() {
+      var message = this.message,
+          lastMessage = this.lastMessage;
+
+      if (!this.unblock) {
+        this.unblock = this.router.history.block(message);
+      } else if (message !== lastMessage) {
+        this.unblock();
+        this.unblock = this.router.history.block(message);
+      } // last message
+
+
+      this.lastMessage = message;
+    }
+  },
+  beforeDestroy: function beforeDestroy() {
+    if (this.unblock) this.unblock();
+  },
+  render: function render() {
+    return null;
+  }
+};
+
+/* script */
+const __vue_script__$7 = Prompt;
+
+/* template */
+
+  /* style */
+  const __vue_inject_styles__$7 = undefined;
+  /* scoped */
+  const __vue_scope_id__$7 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$7 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$7 = undefined;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var Prompt$1 = normalizeComponent_1(
+    {},
+    __vue_inject_styles__$7,
+    __vue_script__$7,
+    __vue_scope_id__$7,
+    __vue_is_functional_template__$7,
+    __vue_module_identifier__$7,
+    undefined,
+    undefined
+  );
+
+/**
+ * copy from:
+ * https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/generatePath.js
+ */
+var cache$1 = {};
+var cacheLimit$1 = 10000;
+var cacheCount$1 = 0;
+
+function compilePath$1(path) {
+  if (cache$1[path]) return cache$1[path];
+  var generator = pathToRegexp.compile(path);
+
+  if (cacheCount$1 < cacheLimit$1) {
+    cache$1[path] = generator;
+    cacheCount$1++;
+  }
+
+  return generator;
+}
+/**
+ * generating a URL pathname from a path and parameters.
+ */
+
+
+function generatePath() {
+  var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "/";
+  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  return path === "/" ? path : compilePath$1(path)(params, options);
+}
+
+var Redirect = {
+  name: 'redirect',
+  props: {
+    // to path
+    to: {
+      type: [String, Object],
+      required: true
+    },
+    // wheather push
+    push: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  inject: ['router', 'route'],
+  created: function created() {
+    assert(this.router, 'You must not use <redirect> outside a <router>.'); // static router
+
+    if (this.isStatic()) this.perform();
+  },
+  mounted: function mounted() {
+    // not static router
+    if (!this.isStatic()) this.perform();
+  },
+  beforeUpdate: function beforeUpdate() {
+    assert(this.router, 'You must not use <redirect> outside a <router>.');
+    var to = this.computeTo(); // already redirect
+
+    if (locationsAreEqual(this.lastTo, to)) {
+      return;
+    }
+
+    this.perform();
+  },
+  methods: {
+    // if static router
+    isStatic: function isStatic() {
+      return this.router && this.router.history.isStatic;
+    },
+    // to location
+    computeTo: function computeTo() {
+      var match = this.route.match; // to
+
+      var p = this.to; // route
+
+      if (match) {
+        if (typeof this.to === 'string') {
+          // to is string
+          p = generatePath(this.to, match.params);
+        } else {
+          // to is object
+          p = _objectSpread({}, this.to, {
+            pathname: generatePath(this.to.pathname, match.params)
+          });
+        }
+      } // to
+
+
+      var to = createLocation(p);
+      return to;
+    },
+    perform: function perform() {
+      var history = this.router.history; // history method
+
+      var method = this.push ? history.push : history.replace;
+      var to = this.computeTo(); // redirect
+
+      this.lastTo = to;
+      method(to);
+    }
+  },
+  render: function render() {
+    return null;
+  }
+};
+
+/* script */
+const __vue_script__$8 = Redirect;
+
+/* template */
+
+  /* style */
+  const __vue_inject_styles__$8 = undefined;
+  /* scoped */
+  const __vue_scope_id__$8 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$8 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$8 = undefined;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var Redirect$1 = normalizeComponent_1(
+    {},
+    __vue_inject_styles__$8,
+    __vue_script__$8,
+    __vue_scope_id__$8,
+    __vue_is_functional_template__$8,
+    __vue_module_identifier__$8,
+    undefined,
+    undefined
+  );
+
 var Route = {
   name: 'route',
   props: {
@@ -938,463 +1392,9 @@ var Route = {
 };
 
 /* script */
-const __vue_script__$5 = Route;
+const __vue_script__$9 = Route;
 
 /* template */
-
-  /* style */
-  const __vue_inject_styles__$5 = undefined;
-  /* scoped */
-  const __vue_scope_id__$5 = undefined;
-  /* module identifier */
-  const __vue_module_identifier__$5 = undefined;
-  /* functional template */
-  const __vue_is_functional_template__$5 = undefined;
-  /* style inject */
-  
-  /* style inject SSR */
-  
-
-  
-  var Route$1 = normalizeComponent_1(
-    {},
-    __vue_inject_styles__$5,
-    __vue_script__$5,
-    __vue_scope_id__$5,
-    __vue_is_functional_template__$5,
-    __vue_module_identifier__$5,
-    undefined,
-    undefined
-  );
-
-var Prompt = {
-  name: 'prompt',
-  props: {
-    when: {
-      type: Boolean,
-      "default": true
-    },
-    message: {
-      type: [Function, String],
-      required: true
-    }
-  },
-  inject: ['router', 'route'],
-  created: function created() {
-    assert(this.router, 'You should not use <prompt> outside a <router>');
-    this.lastMessage = null;
-    this.unblock = null;
-  },
-  beforeUpdate: function beforeUpdate() {
-    assert(this.router, 'You should not use <prompt> outside a <router>');
-  },
-  mounted: function mounted() {
-    if (this.when) this.block();
-  },
-  watch: {
-    when: function when(val, oldVal) {
-      if (!val) {
-        if (this.unblock) this.unblock();
-      } else {
-        this.block();
-      }
-    }
-  },
-  methods: {
-    block: function block() {
-      var message = this.message,
-          lastMessage = this.lastMessage;
-
-      if (!this.unblock) {
-        this.unblock = this.router.history.block(message);
-      } else if (message !== lastMessage) {
-        this.unblock();
-        this.unblock = this.router.history.block(message);
-      } // last message
-
-
-      this.lastMessage = message;
-    }
-  },
-  beforeDestroy: function beforeDestroy() {
-    if (this.unblock) this.unblock();
-  },
-  render: function render() {
-    return null;
-  }
-};
-
-/* script */
-const __vue_script__$6 = Prompt;
-
-/* template */
-
-  /* style */
-  const __vue_inject_styles__$6 = undefined;
-  /* scoped */
-  const __vue_scope_id__$6 = undefined;
-  /* module identifier */
-  const __vue_module_identifier__$6 = undefined;
-  /* functional template */
-  const __vue_is_functional_template__$6 = undefined;
-  /* style inject */
-  
-  /* style inject SSR */
-  
-
-  
-  var Prompt$1 = normalizeComponent_1(
-    {},
-    __vue_inject_styles__$6,
-    __vue_script__$6,
-    __vue_scope_id__$6,
-    __vue_is_functional_template__$6,
-    __vue_module_identifier__$6,
-    undefined,
-    undefined
-  );
-
-/**
- * copy from:
- * https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/generatePath.js
- */
-var cache$1 = {};
-var cacheLimit$1 = 10000;
-var cacheCount$1 = 0;
-
-function compilePath$1(path) {
-  if (cache$1[path]) return cache$1[path];
-  var generator = pathToRegexp.compile(path);
-
-  if (cacheCount$1 < cacheLimit$1) {
-    cache$1[path] = generator;
-    cacheCount$1++;
-  }
-
-  return generator;
-}
-/**
- * generating a URL pathname from a path and parameters.
- */
-
-
-function generatePath() {
-  var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "/";
-  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  return path === "/" ? path : compilePath$1(path)(params, options);
-}
-
-var Redirect = {
-  name: 'redirect',
-  props: {
-    // to path
-    to: {
-      type: [String, Object],
-      required: true
-    },
-    // wheather push
-    push: {
-      type: Boolean,
-      "default": false
-    }
-  },
-  inject: ['router', 'route'],
-  created: function created() {
-    assert(this.router, 'You must not use <redirect> outside a <router>.'); // static router
-
-    if (this.isStatic()) this.perform();
-  },
-  mounted: function mounted() {
-    // not static router
-    if (!this.isStatic()) this.perform();
-  },
-  beforeUpdate: function beforeUpdate() {
-    assert(this.router, 'You must not use <redirect> outside a <router>.');
-    var to = this.computeTo(); // already redirect
-
-    if (locationsAreEqual(this.lastTo, to)) {
-      return;
-    }
-
-    this.perform();
-  },
-  methods: {
-    // if static router
-    isStatic: function isStatic() {
-      return this.router && this.router.history.isStatic;
-    },
-    // to location
-    computeTo: function computeTo() {
-      var match = this.route.match; // to
-
-      var p = this.to; // route
-
-      if (match) {
-        if (typeof this.to === 'string') {
-          // to is string
-          p = generatePath(this.to, match.params);
-        } else {
-          // to is object
-          p = _objectSpread({}, this.to, {
-            pathname: generatePath(this.to.pathname, match.params)
-          });
-        }
-      } // to
-
-
-      var to = createLocation(p);
-      return to;
-    },
-    perform: function perform() {
-      var history = this.router.history; // history method
-
-      var method = this.push ? history.push : history.replace;
-      var to = this.computeTo(); // redirect
-
-      this.lastTo = to;
-      method(to);
-    }
-  },
-  render: function render() {
-    return null;
-  }
-};
-
-/* script */
-const __vue_script__$7 = Redirect;
-
-/* template */
-
-  /* style */
-  const __vue_inject_styles__$7 = undefined;
-  /* scoped */
-  const __vue_scope_id__$7 = undefined;
-  /* module identifier */
-  const __vue_module_identifier__$7 = undefined;
-  /* functional template */
-  const __vue_is_functional_template__$7 = undefined;
-  /* style inject */
-  
-  /* style inject SSR */
-  
-
-  
-  var Redirect$1 = normalizeComponent_1(
-    {},
-    __vue_inject_styles__$7,
-    __vue_script__$7,
-    __vue_scope_id__$7,
-    __vue_is_functional_template__$7,
-    __vue_module_identifier__$7,
-    undefined,
-    undefined
-  );
-
-var script = {
-  name: 'tag',
-  functional: true,
-  props: {
-    tag: String
-  },
-  render: function render(createElement, context) {
-    return createElement(context.props.tag || 'div', context.data, context.children);
-  }
-};
-
-/* script */
-const __vue_script__$8 = script;
-
-/* template */
-
-  /* style */
-  const __vue_inject_styles__$8 = undefined;
-  /* scoped */
-  const __vue_scope_id__$8 = undefined;
-  /* module identifier */
-  const __vue_module_identifier__$8 = undefined;
-  /* functional template */
-  const __vue_is_functional_template__$8 = undefined;
-  /* style inject */
-  
-  /* style inject SSR */
-  
-
-  
-  var Tag = normalizeComponent_1(
-    {},
-    __vue_inject_styles__$8,
-    __vue_script__$8,
-    __vue_scope_id__$8,
-    __vue_is_functional_template__$8,
-    __vue_module_identifier__$8,
-    undefined,
-    undefined
-  );
-
-//
-var RouterLink = {
-  name: 'router-link',
-  components: {
-    Tag: Tag
-  },
-  props: {
-    // to path
-    to: {
-      type: [String, Object],
-      required: true
-    },
-    // replace or push
-    replace: {
-      type: Boolean,
-      "default": false
-    },
-    // tag
-    tag: {
-      type: String,
-      "default": 'a'
-    },
-    // user to check active
-    exact: {
-      type: Boolean,
-      "default": false
-    },
-    // user to check active
-    strict: {
-      type: Boolean,
-      "default": false
-    },
-    // user to check active
-    sensitive: {
-      type: Boolean,
-      "default": true
-    },
-    // active class name
-    activeClass: {
-      type: String,
-      "default": 'router-link-active'
-    },
-    // active class name
-    exactActiveClass: {
-      type: String,
-      "default": 'router-link-exact-active'
-    },
-    // navitage event
-    event: {
-      type: String,
-      "default": 'click'
-    },
-    // location
-    location: {
-      type: Object
-    }
-  },
-  inject: ['router', 'route'],
-  computed: {
-    // current location
-    currentLocation: function currentLocation() {
-      var currentLocation = this.location || this.route.location;
-      return currentLocation;
-    },
-    // to location
-    toLocation: function toLocation() {
-      var toLocation = normalizeToLocation(resolveToLocation(this.to, this.currentLocation), this.currentLocation);
-      return toLocation;
-    },
-    // link href
-    href: function href() {
-      var history = this.router.history;
-      var href = this.toLocation ? history.createHref(this.toLocation) : '';
-      return href;
-    },
-    // path match with current location
-    match: function match() {
-      var to = this.to,
-          exact = this.exact,
-          strict = this.strict,
-          sensitive = this.sensitive;
-      var pathToMatch = this.currentLocation.pathname;
-      var path = this.toLocation.pathname; // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
-
-      var escapedPath = path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
-      var match = escapedPath ? matchPath(pathToMatch, {
-        path: escapedPath,
-        exact: exact,
-        strict: strict,
-        sensitive: sensitive
-      }) : null;
-      return match;
-    },
-    classNames: function classNames() {
-      var classNames = '';
-      if (!this.match) return classNames;
-      classNames += " ".concat(this.activeClass);
-      if (this.match.exact) classNames += " ".concat(this.exactActiveClass);
-      return classNames;
-    }
-  },
-  methods: {
-    handleClick: function handleClick(event) {
-      this.$emit('click', event);
-      if (!guardEvent(event)) return;
-      var history = this.router.history;
-      var replace = this.replace,
-          to = this.to;
-      var loc = resolveToLocation(to, this.currentLocation);
-
-      if (replace) {
-        history.replace(loc);
-      } else {
-        history.push(loc);
-      }
-    }
-  },
-  created: function created() {
-    assert(this.router, 'You should not use <router-link> outside a <router>');
-  },
-  beforeUpdate: function beforeUpdate() {
-    assert(this.router, 'You should not use <router-link> outside a <router>');
-  }
-};
-
-/* script */
-const __vue_script__$9 = RouterLink;
-
-/* template */
-var __vue_render__$4 = function() {
-  var _vm = this;
-  var _h = _vm.$createElement;
-  var _c = _vm._self._c || _h;
-  return _c(
-    "tag",
-    _vm._b(
-      {
-        class: _vm.classNames,
-        attrs: { tag: _vm.tag, href: _vm.href },
-        on: _vm._d({}, [
-          _vm.event,
-          function($event) {
-            return _vm.handleClick($event)
-          }
-        ])
-      },
-      "tag",
-      _vm.$attrs,
-      false
-    ),
-    [
-      _vm._t("default", null, {
-        href: _vm.href,
-        match: _vm.match,
-        history: _vm.router.history,
-        location: _vm.router.history.location
-      })
-    ],
-    2
-  )
-};
-var __vue_staticRenderFns__$4 = [];
-__vue_render__$4._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$9 = undefined;
@@ -1403,15 +1403,15 @@ __vue_render__$4._withStripped = true;
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$9 = false;
+  const __vue_is_functional_template__$9 = undefined;
   /* style inject */
   
   /* style inject SSR */
   
 
   
-  var RouterLink$1 = normalizeComponent_1(
-    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+  var Route$1 = normalizeComponent_1(
+    {},
     __vue_inject_styles__$9,
     __vue_script__$9,
     __vue_scope_id__$9,
@@ -1422,7 +1422,7 @@ __vue_render__$4._withStripped = true;
   );
 
 var script$1 = {
-  name: 'router-ref',
+  name: 'router-context',
   inject: ['router', 'route'],
   data: function data() {
     return {
@@ -1455,7 +1455,7 @@ const __vue_script__$a = script$1;
   
 
   
-  var RouterRef = normalizeComponent_1(
+  var RouteContext = normalizeComponent_1(
     {},
     __vue_inject_styles__$a,
     __vue_script__$a,
@@ -1467,7 +1467,7 @@ const __vue_script__$a = script$1;
   );
 
 var script$2 = {
-  name: 'match-first',
+  name: 'route-switch',
   functional: true,
   props: {
     location: Object
@@ -1477,7 +1477,7 @@ var script$2 = {
     var _context$injections = context.injections,
         router = _context$injections.router,
         route = _context$injections.route;
-    assert(router, "You should not use <match-first> outside a <router>'");
+    assert(router, "You should not use <route-switch> outside a <router>'");
     var vnodeKey = '';
     var location = context.props.location || route.location;
     var children = context.slots()["default"].filter(isNotTextNode);
@@ -1530,7 +1530,7 @@ const __vue_script__$b = script$2;
   
 
   
-  var MatchFirst = normalizeComponent_1(
+  var RouteSwitch = normalizeComponent_1(
     {},
     __vue_inject_styles__$b,
     __vue_script__$b,
@@ -1541,5 +1541,5 @@ const __vue_script__$b = script$2;
     undefined
   );
 
-export { BrowserRouter$1 as BrowserRouter, HashRouter$1 as HashRouter, MatchFirst, MemoryRouter$1 as MemoryRouter, Prompt$1 as Prompt, Redirect$1 as Redirect, Route$1 as Route, Router$1 as Router, RouterLink$1 as RouterLink, RouterRef, StaticRouter$1 as StaticRouter, createStaticHistory, generatePath, matchPath };
+export { BrowserRouter$1 as BrowserRouter, HashRouter$1 as HashRouter, MemoryRouter$1 as MemoryRouter, Prompt$1 as Prompt, Redirect$1 as Redirect, Route$1 as Route, RouteContext, RouteSwitch, Router$1 as Router, RouterLink$1 as RouterLink, StaticRouter$1 as StaticRouter, createStaticHistory, generatePath, matchPath };
 //# sourceMappingURL=router.esm.js.map

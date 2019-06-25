@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: 'router-ref',
+  name: 'router-context',
   inject: ['router', 'route'],
   data() {
     return {

@@ -1,10 +1,10 @@
 import Vue from 'vue'
-import { BrowserRouter as Router, Route, RouterLink, Redirect, MatchFirst } from 'vue-router-lite'
+import { BrowserRouter as Router, Route, RouterLink, Redirect, RouteSwitch } from 'vue-router-lite'
 
 const Home = { 
   template: `
     <p>
-      A <code>&lt;match-first></code> renders the first child <code>&lt;route></code>{{" "}}
+      A <code>&lt;route-switch></code> renders the first child <code>&lt;route></code>{{" "}}
       that matches. A <code>&lt;route></code> with no <code>path</code> always
       matches.
     </p>
@@ -38,7 +38,7 @@ const App = {
     Route, 
     RouterLink,
     Redirect,
-    MatchFirst,
+    RouteSwitch,
     Home,
     WillMatch,
     NoMatch,
@@ -64,7 +64,7 @@ const App = {
             <router-link to="/also/will/not/match">Also Will Not Match</router-link>
           </li>
         </ul>
-        <match-first>
+        <route-switch>
           <route path="/" exact>
             <home />
           </route>
@@ -77,7 +77,7 @@ const App = {
           <route v-slot:default="{ location }">
             <no-match :location="location" />
           </route>
-        </match-first>
+        </route-switch>
       </div>
     </div>
   `,

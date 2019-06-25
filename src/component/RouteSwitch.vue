@@ -3,7 +3,7 @@ import { assert, isNotTextNode } from '../util/utils';
 import matchPath from "../util/matchPath";
 
 export default {
-  name: 'match-first',
+  name: 'route-switch',
   functional: true,
   props: {
     location: Object
@@ -14,7 +14,7 @@ export default {
 
     assert(
       router, 
-      `You should not use <match-first> outside a <router>'`
+      `You should not use <route-switch> outside a <router>'`
     );
 
     let vnodeKey = '';
