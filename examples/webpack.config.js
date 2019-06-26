@@ -33,7 +33,17 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: 'babel-loader'
+        use: {
+          loader: 'babel-loader',
+          options: {
+            babelrc: false,
+            presets: ['@babel/preset-env'],
+            plugins: [
+              '@babel/plugin-syntax-dynamic-import', 
+              '@babel/plugin-proposal-object-rest-spread'
+            ]
+          }
+        }
       },
       {
         test: /\.vue$/,

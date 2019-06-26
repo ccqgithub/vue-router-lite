@@ -22,7 +22,7 @@ import { getPost } from './api'
 
 export default {
   props: {
-    match: Object
+    id: [String, Number]
   },
   data () {
     return {
@@ -35,13 +35,13 @@ export default {
     this.fetchData()
   },
   watch: {
-    'match': 'fetchData'
+    'id': 'fetchData'
   },
   methods: {
     fetchData () {
       this.error = this.post = null
       this.loading = true
-      getPost(this.match.params.id, (err, post) => {
+      getPost(this.id, (err, post) => {
         this.loading = false
         if (err) {
           this.error = err.toString()

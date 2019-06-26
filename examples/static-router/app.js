@@ -2,9 +2,13 @@ import Vue from 'vue'
 import { StaticRouter as Router, Route, RouterLink } from 'vue-router-lite'
 
 const Home = { 
+  props: {
+    history: Object
+  },
   template: `
     <div>
       <h2>Home</h2>
+      <div>Status Code: {{ history.context.statusCode }}</div>
     </div>
   ` 
 }
@@ -15,6 +19,19 @@ const About = {
       <h2>About</h2>
     </div>
   ` 
+}
+
+const SetStatusCode = {
+  functional: true,
+  props: {
+    code: String,
+    history: Object
+  },
+  render(h, context) {
+    const { history, code } = context.props;
+    history.context.statusCode = code;
+    return null;
+  }
 }
 
 const Topic = {
@@ -87,7 +104,8 @@ const App = {
     RouterLink,
     Home,
     About,
-    Topics
+    Topics,
+    SetStatusCode
   },
   template: `
     <div id="app">
@@ -112,13 +130,19 @@ const App = {
       </ul>
 
       <hr />
-      
-      <route exact path="/">
-        <home />
+
+      <route v-slot="props">
+        <set-status-code v-bind="props" code="404" />
       </route>
+      
+      <route exact path="/" v-slot="props">
+        <home v-bind="props"/>
+      </route>
+
       <route path="/about">
         <about />
       </route>
+
       <route path="/topics" v-slot:default="{ match }">
         <topics :match="match" />
       </route>
@@ -137,7 +161,9 @@ new Vue({
   },
   data() {
     return {
-      context: {},
+      context: {
+        statusCode: 200
+      },
       location: {
         pathname: window.location.pathname
       }

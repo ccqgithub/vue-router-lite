@@ -35,7 +35,7 @@ const Route = {
 
   provide() {
     return {
-      route: this.route
+      route: this.computedRoute
     }
   },
 
@@ -44,20 +44,61 @@ const Route = {
       isActive: true,
       // add provide's properties in data, to make provide reactivity 
       computedRoute: {
-        location: this.computeLocation(),
-        match: this.computeMatch()
+        location: this.location || this.route.location,
+        match: this.route.match
       }
     }
   },
 
+  computed: {
+    computeLocation() {
+      return this.location || this.route.location;
+    },
+    computeMatch() {
+      const computedLocation = this.computeLocation;
+      const { path, strict, exact, sensitive, route } = this;
+      const pathname = computedLocation.pathname;
+      const match = path ? 
+        matchPath(
+          pathname,
+          { path, strict, exact, sensitive }
+        ) : route.match;
+
+      return match;
+    }
+  },
+
   watch: {
-    route: {
+    computeMatch: {
       handler() {
-        if (!this.isActive) return;
-        this.computedRoute.location = this.computeLocation();
-        this.computedRoute.match = this.computeMatch();
+        this.updateRoute();
       },
       deep: true
+    }
+  },
+
+  methods: {
+    updateRoute() {
+      if (!this.isActive) return;
+      const match = this.computeMatch;
+
+      // cache
+      if (!this.cacheMatch || !match) {
+        this.cacheMatch = match;
+      } else {
+        Object.keys(match).forEach(key => {
+          this.cacheMatch[key] = match[key];
+        })
+      }
+
+      this.computedRoute.location = this.computeLocation;
+      this.computedRoute.match = this.cacheMatch;
+    },
+    clearCache() {
+      for (let key in this.cache) {
+        this.cache[key].componentInstance.$destroy();
+        this.cache[key] = null;
+      }
     }
   },
 
@@ -67,13 +108,12 @@ const Route = {
       `You should not use <route> outside a <router>.`
     );
 
+    // cache match object
     this.cacheMatch = null;
-    // use for keepalive
+    // use for cache keepalive component
     this.cache = Object.create(null);
-  },
-
-  destroyed () {
-    this.clearCache();
+    // update current route
+    this.updateRoute();
   },
 
   beforeUpdate() {
@@ -85,45 +125,15 @@ const Route = {
 
   activated() {
     this.isActive = true;
-    this.computedRoute.location = this.computeLocation();
-    this.computedRoute.match = this.computeMatch();
+    this.updateRoute();
   },
 
   deactivated() {
     this.isActive = false;
   },
 
-  methods: {
-    computeLocation() {
-      return this.location || this.route.location;
-    },
-    computeMatch() {
-      const computedLocation = this.computeLocation();
-      const { path, strict, exact, sensitive, route } = this;
-      const pathname = computedLocation.pathname;
-      const match = path ? 
-        matchPath(
-          pathname,
-          { path, strict, exact, sensitive }
-        ) : route.match;
-
-      // cache
-      if (!this.cacheMatch || !match) {
-        this.cacheMatch = match;
-      } else {
-        Object.keys(match).forEach(key => {
-          this.cacheMatch[key] = match[key];
-        })
-      }
-
-      return this.cacheMatch;
-    },
-    clearCache() {
-      for (let key in this.cache) {
-        this.cache[key].componentInstance.$destroy();
-        this.cache[key] = null;
-      }
-    }
+  destroyed () {
+    this.clearCache();
   },
 
   render(createElement) {

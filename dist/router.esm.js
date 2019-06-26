@@ -1266,7 +1266,7 @@ var Route = {
   inject: ['router', 'route'],
   provide: function provide() {
     return {
-      route: this.route
+      route: this.computedRoute
     };
   },
   data: function data() {
@@ -1274,49 +1274,17 @@ var Route = {
       isActive: true,
       // add provide's properties in data, to make provide reactivity 
       computedRoute: {
-        location: this.computeLocation(),
-        match: this.computeMatch()
+        location: this.location || this.route.location,
+        match: this.route.match
       }
     };
   },
-  watch: {
-    route: {
-      handler: function handler() {
-        if (!this.isActive) return;
-        this.computedRoute.location = this.computeLocation();
-        this.computedRoute.match = this.computeMatch();
-      },
-      deep: true
-    }
-  },
-  created: function created() {
-    assert(this.router, "You should not use <route> outside a <router>.");
-    this.cacheMatch = null; // use for keepalive
-
-    this.cache = Object.create(null);
-  },
-  destroyed: function destroyed() {
-    this.clearCache();
-  },
-  beforeUpdate: function beforeUpdate() {
-    assert(this.router, "You should not use <route> outside a <router>.");
-  },
-  activated: function activated() {
-    this.isActive = true;
-    this.computedRoute.location = this.computeLocation();
-    this.computedRoute.match = this.computeMatch();
-  },
-  deactivated: function deactivated() {
-    this.isActive = false;
-  },
-  methods: {
+  computed: {
     computeLocation: function computeLocation() {
       return this.location || this.route.location;
     },
     computeMatch: function computeMatch() {
-      var _this = this;
-
-      var computedLocation = this.computeLocation();
+      var computedLocation = this.computeLocation;
       var path = this.path,
           strict = this.strict,
           exact = this.exact,
@@ -1328,7 +1296,24 @@ var Route = {
         strict: strict,
         exact: exact,
         sensitive: sensitive
-      }) : route.match; // cache
+      }) : route.match;
+      return match;
+    }
+  },
+  watch: {
+    computeMatch: {
+      handler: function handler() {
+        this.updateRoute();
+      },
+      deep: true
+    }
+  },
+  methods: {
+    updateRoute: function updateRoute() {
+      var _this = this;
+
+      if (!this.isActive) return;
+      var match = this.computeMatch; // cache
 
       if (!this.cacheMatch || !match) {
         this.cacheMatch = match;
@@ -1338,7 +1323,8 @@ var Route = {
         });
       }
 
-      return this.cacheMatch;
+      this.computedRoute.location = this.computeLocation;
+      this.computedRoute.match = this.cacheMatch;
     },
     clearCache: function clearCache() {
       for (var key in this.cache) {
@@ -1346,6 +1332,28 @@ var Route = {
         this.cache[key] = null;
       }
     }
+  },
+  created: function created() {
+    assert(this.router, "You should not use <route> outside a <router>."); // cache match object
+
+    this.cacheMatch = null; // use for cache keepalive component
+
+    this.cache = Object.create(null); // update current route
+
+    this.updateRoute();
+  },
+  beforeUpdate: function beforeUpdate() {
+    assert(this.router, "You should not use <route> outside a <router>.");
+  },
+  activated: function activated() {
+    this.isActive = true;
+    this.updateRoute();
+  },
+  deactivated: function deactivated() {
+    this.isActive = false;
+  },
+  destroyed: function destroyed() {
+    this.clearCache();
   },
   render: function render(createElement) {
     var router = this.router,
@@ -1468,21 +1476,89 @@ const __vue_script__$a = script$1;
 
 var script$2 = {
   name: 'route-switch',
-  functional: true,
   props: {
     location: Object
   },
   inject: ['router', 'route'],
+  provide: function provide() {
+    return {
+      route: this.computedRoute
+    };
+  },
+  data: function data() {
+    return {
+      isActive: true,
+      // add provide's properties in data, to make provide reactivity 
+      computedRoute: {
+        location: this.location || this.route.location,
+        match: this.route.match
+      }
+    };
+  },
+  computed: {
+    computeLocation: function computeLocation() {
+      return this.location || this.route.location;
+    }
+  },
+  watch: {
+    computeLocation: {
+      handler: function handler() {
+        this.updateRoute();
+      },
+      deep: true
+    }
+  },
+  methods: {
+    updateRoute: function updateRoute() {
+      if (!this.isActive) return;
+      this.computedRoute.location = this.computeLocation;
+      this.computedRoute.match = this.route.match;
+    },
+    clearCache: function clearCache() {
+      for (var key in this.cache) {
+        this.cache[key].componentInstance.$destroy();
+        this.cache[key] = null;
+      }
+    }
+  },
+  created: function created() {
+    assert(this.router, "You should not use <route-switch> outside a <router>."); // use for cache keepalive component
+
+    this.cache = Object.create(null); // update current route
+
+    this.updateRoute();
+  },
+  beforeUpdate: function beforeUpdate() {
+    assert(this.router, "You should not use <route-switch> outside a <router>.");
+  },
+  activated: function activated() {
+    this.isActive = true;
+    this.updateRoute();
+  },
+  deactivated: function deactivated() {
+    this.isActive = false;
+  },
+  destroyed: function destroyed() {
+    this.clearCache();
+  },
   render: function render(createElement, context) {
-    var _context$injections = context.injections,
-        router = _context$injections.router,
-        route = _context$injections.route;
-    assert(router, "You should not use <route-switch> outside a <router>'");
-    var vnodeKey = '';
-    var location = context.props.location || route.location;
-    var children = context.slots()["default"].filter(isNotTextNode);
+    var router = this.router,
+        cache = this.cache;
+    var location = this.computedRoute.location;
+    var children = (this.$slots["default"] || []).filter(isNotTextNode);
+    var isKeepAlive = this.$vnode.data.keepAlive; // no keep alive
+
+    if (!isKeepAlive) {
+      this.clearCache();
+    }
+
+    if (!children.length) return null;
+    var key = '';
     var vnode = children.find(function (vnode) {
-      if (!vnode.componentOptions) return false;
+      // filter text nodes
+      if (!vnode.tag) return false; // check children if <route> component
+
+      assert(vnode.componentOptions, "<route-switch>'s children can only be <route>.");
       var propsData = vnode.componentOptions.propsData || {};
       var _propsData$path = propsData.path,
           path = _propsData$path === void 0 ? '' : _propsData$path,
@@ -1491,10 +1567,9 @@ var script$2 = {
           _propsData$strict = propsData.strict,
           strict = _propsData$strict === void 0 ? false : _propsData$strict,
           _propsData$sensitive = propsData.sensitive,
-          sensitive = _propsData$sensitive === void 0 ? true : _propsData$sensitive,
-          _propsData$key = propsData.key,
-          key = _propsData$key === void 0 ? '' : _propsData$key;
-      vnodeKey = key || "path-".concat(path, "--exact-").concat(exact, "--strict-").concat(strict, "--sensitive=").concat(sensitive); // no path on route
+          sensitive = _propsData$sensitive === void 0 ? true : _propsData$sensitive; // key
+
+      key = vnode.key || "path-".concat(path, "--exact-").concat(exact, "--strict-").concat(strict, "--sensitive-").concat(sensitive); // no path on route
 
       if (!path) return true;
       var match = matchPath(location.pathname, {
@@ -1504,9 +1579,21 @@ var script$2 = {
         sensitive: sensitive
       });
       return !!match;
-    }); // key
+    });
+    if (!vnode) return vnode; // is keepAlive and is component
 
-    if (vnode) vnode.key = vnodeKey;
+    if (isKeepAlive) {
+      if (cache[key]) {
+        vnode.componentInstance = cache[key].componentInstance;
+      } else {
+        cache[key] = vnode;
+      }
+
+      vnode.data.keepAlive = true;
+    } // key
+
+
+    vnode.key = key;
     return vnode;
   }
 };

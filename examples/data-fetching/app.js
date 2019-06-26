@@ -27,10 +27,8 @@ new Vue({
           <home />
         </route>
 
-        <route path="/post/:id">
-          <template v-slot:default="{ match }">
-            <post :match="match" />
-          </template>
+        <route path="/post/:id" v-slot="{ match }">
+          <post :id="match.params.id" />
         </route>
       </div>
     </router>
