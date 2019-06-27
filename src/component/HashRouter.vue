@@ -24,7 +24,8 @@ const HashRouter = {
     hashType: {
       validator(value) {
         return ["hashbang", "noslash", "slash"].indexOf(value) !== -1;
-      }
+      },
+      default: 'slash'
     },
     getUserConfirmation: {
       type: Function,

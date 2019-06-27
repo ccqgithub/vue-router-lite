@@ -53,6 +53,8 @@
     "dev:dist": "rollup -wm -c build/rollup.dev.config.js",
     "build": "node build/build.js",
     "test": "jest",
+    "docs": "vuepress dev docs",
+    "docs:build": "vuepress build docs",
     "install-deps": "npm i --chromedriver_cdnurl=https://npm.taobao.org/mirrors/chromedriver"
   },
   "repository": {
