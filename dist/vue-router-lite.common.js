@@ -1,6 +1,16 @@
-import { createLocation, createMemoryHistory, createHashHistory, createBrowserHistory, createPath, locationsAreEqual } from 'history';
-export { createBrowserHistory, createHashHistory, createMemoryHistory } from 'history';
-import pathToRegexp from 'path-to-regexp';
+/*!
+  * vue-router-lite v1.0.0
+  * (c) 2019-present Season Chen
+  * @license MIT
+  */
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var history = require('history');
+var pathToRegexp = _interopDefault(require('path-to-regexp'));
 
 function assert(condition, message) {
   if (!condition) {
@@ -13,7 +23,7 @@ var resolveToLocation = function resolveToLocation(to, currentLocation) {
 }; // 
 
 var normalizeToLocation = function normalizeToLocation(to, currentLocation) {
-  return typeof to === "string" ? createLocation(to, null, null, currentLocation) : to;
+  return typeof to === "string" ? history.createLocation(to, null, null, currentLocation) : to;
 };
 var guardEvent = function guardEvent(e) {
   // don't redirect with control keys
@@ -255,14 +265,14 @@ var MemoryRouter = {
     }
   },
   data: function data() {
-    var history = createMemoryHistory({
+    var history$1 = history.createMemoryHistory({
       initialEntries: this.initialEntries,
       initialIndex: this.initialIndex,
       keyLength: this.keyLength,
       getUserConfirmation: this.getUserConfirmation
     });
     return {
-      history: history
+      history: history$1
     };
   }
 };
@@ -343,13 +353,13 @@ var HashRouter = {
     }
   },
   data: function data() {
-    var history = createHashHistory({
+    var history$1 = history.createHashHistory({
       basename: this.basename,
       hashType: this.hashType,
       getUserConfirmation: this.getUserConfirmation
     });
     return {
-      history: history
+      history: history$1
     };
   }
 };
@@ -433,14 +443,14 @@ var BrowserRouter = {
     }
   },
   data: function data() {
-    var history = createBrowserHistory({
+    var history$1 = history.createBrowserHistory({
       basename: this.basename,
       forceRefresh: this.forceRefresh,
       keyLength: this.keyLength,
       getUserConfirmation: this.getUserConfirmation
     });
     return {
-      history: history
+      history: history$1
     };
   }
 };
@@ -572,7 +582,7 @@ var stripBasename = function stripBasename(basename, location) {
 };
 
 var createURL = function createURL(location) {
-  return typeof location === "string" ? location : createPath(location);
+  return typeof location === "string" ? location : history.createPath(location);
 };
 
 var staticHandler = function staticHandler(methodName) {
@@ -590,11 +600,11 @@ function createStaticHistory(_ref) {
       context = _ref$context === void 0 ? {} : _ref$context,
       _ref$location = _ref.location,
       location = _ref$location === void 0 ? '/' : _ref$location;
-  var history = {
+  var history$1 = {
     isStatic: true,
     context: context,
     action: "POP",
-    location: stripBasename(basename, createLocation(location)),
+    location: stripBasename(basename, history.createLocation(location)),
     go: staticHandler("go"),
     goBack: staticHandler("goBack"),
     goForward: staticHandler("goForward"),
@@ -603,12 +613,12 @@ function createStaticHistory(_ref) {
     },
     push: function push(location) {
       context.action = "PUSH";
-      context.location = addBasename(basename, createLocation(location));
+      context.location = addBasename(basename, history.createLocation(location));
       context.url = createURL(context.location);
     },
     replace: function replace(location) {
       context.action = "REPLACE";
-      context.location = addBasename(basename, createLocation(location));
+      context.location = addBasename(basename, history.createLocation(location));
       context.url = createURL(context.location);
     },
     listen: function listen() {
@@ -618,7 +628,7 @@ function createStaticHistory(_ref) {
       return noop;
     }
   };
-  return history;
+  return history$1;
 }
 
 //
@@ -1158,7 +1168,7 @@ var Redirect = {
     assert(this.router, 'You must not use <redirect> outside a <router>.');
     var to = this.computeTo(); // already redirect
 
-    if (locationsAreEqual(this.lastTo, to)) {
+    if (history.locationsAreEqual(this.lastTo, to)) {
       return;
     }
 
@@ -1188,7 +1198,7 @@ var Redirect = {
       } // to
 
 
-      var to = createLocation(p);
+      var to = history.createLocation(p);
       return to;
     },
     perform: function perform() {
@@ -1628,5 +1638,35 @@ const __vue_script__$b = script$2;
     undefined
   );
 
-export { BrowserRouter$1 as BrowserRouter, HashRouter$1 as HashRouter, MemoryRouter$1 as MemoryRouter, Prompt$1 as Prompt, Redirect$1 as Redirect, Route$1 as Route, RouteContext, RouteSwitch, Router$1 as Router, RouterLink$1 as RouterLink, StaticRouter$1 as StaticRouter, createStaticHistory, generatePath, matchPath };
-//# sourceMappingURL=router.esm.js.map
+Object.defineProperty(exports, 'createBrowserHistory', {
+  enumerable: true,
+  get: function () {
+    return history.createBrowserHistory;
+  }
+});
+Object.defineProperty(exports, 'createHashHistory', {
+  enumerable: true,
+  get: function () {
+    return history.createHashHistory;
+  }
+});
+Object.defineProperty(exports, 'createMemoryHistory', {
+  enumerable: true,
+  get: function () {
+    return history.createMemoryHistory;
+  }
+});
+exports.BrowserRouter = BrowserRouter$1;
+exports.HashRouter = HashRouter$1;
+exports.MemoryRouter = MemoryRouter$1;
+exports.Prompt = Prompt$1;
+exports.Redirect = Redirect$1;
+exports.Route = Route$1;
+exports.RouteContext = RouteContext;
+exports.RouteSwitch = RouteSwitch;
+exports.Router = Router$1;
+exports.RouterLink = RouterLink$1;
+exports.StaticRouter = StaticRouter$1;
+exports.createStaticHistory = createStaticHistory;
+exports.generatePath = generatePath;
+exports.matchPath = matchPath;

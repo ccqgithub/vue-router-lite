@@ -59,7 +59,7 @@ module.exports = {
   resolve: {
     alias: {
       vue: 'vue/dist/vue.esm.js',
-      'vue-router-lite': path.join(__dirname, '..', 'dist/router.common.js')
+      'vue-router-lite': path.join(__dirname, '..', 'dist/vue-router-lite.common.js')
     }
   },
 
