@@ -6,8 +6,9 @@
 
 .idea
 .tags*
+
 node_modules
-_book
+docs/.vuepress/dist
 
 npm-debug.log*
 # yarn.lock

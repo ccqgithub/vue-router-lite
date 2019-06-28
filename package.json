@@ -49,12 +49,13 @@
     "yorkie": "^2.0.0"
   },
   "scripts": {
-    "dev": "node examples/server.js",
-    "dev:dist": "rollup -wm -c build/rollup.dev.config.js",
+    "dev": "rollup -wm -c build/rollup.dev.config.js",
     "build": "node build/build.js",
-    "test": "jest",
+    "examples": "node examples/server.js",
+    "examples:build": "node examples/server.js",
     "docs": "vuepress dev docs",
     "docs:build": "vuepress build docs",
+    "test": "jest",
     "install-deps": "npm i --chromedriver_cdnurl=https://npm.taobao.org/mirrors/chromedriver"
   },
   "repository": {
