@@ -7,7 +7,7 @@ const Prompt = {
   props: {
     when: {
       type: Boolean,
-      default: true
+      required: true
     },
     message: {
       type: [Function, String],

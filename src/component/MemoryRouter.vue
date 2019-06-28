@@ -30,7 +30,8 @@ const MemoryRouter = {
       default: 6
     },
     getUserConfirmation: {
-      type: Function
+      type: Function,
+      default: null
     }
   },
 
