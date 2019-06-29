@@ -8,9 +8,6 @@ defaults: &defaults
 jobs:
   install:
     <<: *defaults
-    branches:
-      only:
-        - master
     steps:
       - checkout
       - restore_cache:
@@ -30,9 +27,6 @@ jobs:
   
   docs:
     <<: *defaults
-    branches:
-      only:
-        - master
     steps:
       - attach_workspace:
           at: ~/project/vue-router-lite
@@ -85,6 +79,9 @@ jobs:
 workflows:
   version: 2
   install-workflows:
+    branches:
+      only:
+        - master
     jobs:
       - install
       - docs:
