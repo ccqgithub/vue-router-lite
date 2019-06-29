@@ -34,12 +34,12 @@ jobs:
       - run: npm run docs:build
       # 进入生成的文件夹
       - run: cd docs/.vuepress/dist && ls
-      - run: git init
-      - run: git config --global user.email "season.chen.i@foxmail.com"
-      - run: git config --global user.name "Season Chen"
-      - run: ls && git add -A
-      - run: git commit -m 'deploy'
-      - run: git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
+      - run: cd docs/.vuepress/dist && git init
+      - run: cd docs/.vuepress/dist && git config --global user.email "season.chen.i@foxmail.com"
+      - run: cd docs/.vuepress/dist && git config --global user.name "Season Chen"
+      - run: cd docs/.vuepress/dist && git add -A
+      - run: cd docs/.vuepress/dist && git commit -m 'deploy'
+      - run: cd docs/.vuepress/dist && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
 
   # lint-flow-types:
   #   <<: *defaults
