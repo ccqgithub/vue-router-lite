@@ -10,6 +10,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+      - run: git remote -v
       - restore_cache:
           keys:
             - v1-vue-router-lite-{{ .Branch }}-{{ checksum "package-lock.json" }}
