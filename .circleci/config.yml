@@ -10,7 +10,6 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - run: git remote -v
       - restore_cache:
           keys:
             - v1-vue-router-lite-{{ .Branch }}-{{ checksum "package-lock.json" }}
@@ -21,6 +20,16 @@ jobs:
           key: v1-vue-router-lite-{{ .Branch }}-{{ checksum "package-lock.json" }}
           paths:
             - node_modules/
+      # 生成静态文件
+      - run: npm run docs:build
+      # 进入生成的文件夹
+      - run: cd docs/.vuepress/dist && ls
+      - run: cd docs/.vuepress/dist && git init
+      - run: cd docs/.vuepress/dist && git config --global user.email "season.chen.i@foxmail.com"
+      - run: cd docs/.vuepress/dist && git config --global user.name "Season Chen"
+      - run: cd docs/.vuepress/dist && git add -A
+      - run: cd docs/.vuepress/dist && git commit -m 'deploy'
+      - run: cd docs/.vuepress/dist && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
       - persist_to_workspace:
           root: ~/project
           paths:
@@ -87,9 +96,9 @@ workflows:
   install-workflows:
     jobs:
       - install
-      - docs:
-          requires:
-            - install
+      # - docs:
+      #     requires:
+      #       - install
       # - test-unit:
       #     requires:
       #       - install
