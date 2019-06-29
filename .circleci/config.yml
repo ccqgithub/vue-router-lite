@@ -28,6 +28,9 @@ jobs:
   docs:
     <<: *defaults
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "e6:03:a3:2c:0c:7f:18:c8:9a:ac:57:92:c8:f4:8a:a6"
       - attach_workspace:
           at: ~/project
       # 生成静态文件
