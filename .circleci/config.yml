@@ -24,10 +24,10 @@ jobs:
       - run: npm run docs:build
       - run: cd docs/.vuepress/dist && git init && git config --global user.email "season.chen.i@foxmail.com" && git config --global user.name "Season Chen"
       - run: cd docs/.vuepress/dist && git add -A && git commit -m 'deploy' && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
-      - persist_to_workspace:
-          root: ~/project
-          paths:
-            - vue-router-lite
+      # - persist_to_workspace:
+      #     root: ~/project
+      #     paths:
+      #       - vue-router-lite
 
   # lint-flow-types:
   #   <<: *defaults
