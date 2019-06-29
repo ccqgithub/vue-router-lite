@@ -33,7 +33,7 @@ jobs:
       # 生成静态文件
       - run: npm run docs:build
       # 进入生成的文件夹
-      - run: cd docs/.vuepress/dist
+      - run: cd docs/.vuepress/dist && ls
       - run: git init
       - run: git config --global user.email "season.chen.i@foxmail.com"
       - run: git config --global user.name "Season Chen"
