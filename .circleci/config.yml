@@ -6,7 +6,7 @@ defaults: &defaults
     - image: circleci/node:lts-browsers
 
 jobs:
-  install:
+  deploy-docs:
     <<: *defaults
     steps:
       - checkout
@@ -22,37 +22,12 @@ jobs:
             - node_modules/
       # 生成静态文件
       - run: npm run docs:build
-      # 进入生成的文件夹
-      - run: cd docs/.vuepress/dist && ls
-      - run: cd docs/.vuepress/dist && git init
-      - run: cd docs/.vuepress/dist && git config --global user.email "season.chen.i@foxmail.com"
-      - run: cd docs/.vuepress/dist && git config --global user.name "Season Chen"
-      - run: cd docs/.vuepress/dist && git add -A
-      - run: cd docs/.vuepress/dist && git commit -m 'deploy'
-      - run: cd docs/.vuepress/dist && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
+      - run: cd docs/.vuepress/dist && git init && git config --global user.email "season.chen.i@foxmail.com" && git config --global user.name "Season Chen"
+      - run: cd docs/.vuepress/dist && git add -A && git commit -m 'deploy' && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
       - persist_to_workspace:
           root: ~/project
           paths:
             - vue-router-lite
-  
-  docs:
-    <<: *defaults
-    steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "e6:03:a3:2c:0c:7f:18:c8:9a:ac:57:92:c8:f4:8a:a6"
-      - attach_workspace:
-          at: ~/project
-      # 生成静态文件
-      - run: npm run docs:build
-      # 进入生成的文件夹
-      - run: cd docs/.vuepress/dist && ls
-      - run: cd docs/.vuepress/dist && git init
-      - run: cd docs/.vuepress/dist && git config --global user.email "season.chen.i@foxmail.com"
-      - run: cd docs/.vuepress/dist && git config --global user.name "Season Chen"
-      - run: cd docs/.vuepress/dist && git add -A
-      - run: cd docs/.vuepress/dist && git commit -m 'deploy'
-      - run: cd docs/.vuepress/dist && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
 
   # lint-flow-types:
   #   <<: *defaults
@@ -95,7 +70,7 @@ workflows:
   version: 2
   install-workflows:
     jobs:
-      - install
+      - deploy-docs
       # - docs:
       #     requires:
       #       - install

@@ -1,4 +1,5 @@
 module.exports = {
+  base: process.env.VUEPRESS_BASE || '/',
   locales: {
     '/': {
       lang: 'en-US',
