@@ -29,7 +29,7 @@ jobs:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: ~/project/vue-router-lite
+          at: ~/project/vue-router-lite/
       - run: ls
       # 生成静态文件
       - run: npm run docs:build
