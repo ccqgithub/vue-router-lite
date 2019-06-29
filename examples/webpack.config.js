@@ -1,6 +1,10 @@
 const fs = require('fs')
 const path = require('path')
 const VuePlugin = require('vue-loader/lib/plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyPlugin = require('copy-webpack-plugin')
+
+const htmlPlugins = [];
 
 module.exports = {
   // Expose __dirname to allow automatically setting basename.
@@ -14,8 +18,16 @@ module.exports = {
   entry: fs.readdirSync(__dirname).reduce((entries, dir) => {
     const fullDir = path.join(__dirname, dir)
     const entry = path.join(fullDir, 'app.js')
+    const entryName = path.join(dir, 'app.js').replace(/\.js$/, '');
     if (fs.statSync(fullDir).isDirectory() && fs.existsSync(entry)) {
-      entries[dir] = ['es6-promise/auto', entry]
+      entries[entryName] = ['es6-promise/auto', entry]
+      const filename = path.join(dir, 'index.html')
+      const template = path.join(fullDir, 'index.html')
+      htmlPlugins.push(new HtmlWebpackPlugin({
+        filename,
+        template,
+        inject: false
+      }))
     }
 
     return entries
@@ -75,5 +87,11 @@ module.exports = {
     }
   },
 
-  plugins: [new VuePlugin()]
+  plugins: [
+    new VuePlugin(),
+    new CopyPlugin([
+      'index.html',
+      'global.css'
+    ]),
+  ].concat(htmlPlugins)
 }

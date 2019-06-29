@@ -9,6 +9,7 @@
 
 node_modules
 docs/.vuepress/dist
+examples/__build__
 
 npm-debug.log*
 # yarn.lock
