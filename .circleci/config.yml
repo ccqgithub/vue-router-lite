@@ -9,6 +9,9 @@ jobs:
   deploy-docs-examples:
     <<: *defaults
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "e6:03:a3:2c:0c:7f:18:c8:9a:ac:57:92:c8:f4:8a:a6"
       - checkout
       - restore_cache:
           keys:
@@ -21,13 +24,13 @@ jobs:
           paths:
             - node_modules/
       # init gh-pages
-      - run: mkdir gh-pages
+      - run: cd ../ && mkdir gh-pages
       # docs
-      - run: npm run docs:build && cp -r docs/.vuepress/dist gh-pages/docs 
+      - run: npm run docs:build && cp -r docs/.vuepress/dist ../gh-pages/docs 
       # examples
-      - run: npm run examples:build && cp -r examples/__build__ gh-pages/examples 
+      - run: npm run examples:build && cp -r examples/__build__ ../gh-pages/examples 
       # push
-      - run: cd gh-pages && git init && git config --global user.email "season.chen.i@foxmail.com" && git config --global user.name "Season Chen" && git add -A && git commit -m 'deploy' && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
+      - run: cd ../gh-pages && git init && git config --global user.email "season.chen.i@foxmail.com" && git config --global user.name "Season Chen" && git add -A && git commit -m 'deploy' && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
       # - persist_to_workspace:
       #     root: ~/project
       #     paths:
