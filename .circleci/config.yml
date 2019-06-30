@@ -6,7 +6,7 @@ defaults: &defaults
     - image: circleci/node:lts-browsers
 
 jobs:
-  deploy-docs:
+  deploy-docs-examples:
     <<: *defaults
     steps:
       - checkout
@@ -20,10 +20,14 @@ jobs:
           key: v1-vue-router-lite-{{ .Branch }}-{{ checksum "package-lock.json" }}
           paths:
             - node_modules/
-      # 生成静态文件
-      - run: npm run docs:build
-      - run: cd docs/.vuepress/dist && git init && git config --global user.email "season.chen.i@foxmail.com" && git config --global user.name "Season Chen"
-      - run: cd docs/.vuepress/dist && git add -A && git commit -m 'deploy' && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
+      # init gh-pages
+      - run: cd ../ && mkdir gh-pages
+      # docs
+      - run: npm run docs:build && cp -r docs/.vuepress/dist ../gh-pages/docs 
+      # examples
+      - run: npm run examples:build && cp -r examples/__build__ ../gh-pages/examples 
+      # push
+      - run: cd gh-pages && git init && git config --global user.email "season.chen.i@foxmail.com" && git config --global user.name "Season Chen" && git add -A && git commit -m 'deploy' && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
       # - persist_to_workspace:
       #     root: ~/project
       #     paths:
@@ -68,9 +72,9 @@ jobs:
 
 workflows:
   version: 2
-  install-workflows:
+  deploy-docs-examples:
     jobs:
-      - deploy-docs
+      - deploy-docs-examples
       # - docs:
       #     requires:
       #       - install
