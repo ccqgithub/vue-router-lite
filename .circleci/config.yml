@@ -75,6 +75,10 @@ workflows:
   deploy-docs-examples:
     jobs:
       - deploy-docs-examples
+          filters:
+            branches:
+              only:
+                - master
       # - docs:
       #     requires:
       #       - install

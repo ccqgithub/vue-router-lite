@@ -58,7 +58,7 @@
     "examples": "node examples/server.js",
     "examples:build": "webpack --config examples/webpack.config.js",
     "docs": "vuepress dev docs",
-    "docs:build": "cross-env VUEPRESS_BASE=/vue-router-lite/ vuepress build docs",
+    "docs:build": "cross-env VUEPRESS_BASE=/vue-router-lite/docs/ vuepress build docs",
     "test": "jest",
     "install-deps": "npm i --chromedriver_cdnurl=https://npm.taobao.org/mirrors/chromedriver"
   },
