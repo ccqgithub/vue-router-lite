@@ -20,10 +20,10 @@ Features include: Read [Live Docs](https://github.com/ccqgithub/vue-router-lite/
 
 ## Doccuments And Examples
 
-- [Examples](../examples/).
-- [Examples Live](https://github.com/ccqgithub/vue-router-lite/tree/master/examples).
-- [Docs](../docs/).
-- [Docs Live](https://github.com/ccqgithub/vue-router-lite/tree/master/docs).
+- [Examples](https://github.com/ccqgithub/vue-router-lite/tree/master/examples).
+- [Examples Live](https://github.chenchangqin.com/vue-router-lite/examples/).
+- [Docs](https://github.com/ccqgithub/vue-router-lite/tree/master/docs).
+- [Docs Live](https://github.chenchangqin.com/vue-router-lite/docs/).
 
 ## Development Setup
 
