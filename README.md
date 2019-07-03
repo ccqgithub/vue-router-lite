@@ -18,6 +18,11 @@ Features include: Read [Live Docs](https://github.com/ccqgithub/vue-router-lite/
 - HTML5 history mode or hash mode or memory mode
 - Some other features that [vue-router](https://github.com/vuejs/vue-router) and [react-router4](https://reacttraining.com/react-router/) can do.
 
+## Doccuments And Examples
+
+- [Documents](../docs/), [Live](https://github.com/ccqgithub/vue-router-lite/tree/master/docs).
+- [Examples](../examples/), [Live](https://github.com/ccqgithub/vue-router-lite/tree/master/examples).
+
 ## Development Setup
 
 ```sh
@@ -35,13 +40,6 @@ cd docs
 npm install
 npm run docs
 ```
-
-## Doccuments And Examples
-
-- [Examples](../examples/)
-- [Docs](../docs/)
-- [Live Examples](https://github.com/ccqgithub/vue-router-lite/tree/master/examples)
-- [Live Docs](https://github.com/ccqgithub/vue-router-lite/tree/master/docs)
 
 ## Inspired By
 
