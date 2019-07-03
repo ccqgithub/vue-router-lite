@@ -73,7 +73,10 @@
   },
   "homepage": "https://github.com/ccqgithub/vue-router-lite#readme",
   "dependencies": {
-    "history": "^4.9.0",
-    "path-to-regexp": "^3.0.0"
+    "history": "~4.9.0",
+    "path-to-regexp": "~3.0.0"
+  },
+  "peerDependencies": {
+    "vue": "~2.6.0"
   }
 }
