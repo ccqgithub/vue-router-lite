@@ -35,3 +35,9 @@ Features include: Read [Live Docs](https://github.chenchangqin.com/vue-router-li
 - [Vue 2.6+](https://vuejs.org/): peer dependence, need vue2.6+'s new unified slot syntax.
 - [History 4.x](https://github.com/ReactTraining/history)
 - [Path-To-Regexp 3.x](https://github.com/pillarjs/path-to-regexp)
+
+## License
+
+[MIT](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2019-present [Season Chen](https://github.com/ccqgithub)
