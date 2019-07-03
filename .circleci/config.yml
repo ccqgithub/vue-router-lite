@@ -18,11 +18,20 @@ jobs:
             - v1-vue-router-lite-{{ .Branch }}-{{ checksum "package-lock.json" }}
             - v1-vue-router-lite-{{ .Branch }}-
             - v1-vue-router-lite
-      - run: npm install
+      - restore_cache:
+          keys:
+            - v1-vue-router-lite-docs-{{ .Branch }}-{{ checksum "docs/package-lock.json" }}
+            - v1-vue-router-lite-docs-{{ .Branch }}-
+            - v1-vue-router-lite-docs
+      - run: npm install && cd docs && npm install
       - save_cache:
           key: v1-vue-router-lite-{{ .Branch }}-{{ checksum "package-lock.json" }}
           paths:
             - node_modules/
+      - save_cache:
+          key: v1-vue-router-lite-docs-{{ .Branch }}-{{ checksum "docs/package-lock.json" }}
+          paths:
+            - docs/node_modules/
       # init gh-pages
       - run: cd ../ && mkdir gh-pages
       # docs
