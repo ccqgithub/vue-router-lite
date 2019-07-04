@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Vue Router Lite Examples</title>
-  <link rel="stylesheet" href="./global.css">
+
+  <% for (var css in htmlWebpackPlugin.files.css) { %>
+  <link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet">
+  <% } %>
 </head>
 <body style="padding: 0 20px">
   <h1>Vue Router Lite Examples</h1>
@@ -31,5 +34,9 @@
     <li><a href="active-links">Active Links</a></li>
     <li><a href="data-fetching">Data Fetching</a></li>
   </ul>
+
+  <% for (var js in htmlWebpackPlugin.files.js) { %>
+  <script src="<%= htmlWebpackPlugin.files.js[js] %>"></script>
+  <% } %>
 </body>
 </html>

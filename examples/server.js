@@ -3,18 +3,9 @@ const rewrite = require('express-urlrewrite')
 const webpack = require('webpack')
 const webpackDevMiddleware = require('webpack-dev-middleware')
 const WebpackConfig = require('./webpack.config')
+const publicPath = process.env.PUBLIC_PATH || '/'
 
 const app = express()
-
-app.use(
-  webpackDevMiddleware(webpack(WebpackConfig), {
-    publicPath: '/__build__/',
-    stats: {
-      colors: true,
-      chunks: false
-    }
-  })
-)
 
 const fs = require('fs')
 const path = require('path')
@@ -24,6 +15,16 @@ fs.readdirSync(__dirname).forEach(file => {
     app.use(rewrite('/' + file + '/*', '/' + file + '/index.html'))
   }
 })
+
+app.use(
+  webpackDevMiddleware(webpack(WebpackConfig), {
+    publicPath,
+    stats: {
+      colors: true,
+      chunks: false
+    }
+  })
+)
 
 app.use(express.static(__dirname))
 

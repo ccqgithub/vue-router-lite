@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import { BrowserRouter as Router, Route, RouterLink } from 'vue-router-lite'
+import '../global.css'
 
 const Home = { template: '<div><h2>Home</h2></div>' }
 const About = { template: '<div><h2>About</h2></div>' }
