@@ -6,7 +6,7 @@
 
 `vue-router-lite` is a component-based router for [Vue.js](http://vuejs.org/).  
 
-Features include: Read [Live Docs](https://github.com/ccqgithub/vue-router-lite/tree/master/docs) for more details.
+Features include: Read [Live Docs](https://github.chenchangqin.com/vue-router-lite/docs/) for more details.
 
 - Component-Based: just use some HOC(Higher-Order Components) to control your routes.
 - Nested routes or mapping routes
