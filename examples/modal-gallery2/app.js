@@ -258,8 +258,15 @@ new Vue({
     App,
     Router
   },
+  data() {
+    const p = '/modal-gallery2';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/modal-gallery2/" v-slot="slotProps">
+    <router :basename="basename" v-slot="slotProps">
       <app v-bind="slotProps"/>
     </router>
   `

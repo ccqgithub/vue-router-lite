@@ -73,8 +73,15 @@ new Vue({
     App,
     Router
   },
+  data() {
+    const p = '/custom-link';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/custom-link/">
+    <router :basename="basename">
       <app />
     </router>
   `

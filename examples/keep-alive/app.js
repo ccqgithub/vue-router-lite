@@ -163,8 +163,15 @@ new Vue({
     App,
     Router
   },
+  data() {
+    const p = '/keep-alive';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/keep-alive/">
+    <router :basename="basename">
       <app />
     </router>
   `

@@ -99,8 +99,15 @@ new Vue({
     App,
     Router
   },
+  data() {
+    const p = '/preventing-transitions';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/preventing-transitions/">
+    <router :basename="basename">
       <app />
     </router>
   `

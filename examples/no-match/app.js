@@ -92,8 +92,15 @@ new Vue({
     App,
     Router
   },
+  data() {
+    const p = '/no-match';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/no-match/">
+    <router :basename="basename">
       <app />
     </router>
   `

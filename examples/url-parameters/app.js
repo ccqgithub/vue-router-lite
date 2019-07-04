@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import { BrowserRouter as Router, Route, RouterLink } from 'vue-router-lite'
+import { basename } from 'path';
 
 const Child = { 
   props: {
@@ -71,8 +72,15 @@ new Vue({
     App,
     Router
   },
+  data() {
+    const p = '/url-parameters';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/url-parameters/">
+    <router :basename="basename">
       <app />
     </router>
   `

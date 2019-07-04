@@ -160,7 +160,10 @@ new Vue({
     Router
   },
   data() {
+    const p = '/static-router';
+    const basename = location.pathname.split(p)[0] + p + '/';
     return {
+      basename,
       context: {
         statusCode: 200
       },
@@ -170,7 +173,7 @@ new Vue({
     }
   },
   template: `
-    <router basename="/static-router/" :location="location" :context="context">
+    <router :basename="basename" :location="location" :context="context">
       <app />
     </router>
   `

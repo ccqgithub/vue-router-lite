@@ -122,8 +122,15 @@ new Vue({
     App,
     Router
   },
+  data() {
+    const p = '/memory-router';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/memory-router/">
+    <router :basename="basename">
       <app />
     </router>
   `

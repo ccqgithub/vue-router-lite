@@ -118,8 +118,10 @@ const App = {
   }
 }
 
+const p = '/control-history';
+const basename = location.pathname.split(p)[0] + p + '/';
 const history = createBrowserHistory({
-  basename: '/control-history/'
+  basename
 })
 
 new Vue({

@@ -129,8 +129,15 @@ new Vue({
     App,
     Router
   },
+  data() {
+    const p = '/basic';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/basic/">
+    <router :basename="basename">
       <app />
     </router>
   `

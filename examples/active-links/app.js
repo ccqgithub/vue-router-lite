@@ -48,8 +48,15 @@ new Vue({
     About,
     Users
   },
+  data() {
+    const p = '/active-links';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/active-links/">
+    <router :basename="basename">
       <div id="app">
         <h1>Active Links</h1>
         <ul>

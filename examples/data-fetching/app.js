@@ -12,8 +12,15 @@ new Vue({
     Home,
     Post
   },
+  data() {
+    const p = '/data-fetching';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/data-fetching/">
+    <router :basename="basename">
       <div id="app">
         <h1>Data Fetching</h1>
         <ul>

@@ -109,8 +109,15 @@ new Vue({
     Router,
     App
   },
+  data() {
+    const p = '/transitions';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/transitions/" v-slot="props">
+    <router :basename="basename" v-slot="props">
       <app v-bind="props"/>
     </router>
   `

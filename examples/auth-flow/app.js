@@ -9,8 +9,15 @@ new Vue({
     App,
     Router
   },
+  data() {
+    const p = '/auth-flow';
+    const basename = location.pathname.split(p)[0] + p + '/';
+    return {
+      basename
+    }
+  },
   template: `
-    <router basename="/auth-flow/" v-slot="{ match, location, history }">
+    <router :basename="basename" v-slot="{ match, location, history }">
       <app :match="match" :location="location" :history="history" />
     </router>
   `
