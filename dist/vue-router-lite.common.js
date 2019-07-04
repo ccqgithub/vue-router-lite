@@ -1,5 +1,5 @@
 /*!
-  * vue-router-lite v1.0.0
+  * vue-router-lite v1.2.0
   * (c) 2019-present Season Chen
   * @license MIT
   */
@@ -261,7 +261,8 @@ var MemoryRouter = {
       "default": 6
     },
     getUserConfirmation: {
-      type: Function
+      type: Function,
+      "default": null
     }
   },
   data: function data() {
@@ -343,7 +344,8 @@ var HashRouter = {
     hashType: {
       validator: function validator(value) {
         return ["hashbang", "noslash", "slash"].indexOf(value) !== -1;
-      }
+      },
+      "default": 'slash'
     },
     getUserConfirmation: {
       type: Function,
@@ -1027,7 +1029,7 @@ var Prompt = {
   props: {
     when: {
       type: Boolean,
-      "default": true
+      required: true
     },
     message: {
       type: [Function, String],
@@ -1143,6 +1145,10 @@ function generatePath() {
 var Redirect = {
   name: 'redirect',
   props: {
+    // from path
+    from: {
+      type: String
+    },
     // to path
     to: {
       type: [String, Object],
@@ -1152,6 +1158,18 @@ var Redirect = {
     push: {
       type: Boolean,
       "default": false
+    },
+    exact: {
+      type: Boolean,
+      "default": false
+    },
+    strict: {
+      type: Boolean,
+      "default": false
+    },
+    sensitive: {
+      type: Boolean,
+      "default": true
     }
   },
   inject: ['router', 'route'],
@@ -1181,7 +1199,18 @@ var Redirect = {
     },
     // to location
     computeTo: function computeTo() {
-      var match = this.route.match; // to
+      var from = this.from,
+          strict = this.strict,
+          exact = this.exact,
+          sensitive = this.sensitive,
+          route = this.route;
+      var pathname = route.location.pathname;
+      var match = from ? matchPath(pathname, {
+        from: from,
+        strict: strict,
+        exact: exact,
+        sensitive: sensitive
+      }) : route.match; // to
 
       var p = this.to; // route
 

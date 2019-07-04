@@ -1,6 +1,6 @@
 {
   "name": "vue-router-lite",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "> vue-router-lite",
   "main": "dist/vue-router-lite.common.js",
   "module": "dist/vue-router-lite.esm.js",

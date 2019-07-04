@@ -1,4 +1,6 @@
-/demos
-/docs
-.git
-node_modules
+/**
+!dist/**
+!src/**
+!LICENSE
+!README.md
+!package.json

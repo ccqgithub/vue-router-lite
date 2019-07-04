@@ -1,5 +1,5 @@
 /*!
-  * vue-router-lite v1.0.0
+  * vue-router-lite v1.2.0
   * (c) 2019-present Season Chen
   * @license MIT
   */
@@ -1312,7 +1312,8 @@ const MemoryRouter = {
       default: 6
     },
     getUserConfirmation: {
-      type: Function
+      type: Function,
+      default: null
     }
   },
 
@@ -1399,7 +1400,8 @@ const HashRouter = {
     hashType: {
       validator(value) {
         return ["hashbang", "noslash", "slash"].indexOf(value) !== -1;
-      }
+      },
+      default: 'slash'
     },
     getUserConfirmation: {
       type: Function,
@@ -2418,7 +2420,7 @@ const Prompt = {
   props: {
     when: {
       type: Boolean,
-      default: true
+      required: true
     },
     message: {
       type: [Function, String],
@@ -2547,6 +2549,10 @@ const Redirect = {
   name: 'redirect',
 
   props: {
+    // from path
+    from: {
+      type: String
+    },
     // to path
     to: {
       type: [String, Object],
@@ -2556,6 +2562,18 @@ const Redirect = {
     push: {
       type: Boolean,
       default: false
+    },
+    exact: {
+      type: Boolean,
+      default: false
+    },
+    strict: {
+      type: Boolean,
+      default: false
+    },
+    sensitive: {
+      type: Boolean,
+      default: true
     }
   },
 
@@ -2600,7 +2618,14 @@ const Redirect = {
 
     // to location
     computeTo() {
-      const { match } = this.route;
+      const { from, strict, exact, sensitive, route } = this;
+      const pathname = route.location.pathname;
+      const match = from ? 
+        matchPath(
+          pathname,
+          { from, strict, exact, sensitive }
+        ) : route.match;
+
       // to
       let p = this.to;
       // route
