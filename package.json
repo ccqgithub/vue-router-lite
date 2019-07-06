@@ -1,6 +1,6 @@
 {
   "name": "vue-router-lite",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "> `vue-router-lite` is a component-based router for Vue.js.",
   "main": "dist/vue-router-lite.js",
   "module": "dist/vue-router-lite.module.js",

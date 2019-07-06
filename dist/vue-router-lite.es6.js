@@ -1,5 +1,5 @@
 /*!
-  * vue-router-lite v1.2.0
+  * vue-router-lite v1.2.1
   * (c) 2019-present Season Chen
   * @license MIT
   */
@@ -3189,7 +3189,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 
 var index = {
-  version: '1.2.0',
+  version: '1.2.1',
   install
 };
 
