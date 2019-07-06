@@ -1,14 +1,14 @@
-const { rollup } = require("rollup");
+const { rollup } = require('rollup');
 const babelPlugin = require('rollup-plugin-babel');
 const cjsPlugin = require('rollup-plugin-commonjs');
 const vuePlugin = require('rollup-plugin-vue');
-const resolvePlugin = require("rollup-plugin-node-resolve");
-const filesizePlugin = require("rollup-plugin-filesize");
-const replacePlugin = require("rollup-plugin-replace");
-const terserPlugin = require("rollup-plugin-terser").terser;
+const resolvePlugin = require('rollup-plugin-node-resolve');
+const filesizePlugin = require('rollup-plugin-filesize');
+const replacePlugin = require('rollup-plugin-replace');
+const terserPlugin = require('rollup-plugin-terser').terser;
 
-const fs = require("fs-extra");
-const path = require("path");
+const fs = require('fs-extra');
+const path = require('path');
 
 const pkg = require('../package.json');
 const version = process.env.VERSION || pkg.version;
@@ -24,9 +24,9 @@ external = external.concat(Object.keys(pkg.dependencies || {}));
 external = external.concat(Object.keys(pkg.peerDependencies || {}));
 
 // make sure we're in the right folder
-process.chdir(__dirname, '../');
+process.chdir(path.resolve(__dirname, '../'));
 
-fs.removeSync("../dist");
+fs.removeSync('../dist');
 
 async function generateBundledModule({ 
   inputFile, 
@@ -60,7 +60,9 @@ async function generateBundledModule({
 
   // babel compield to es5
   if (es5) {
-    plugins.push(babelPlugin());
+    plugins.push(babelPlugin({
+      // configFile: path.join(__dirname, '../babel.config.js')
+    }));
   }
 
   // min
@@ -82,8 +84,8 @@ async function generateBundledModule({
     file: outputFile,
     format,
     banner,
-    exports: "named",
-    name: format === "umd" ? "VueRouterLite" : undefined
+    exports: 'named',
+    name: format === 'umd' ? 'VueRouterLite' : undefined
   });
 
   console.log(`Generation of ${outputFile} bundle finished.`);

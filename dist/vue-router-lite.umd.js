@@ -1069,16 +1069,18 @@
 
   function assert(condition, message) {
     if (!condition) {
-      throw new Error(`[vue-router-lite] ${message}`);
+      throw new Error("[vue-router-lite] ".concat(message));
     }
   }
 
-  const resolveToLocation = (to, currentLocation) => typeof to === "function" ? to(currentLocation) : to; // 
+  var resolveToLocation = function resolveToLocation(to, currentLocation) {
+    return typeof to === "function" ? to(currentLocation) : to;
+  }; // 
 
-  const normalizeToLocation = (to, currentLocation) => {
+  var normalizeToLocation = function normalizeToLocation(to, currentLocation) {
     return typeof to === "string" ? createLocation(to, null, null, currentLocation) : to;
   };
-  const guardEvent = e => {
+  var guardEvent = function guardEvent(e) {
     // don't redirect with control keys
     if (e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) return; // don't redirect when preventDefault called
 
@@ -1087,7 +1089,7 @@
     if (e.button !== undefined && e.button !== 0) return; // don't redirect if `target="_blank"`
 
     if (e.currentTarget && e.currentTarget.getAttribute) {
-      const target = e.currentTarget.getAttribute('target');
+      var target = e.currentTarget.getAttribute('target');
       if (/\b_blank\b/i.test(target)) return;
     } // this may be a Weex event which doesn't have this method
 
@@ -1105,7 +1107,7 @@
     return c.tag || isAsyncPlaceholder(c);
   }
 
-  const Router = {
+  var Router = {
     name: 'Router',
     props: {
       // history control
@@ -1116,18 +1118,16 @@
       // name for debug
       name: {
         type: String,
-        default: 'router'
+        "default": 'router'
       }
     },
-
-    provide() {
+    provide: function provide() {
       return {
         router: this.router,
         route: this.route
       };
     },
-
-    data() {
+    data: function data() {
       return {
         // add provide's properties in data, to make provide reactivity 
         router: {
@@ -1140,29 +1140,25 @@
         }
       };
     },
+    created: function created() {
+      var _this = this;
 
-    created() {
-      const {
-        history
-      } = this;
-      this.unlisten = history.listen(() => {
-        this.route.location = history.location;
-        this.route.match = this.computeMatch(history.location.pathname);
+      var history = this.history;
+      this.unlisten = history.listen(function () {
+        _this.route.location = history.location;
+        _this.route.match = _this.computeMatch(history.location.pathname);
       });
     },
-
-    befreDestory() {
+    befreDestory: function befreDestory() {
       this.unlisten();
     },
-
     watch: {
-      history(val, oldVal) {
-        assert(false, `You cannot change <router>\'s history!`);
+      history: function history(val, oldVal) {
+        assert(false, "You cannot change <router>'s history!");
       }
-
     },
     methods: {
-      computeMatch(pathname) {
+      computeMatch: function computeMatch(pathname) {
         return {
           path: "/",
           url: "/",
@@ -1170,20 +1166,17 @@
           isExact: pathname === "/"
         };
       }
-
     },
-
-    render(createElement) {
-      let children = this.$scopedSlots.default({
+    render: function render(createElement) {
+      var children = this.$scopedSlots["default"]({
         history: this.history,
         location: this.route.location,
         match: this.route.match
       });
       children = children.filter(isNotTextNode);
-      assert(children.length === 1, `<${this.name}> must only be used on a single child element.`);
+      assert(children.length === 1, "<".concat(this.name, "> must only be used on a single child element."));
       return children[0];
     }
-
   };
 
   Router.install = function (Vue) {
@@ -1306,7 +1299,7 @@
     );
 
   //
-  const MemoryRouter = {
+  var MemoryRouter = {
     name: 'MemoryRouter',
     components: {
       Router: Router$1
@@ -1314,34 +1307,34 @@
     props: {
       initialEntries: {
         type: Array,
-        default: () => ['/']
+        "default": function _default() {
+          return ['/'];
+        }
       },
       initialIndex: {
         type: Number,
-        default: 0
+        "default": 0
       },
       keyLength: {
         type: Number,
-        default: 6
+        "default": 6
       },
       getUserConfirmation: {
         type: Function,
-        default: null
+        "default": null
       }
     },
-
-    data() {
-      let history = createMemoryHistory({
+    data: function data() {
+      var history = createMemoryHistory({
         initialEntries: this.initialEntries,
         initialIndex: this.initialIndex,
         keyLength: this.keyLength,
         getUserConfirmation: this.getUserConfirmation
       });
       return {
-        history
+        history: history
       };
     }
-
   };
 
   MemoryRouter.install = function (Vue) {
@@ -1401,7 +1394,7 @@
     );
 
   //
-  const HashRouter = {
+  var HashRouter = {
     name: 'HashRouter',
     components: {
       Router: Router$1
@@ -1409,36 +1402,31 @@
     props: {
       basename: {
         type: String,
-        default: ''
+        "default": ''
       },
       hashType: {
-        validator(value) {
+        validator: function validator(value) {
           return ["hashbang", "noslash", "slash"].indexOf(value) !== -1;
         },
-
-        default: 'slash'
+        "default": 'slash'
       },
       getUserConfirmation: {
         type: Function,
-
-        default(message, callback) {
+        "default": function _default(message, callback) {
           callback(window.confirm(message));
         }
-
       }
     },
-
-    data() {
-      let history = createHashHistory({
+    data: function data() {
+      var history = createHashHistory({
         basename: this.basename,
         hashType: this.hashType,
         getUserConfirmation: this.getUserConfirmation
       });
       return {
-        history
+        history: history
       };
     }
-
   };
 
   HashRouter.install = function (Vue) {
@@ -1498,7 +1486,7 @@
     );
 
   //
-  const BrowserRouter = {
+  var BrowserRouter = {
     name: 'BrowserRouter',
     components: {
       Router: Router$1
@@ -1506,38 +1494,34 @@
     props: {
       basename: {
         type: String,
-        default: ''
+        "default": ''
       },
       forceRefresh: {
         type: Boolean,
-        default: false
+        "default": false
       },
       keyLength: {
         type: Number,
-        default: 6
+        "default": 6
       },
       getUserConfirmation: {
         type: Function,
-
-        default(message, callback) {
+        "default": function _default(message, callback) {
           callback(window.confirm(message));
         }
-
       }
     },
-
-    data() {
-      let history = createBrowserHistory({
+    data: function data() {
+      var history = createBrowserHistory({
         basename: this.basename,
         forceRefresh: this.forceRefresh,
         keyLength: this.keyLength,
         getUserConfirmation: this.getUserConfirmation
       });
       return {
-        history
+        history: history
       };
     }
-
   };
 
   BrowserRouter.install = function (Vue) {
@@ -1596,44 +1580,104 @@
       undefined
     );
 
-  const addLeadingSlash$1 = path => {
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
+  }
+
+  function _objectSpread2(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      if (i % 2) {
+        var source = arguments[i] != null ? arguments[i] : {};
+        var ownKeys = Object.keys(source);
+
+        if (typeof Object.getOwnPropertySymbols === 'function') {
+          ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
+            return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+          }));
+        }
+
+        ownKeys.forEach(function (key) {
+          _defineProperty(target, key, source[key]);
+        });
+      } else {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(arguments[i]));
+      }
+    }
+
+    return target;
+  }
+
+  function _toArray(arr) {
+    return _arrayWithHoles(arr) || _iterableToArray(arr) || _nonIterableRest();
+  }
+
+  function _arrayWithHoles(arr) {
+    if (Array.isArray(arr)) return arr;
+  }
+
+  function _iterableToArray(iter) {
+    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  }
+
+  function _nonIterableRest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance");
+  }
+
+  var addLeadingSlash$1 = function addLeadingSlash(path) {
     return path.charAt(0) === "/" ? path : "/" + path;
   };
 
-  const removeTailSlash = path => {
+  var removeTailSlash = function removeTailSlash(path) {
     return path.replace(/\/+$/, '');
   };
 
-  const addBasename = (basename, location) => {
+  var addBasename = function addBasename(basename, location) {
     if (!basename) return location;
-    return { ...location,
+    return _objectSpread2({}, location, {
       pathname: removeTailSlash(addLeadingSlash$1(basename)) + addLeadingSlash$1(location.pathname)
-    };
+    });
   };
 
-  const stripBasename$1 = (basename, location) => {
+  var stripBasename$1 = function stripBasename(basename, location) {
     if (!basename) return location;
-    const base = addLeadingSlash$1(basename);
+    var base = addLeadingSlash$1(basename);
     if (location.pathname.indexOf(base) !== 0) return location;
-    return { ...location,
+    return _objectSpread2({}, location, {
       pathname: addLeadingSlash$1(location.pathname.substr(base.length))
+    });
+  };
+
+  var createURL = function createURL(location) {
+    return typeof location === "string" ? location : createPath(location);
+  };
+
+  var staticHandler = function staticHandler(methodName) {
+    return function () {
+      throw new Error("You cannot ".concat(methodName, " with <StaticRouter>"));
     };
   };
 
-  const createURL = location => typeof location === "string" ? location : createPath(location);
+  var noop = function noop() {};
 
-  const staticHandler = methodName => () => {
-    throw new Error(`You cannot ${methodName} with <StaticRouter>`);
-  };
-
-  const noop = () => {};
-
-  function createStaticHistory({
-    basename = '',
-    context = {},
-    location = '/'
-  }) {
-    const history = {
+  function createStaticHistory(_ref) {
+    var _ref$basename = _ref.basename,
+        basename = _ref$basename === void 0 ? '' : _ref$basename,
+        _ref$context = _ref.context,
+        context = _ref$context === void 0 ? {} : _ref$context,
+        _ref$location = _ref.location,
+        location = _ref$location === void 0 ? '/' : _ref$location;
+    var history = {
       isStatic: true,
       context: context,
       action: "POP",
@@ -1641,27 +1685,31 @@
       go: staticHandler("go"),
       goBack: staticHandler("goBack"),
       goForward: staticHandler("goForward"),
-      createHref: location => {
+      createHref: function createHref(location) {
         return addLeadingSlash$1(removeTailSlash(basename) + createURL(location));
       },
-      push: location => {
+      push: function push(location) {
         context.action = "PUSH";
         context.location = addBasename(basename, createLocation(location));
         context.url = createURL(context.location);
       },
-      replace: location => {
+      replace: function replace(location) {
         context.action = "REPLACE";
         context.location = addBasename(basename, createLocation(location));
         context.url = createURL(context.location);
       },
-      listen: () => noop,
-      block: () => noop
+      listen: function listen() {
+        return noop;
+      },
+      block: function block() {
+        return noop;
+      }
     };
     return history;
   }
 
   //
-  const StaticRouter = {
+  var StaticRouter = {
     name: 'StaticRouter',
     components: {
       Router: Router$1
@@ -1669,29 +1717,27 @@
     props: {
       basename: {
         type: String,
-        default: ''
+        "default": ''
       },
       context: {
         type: Object,
-        default: () => {}
+        "default": function _default() {}
       },
       location: {
         type: [String, Object],
-        default: '/'
+        "default": '/'
       }
     },
-
-    data() {
-      const history = createStaticHistory({
+    data: function data() {
+      var history = createStaticHistory({
         basename: this.basename,
         context: this.context,
         location: this.location
       });
       return {
-        history
+        history: history
       };
     }
-
   };
 
   StaticRouter.install = function (Vue) {
@@ -2116,23 +2162,19 @@
   pathToRegexp_1.tokensToFunction = tokensToFunction_1;
   pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
-  /**
-   * copy from:
-   * https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/matchPath.js
-   */
-  const cache = {};
-  const cacheLimit = 10000;
-  let cacheCount = 0;
+  var cache = {};
+  var cacheLimit = 10000;
+  var cacheCount = 0;
 
   function compilePath(path, options) {
-    const cacheKey = `${options.end}${options.strict}${options.sensitive}`;
-    const pathCache = cache[cacheKey] || (cache[cacheKey] = {});
+    var cacheKey = "".concat(options.end).concat(options.strict).concat(options.sensitive);
+    var pathCache = cache[cacheKey] || (cache[cacheKey] = {});
     if (pathCache[path]) return pathCache[path];
-    const keys = [];
-    const regexp = pathToRegexp_1(path, keys, options);
-    const result = {
-      regexp,
-      keys
+    var keys = [];
+    var regexp = pathToRegexp_1(path, keys, options);
+    var result = {
+      regexp: regexp,
+      keys: keys
     };
 
     if (cacheCount < cacheLimit) {
@@ -2148,40 +2190,48 @@
    */
 
 
-  function matchPath(pathname, options = {}) {
+  function matchPath(pathname) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     if (typeof options === "string") options = {
       path: options
     };
-    const {
-      path,
-      exact = true,
-      strict = false,
-      sensitive = true
-    } = options;
-    const paths = [].concat(path);
-    return paths.reduce((matched, path) => {
+    var _options = options,
+        path = _options.path,
+        _options$exact = _options.exact,
+        exact = _options$exact === void 0 ? true : _options$exact,
+        _options$strict = _options.strict,
+        strict = _options$strict === void 0 ? false : _options$strict,
+        _options$sensitive = _options.sensitive,
+        sensitive = _options$sensitive === void 0 ? true : _options$sensitive;
+    var paths = [].concat(path);
+    return paths.reduce(function (matched, path) {
       if (matched) return matched;
-      const {
-        regexp,
-        keys
-      } = compilePath(path, {
+
+      var _compilePath = compilePath(path, {
         end: exact,
-        strict,
-        sensitive
-      });
-      const match = regexp.exec(pathname);
+        strict: strict,
+        sensitive: sensitive
+      }),
+          regexp = _compilePath.regexp,
+          keys = _compilePath.keys;
+
+      var match = regexp.exec(pathname);
       if (!match) return null;
-      const [url, ...values] = match;
-      const isExact = pathname === url;
+
+      var _match = _toArray(match),
+          url = _match[0],
+          values = _match.slice(1);
+
+      var isExact = pathname === url;
       if (exact && !isExact) return null;
       return {
-        path,
+        path: path,
         // the path used to match
         url: path === "/" && url === "" ? "/" : url,
         // the matched portion of the URL
-        isExact,
+        isExact: isExact,
         // whether or not we matched exactly
-        params: keys.reduce((memo, key, index) => {
+        params: keys.reduce(function (memo, key, index) {
           memo[key.name] = values[index];
           return memo;
         }, {})
@@ -2195,11 +2245,9 @@
     props: {
       tag: String
     },
-
-    render(createElement, context) {
+    render: function render(createElement, context) {
       return createElement(context.props.tag || 'div', context.data, context.children);
     }
-
   };
 
   /* script */
@@ -2233,10 +2281,10 @@
     );
 
   //
-  const RouterLink = {
+  var RouterLink = {
     name: 'RouterLink',
     components: {
-      Tag
+      Tag: Tag
     },
     props: {
       // to path
@@ -2247,42 +2295,42 @@
       // replace or push
       replace: {
         type: Boolean,
-        default: false
+        "default": false
       },
       // tag
       tag: {
         type: String,
-        default: 'a'
+        "default": 'a'
       },
       // user to check active
       exact: {
         type: Boolean,
-        default: false
+        "default": false
       },
       // user to check active
       strict: {
         type: Boolean,
-        default: false
+        "default": false
       },
       // user to check active
       sensitive: {
         type: Boolean,
-        default: true
+        "default": true
       },
       // active class name
       activeClass: {
         type: String,
-        default: 'router-link-active'
+        "default": 'router-link-active'
       },
       // active class name
       exactActiveClass: {
         type: String,
-        default: 'router-link-exact-active'
+        "default": 'router-link-exact-active'
       },
       // navitage event
       event: {
         type: String,
-        default: 'click'
+        "default": 'click'
       },
       // location
       location: {
@@ -2292,72 +2340,55 @@
     inject: ['router', 'route'],
     computed: {
       // current location
-      currentLocation() {
-        const currentLocation = this.location || this.route.location;
+      currentLocation: function currentLocation() {
+        var currentLocation = this.location || this.route.location;
         return currentLocation;
       },
-
       // to location
-      toLocation() {
-        const toLocation = normalizeToLocation(resolveToLocation(this.to, this.currentLocation), this.currentLocation);
+      toLocation: function toLocation() {
+        var toLocation = normalizeToLocation(resolveToLocation(this.to, this.currentLocation), this.currentLocation);
         return toLocation;
       },
-
       // link href
-      href() {
-        const {
-          history
-        } = this.router;
-        const href = this.toLocation ? history.createHref(this.toLocation) : '';
+      href: function href() {
+        var history = this.router.history;
+        var href = this.toLocation ? history.createHref(this.toLocation) : '';
         return href;
       },
-
       // path match with current location
-      match() {
-        const {
-          to,
-          exact,
-          strict,
-          sensitive
-        } = this;
-        const {
-          pathname: pathToMatch
-        } = this.currentLocation;
-        const {
-          pathname: path
-        } = this.toLocation; // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
+      match: function match() {
+        var to = this.to,
+            exact = this.exact,
+            strict = this.strict,
+            sensitive = this.sensitive;
+        var pathToMatch = this.currentLocation.pathname;
+        var path = this.toLocation.pathname; // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
 
-        const escapedPath = path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
-        const match = escapedPath ? matchPath(pathToMatch, {
+        var escapedPath = path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
+        var match = escapedPath ? matchPath(pathToMatch, {
           path: escapedPath,
-          exact,
-          strict,
-          sensitive
+          exact: exact,
+          strict: strict,
+          sensitive: sensitive
         }) : null;
         return match;
       },
-
-      classNames() {
-        let classNames = '';
+      classNames: function classNames() {
+        var classNames = '';
         if (!this.match) return classNames;
-        classNames += ` ${this.activeClass}`;
-        if (this.match.exact) classNames += ` ${this.exactActiveClass}`;
+        classNames += " ".concat(this.activeClass);
+        if (this.match.exact) classNames += " ".concat(this.exactActiveClass);
         return classNames;
       }
-
     },
     methods: {
-      handleClick(event) {
+      handleClick: function handleClick(event) {
         this.$emit('click', event);
         if (!guardEvent(event)) return;
-        const {
-          history
-        } = this.router;
-        const {
-          replace,
-          to
-        } = this;
-        const loc = resolveToLocation(to, this.currentLocation);
+        var history = this.router.history;
+        var replace = this.replace,
+            to = this.to;
+        var loc = resolveToLocation(to, this.currentLocation);
 
         if (replace) {
           history.replace(loc);
@@ -2365,17 +2396,13 @@
           history.push(loc);
         }
       }
-
     },
-
-    created() {
+    created: function created() {
       assert(this.router, 'You should not use <router-link> outside a <router>');
     },
-
-    beforeUpdate() {
+    beforeUpdate: function beforeUpdate() {
       assert(this.router, 'You should not use <router-link> outside a <router>');
     }
-
   };
 
   RouterLink.install = function (Vue) {
@@ -2446,7 +2473,7 @@
       undefined
     );
 
-  const Prompt = {
+  var Prompt = {
     name: 'Prompt',
     props: {
       when: {
@@ -2459,37 +2486,30 @@
       }
     },
     inject: ['router', 'route'],
-
-    created() {
+    created: function created() {
       assert(this.router, 'You should not use <prompt> outside a <router>');
       this.lastMessage = null;
       this.unblock = null;
     },
-
-    beforeUpdate() {
+    beforeUpdate: function beforeUpdate() {
       assert(this.router, 'You should not use <prompt> outside a <router>');
     },
-
-    mounted() {
+    mounted: function mounted() {
       if (this.when) this.block();
     },
-
     watch: {
-      when(val, oldVal) {
+      when: function when(val, oldVal) {
         if (!val) {
           if (this.unblock) this.unblock();
         } else {
           this.block();
         }
       }
-
     },
     methods: {
-      block() {
-        let {
-          message,
-          lastMessage
-        } = this;
+      block: function block() {
+        var message = this.message,
+            lastMessage = this.lastMessage;
 
         if (!this.unblock) {
           this.unblock = this.router.history.block(message);
@@ -2501,17 +2521,13 @@
 
         this.lastMessage = message;
       }
-
     },
-
-    beforeDestroy() {
+    beforeDestroy: function beforeDestroy() {
       if (this.unblock) this.unblock();
     },
-
-    render() {
+    render: function render() {
       return null;
     }
-
   };
 
   Prompt.install = function (Vue) {
@@ -2552,13 +2568,13 @@
    * copy from:
    * https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/generatePath.js
    */
-  const cache$1 = {};
-  const cacheLimit$1 = 10000;
-  let cacheCount$1 = 0;
+  var cache$1 = {};
+  var cacheLimit$1 = 10000;
+  var cacheCount$1 = 0;
 
   function compilePath$1(path) {
     if (cache$1[path]) return cache$1[path];
-    const generator = pathToRegexp_1.compile(path);
+    var generator = pathToRegexp_1.compile(path);
 
     if (cacheCount$1 < cacheLimit$1) {
       cache$1[path] = generator;
@@ -2572,11 +2588,14 @@
    */
 
 
-  function generatePath(path = "/", params = {}, options = {}) {
+  function generatePath() {
+    var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "/";
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     return path === "/" ? path : compilePath$1(path)(params, options);
   }
 
-  const Redirect = {
+  var Redirect = {
     name: 'Redirect',
     props: {
       // from path
@@ -2591,37 +2610,34 @@
       // wheather push
       push: {
         type: Boolean,
-        default: false
+        "default": false
       },
       exact: {
         type: Boolean,
-        default: false
+        "default": false
       },
       strict: {
         type: Boolean,
-        default: false
+        "default": false
       },
       sensitive: {
         type: Boolean,
-        default: true
+        "default": true
       }
     },
     inject: ['router', 'route'],
-
-    created() {
+    created: function created() {
       assert(this.router, 'You must not use <redirect> outside a <router>.'); // static router
 
       if (this.isStatic()) this.perform();
     },
-
-    mounted() {
+    mounted: function mounted() {
       // not static router
       if (!this.isStatic()) this.perform();
     },
-
-    beforeUpdate() {
+    beforeUpdate: function beforeUpdate() {
       assert(this.router, 'You must not use <redirect> outside a <router>.');
-      const to = this.computeTo(); // already redirect
+      var to = this.computeTo(); // already redirect
 
       if (locationsAreEqual(this.lastTo, to)) {
         return;
@@ -2629,31 +2645,27 @@
 
       this.perform();
     },
-
     methods: {
       // if static router
-      isStatic() {
+      isStatic: function isStatic() {
         return this.router && this.router.history.isStatic;
       },
-
       // to location
-      computeTo() {
-        const {
-          from,
-          strict,
-          exact,
-          sensitive,
-          route
-        } = this;
-        const pathname = route.location.pathname;
-        const match = from ? matchPath(pathname, {
-          from,
-          strict,
-          exact,
-          sensitive
+      computeTo: function computeTo() {
+        var from = this.from,
+            strict = this.strict,
+            exact = this.exact,
+            sensitive = this.sensitive,
+            route = this.route;
+        var pathname = route.location.pathname;
+        var match = from ? matchPath(pathname, {
+          from: from,
+          strict: strict,
+          exact: exact,
+          sensitive: sensitive
         }) : route.match; // to
 
-        let p = this.to; // route
+        var p = this.to; // route
 
         if (match) {
           if (typeof this.to === 'string') {
@@ -2661,35 +2673,29 @@
             p = generatePath(this.to, match.params);
           } else {
             // to is object
-            p = { ...this.to,
+            p = _objectSpread2({}, this.to, {
               pathname: generatePath(this.to.pathname, match.params)
-            };
+            });
           }
         } // to
 
 
-        const to = createLocation(p);
+        var to = createLocation(p);
         return to;
       },
+      perform: function perform() {
+        var history = this.router.history; // history method
 
-      perform() {
-        const {
-          history
-        } = this.router; // history method
-
-        const method = this.push ? history.push : history.replace;
-        const to = this.computeTo(); // redirect
+        var method = this.push ? history.push : history.replace;
+        var to = this.computeTo(); // redirect
 
         this.lastTo = to;
         method(to);
       }
-
     },
-
-    render() {
+    render: function render() {
       return null;
     }
-
   };
 
   Redirect.install = function (Vue) {
@@ -2726,42 +2732,40 @@
       undefined
     );
 
-  const Route = {
+  var Route = {
     name: 'Route',
     props: {
       path: {
         type: [String, Array],
-        default: ''
+        "default": ''
       },
       exact: {
         type: Boolean,
-        default: false
+        "default": false
       },
       strict: {
         type: Boolean,
-        default: false
+        "default": false
       },
       sensitive: {
         type: Boolean,
-        default: true
+        "default": true
       },
       forceRender: {
         type: Boolean,
-        default: false
+        "default": false
       },
       location: {
         type: Object
       }
     },
     inject: ['router', 'route'],
-
-    provide() {
+    provide: function provide() {
       return {
         route: this.computedRoute
       };
     },
-
-    data() {
+    data: function data() {
       return {
         isActive: true,
         // add provide's properties in data, to make provide reactivity 
@@ -2771,69 +2775,62 @@
         }
       };
     },
-
     computed: {
-      computeLocation() {
+      computeLocation: function computeLocation() {
         return this.location || this.route.location;
       },
-
-      computeMatch() {
-        const computedLocation = this.computeLocation;
-        const {
-          path,
-          strict,
-          exact,
-          sensitive,
-          route
-        } = this;
-        const pathname = computedLocation.pathname;
-        const match = path ? matchPath(pathname, {
-          path,
-          strict,
-          exact,
-          sensitive
+      computeMatch: function computeMatch() {
+        var computedLocation = this.computeLocation;
+        var path = this.path,
+            strict = this.strict,
+            exact = this.exact,
+            sensitive = this.sensitive,
+            route = this.route;
+        var pathname = computedLocation.pathname;
+        var match = path ? matchPath(pathname, {
+          path: path,
+          strict: strict,
+          exact: exact,
+          sensitive: sensitive
         }) : route.match;
         return match;
       }
-
     },
     watch: {
       computeMatch: {
-        handler() {
+        handler: function handler() {
           this.updateRoute();
         },
-
         deep: true
       }
     },
     methods: {
-      updateRoute() {
+      updateRoute: function updateRoute() {
+        var _this = this;
+
         if (!this.isActive) return;
-        const match = this.computeMatch; // cache
+        var match = this.computeMatch; // cache
 
         if (!this.cacheMatch || !match) {
           this.cacheMatch = match;
         } else {
-          Object.keys(match).forEach(key => {
-            this.cacheMatch[key] = match[key];
+          Object.keys(match).forEach(function (key) {
+            _this.cacheMatch[key] = match[key];
           });
         }
 
         this.computedRoute.location = this.computeLocation;
         this.computedRoute.match = this.cacheMatch;
       },
-
-      clearCache() {
-        for (let key in this.cache) {
+      clearCache: function clearCache() {
+        for (var key in this.cache) {
           this.cache[key].componentInstance.$destroy();
           this.cache[key] = null;
         }
       }
-
     },
-
-    created() {
-      assert(this.router, `You should not use <route> outside a <router>.`); // cache match object
+    created: function created() {
+      assert(this.router, "You should not use <route> outside a <router>."); // cache match object
 
       this.cacheMatch = null; // use for cache keepalive component
 
@@ -2841,60 +2838,49 @@
 
       this.updateRoute();
     },
-
-    beforeUpdate() {
-      assert(this.router, `You should not use <route> outside a <router>.`);
+    beforeUpdate: function beforeUpdate() {
+      assert(this.router, "You should not use <route> outside a <router>.");
     },
-
-    activated() {
+    activated: function activated() {
       this.isActive = true;
       this.updateRoute();
     },
-
-    deactivated() {
+    deactivated: function deactivated() {
       this.isActive = false;
     },
-
-    destroyed() {
+    destroyed: function destroyed() {
       this.clearCache();
     },
-
-    render(createElement) {
-      const {
-        router,
-        computedRoute,
-        forceRender,
-        $scopedSlots,
-        name,
-        cache
-      } = this;
-      const {
-        history
-      } = router;
-      const {
-        match,
-        location
-      } = computedRoute;
-      const isKeepAlive = this.$vnode.data.keepAlive; // no keep alive
+    render: function render(createElement) {
+      var router = this.router,
+          computedRoute = this.computedRoute,
+          forceRender = this.forceRender,
+          $scopedSlots = this.$scopedSlots,
+          name = this.name,
+          cache = this.cache;
+      var history = router.history;
+      var match = computedRoute.match,
+          location = computedRoute.location;
+      var isKeepAlive = this.$vnode.data.keepAlive; // no keep alive
 
       if (!isKeepAlive) {
         this.clearCache();
       }
 
       if (!match && !forceRender) return null;
-      let children = $scopedSlots.default({
-        match,
-        history,
-        location
+      var children = $scopedSlots["default"]({
+        match: match,
+        history: history,
+        location: location
       });
       children = (children || []).filter(isNotTextNode);
       if (!children.length) return null;
-      assert(children.length === 1, `<${name}> can only be used on a single child element.`);
-      const vnode = children[0];
-      const componentOptions = vnode && vnode.componentOptions; // is keepAlive and is component
+      assert(children.length === 1, "<".concat(name, "> can only be used on a single child element."));
+      var vnode = children[0];
+      var componentOptions = vnode && vnode.componentOptions; // is keepAlive and is component
 
       if (isKeepAlive && componentOptions) {
-        const key = vnode.key == null ? componentOptions.Ctor.cid + (componentOptions.tag ? "::" + componentOptions.tag : '') : vnode.key;
+        var key = vnode.key == null ? componentOptions.Ctor.cid + (componentOptions.tag ? "::" + componentOptions.tag : '') : vnode.key;
 
         if (cache[key]) {
           vnode.componentInstance = cache[key].componentInstance;
@@ -2907,7 +2893,6 @@
 
       return vnode;
     }
-
   };
 
   Route.install = function (Vue) {
@@ -2944,22 +2929,19 @@
       undefined
     );
 
-  const RouterContext = {
+  var RouterContext = {
     name: 'RouterContext',
     inject: ['router', 'route'],
-
-    data() {
+    data: function data() {
       return {
         history: this.router.history,
         location: this.route.location,
         match: this.route.match
       };
     },
-
-    render() {
+    render: function render() {
       return null;
     }
-
   };
 
   RouterContext.install = function (Vue) {
@@ -2996,20 +2978,18 @@
       undefined
     );
 
-  const RouteSwitch = {
+  var RouteSwitch = {
     name: 'RouteSwitch',
     props: {
       location: Object
     },
     inject: ['router', 'route'],
-
-    provide() {
+    provide: function provide() {
       return {
         route: this.computedRoute
       };
     },
-
-    data() {
+    data: function data() {
       return {
         isActive: true,
         // add provide's properties in data, to make provide reactivity 
@@ -3019,101 +2999,88 @@
         }
       };
     },
-
     computed: {
-      computeLocation() {
+      computeLocation: function computeLocation() {
         return this.location || this.route.location;
       }
-
     },
     watch: {
       computeLocation: {
-        handler() {
+        handler: function handler() {
           this.updateRoute();
         },
-
         deep: true
       }
     },
     methods: {
-      updateRoute() {
+      updateRoute: function updateRoute() {
         if (!this.isActive) return;
         this.computedRoute.location = this.computeLocation;
         this.computedRoute.match = this.route.match;
       },
-
-      clearCache() {
-        for (let key in this.cache) {
+      clearCache: function clearCache() {
+        for (var key in this.cache) {
           this.cache[key].componentInstance.$destroy();
           this.cache[key] = null;
         }
       }
-
     },
-
-    created() {
-      assert(this.router, `You should not use <route-switch> outside a <router>.`); // use for cache keepalive component
+    created: function created() {
+      assert(this.router, "You should not use <route-switch> outside a <router>."); // use for cache keepalive component
 
       this.cache = Object.create(null); // update current route
 
       this.updateRoute();
     },
-
-    beforeUpdate() {
-      assert(this.router, `You should not use <route-switch> outside a <router>.`);
+    beforeUpdate: function beforeUpdate() {
+      assert(this.router, "You should not use <route-switch> outside a <router>.");
     },
-
-    activated() {
+    activated: function activated() {
       this.isActive = true;
       this.updateRoute();
     },
-
-    deactivated() {
+    deactivated: function deactivated() {
       this.isActive = false;
     },
-
-    destroyed() {
+    destroyed: function destroyed() {
       this.clearCache();
     },
-
-    render(createElement, context) {
-      const {
-        router,
-        cache
-      } = this;
-      const {
-        location
-      } = this.computedRoute;
-      const children = (this.$slots.default || []).filter(isNotTextNode);
-      const isKeepAlive = this.$vnode.data.keepAlive; // no keep alive
+    render: function render(createElement, context) {
+      var router = this.router,
+          cache = this.cache;
+      var location = this.computedRoute.location;
+      var children = (this.$slots["default"] || []).filter(isNotTextNode);
+      var isKeepAlive = this.$vnode.data.keepAlive; // no keep alive
 
       if (!isKeepAlive) {
         this.clearCache();
       }
 
       if (!children.length) return null;
-      let key = '';
-      const vnode = children.find(vnode => {
+      var key = '';
+      var vnode = children.find(function (vnode) {
         // filter text nodes
         if (!vnode.tag) return false; // check children if <route> component
 
-        assert(vnode.componentOptions, `<route-switch>'s children can only be <route>.`);
-        const propsData = vnode.componentOptions.propsData || {};
-        const {
-          path = '',
-          exact = false,
-          strict = false,
-          sensitive = true
-        } = propsData; // key
+        assert(vnode.componentOptions, "<route-switch>'s children can only be <route>.");
+        var propsData = vnode.componentOptions.propsData || {};
+        var _propsData$path = propsData.path,
+            path = _propsData$path === void 0 ? '' : _propsData$path,
+            _propsData$exact = propsData.exact,
+            exact = _propsData$exact === void 0 ? false : _propsData$exact,
+            _propsData$strict = propsData.strict,
+            strict = _propsData$strict === void 0 ? false : _propsData$strict,
+            _propsData$sensitive = propsData.sensitive,
+            sensitive = _propsData$sensitive === void 0 ? true : _propsData$sensitive; // key
 
-        key = vnode.key || `path-${path}--exact-${exact}--strict-${strict}--sensitive-${sensitive}`; // no path on route
+        key = vnode.key || "path-".concat(path, "--exact-").concat(exact, "--strict-").concat(strict, "--sensitive-").concat(sensitive); // no path on route
 
         if (!path) return true;
-        const match = matchPath(location.pathname, {
-          path,
-          exact,
-          strict,
-          sensitive
+        var match = matchPath(location.pathname, {
+          path: path,
+          exact: exact,
+          strict: strict,
+          sensitive: sensitive
         });
         return !!match;
       });
@@ -3133,7 +3100,6 @@
       vnode.key = key;
       return vnode;
     }
-
   };
 
   RouteSwitch.install = function (Vue) {
@@ -3170,8 +3136,8 @@
       undefined
     );
 
-  const install = function (Vue) {
-    [MemoryRouter$1, HashRouter$1, BrowserRouter$1, StaticRouter$1, Router$1, RouterLink$1, Prompt$1, Redirect$1, Route$1, RouteContext, RouteSwitch$1].map(component => {
+  var install = function install(Vue) {
+    [MemoryRouter$1, HashRouter$1, BrowserRouter$1, StaticRouter$1, Router$1, RouterLink$1, Prompt$1, Redirect$1, Route$1, RouteContext, RouteSwitch$1].map(function (component) {
       Vue.use(component);
     });
   };
@@ -3184,7 +3150,7 @@
 
   var index = {
     version: '1.2.0',
-    install
+    install: install
   };
 
   exports.BrowserRouter = BrowserRouter$1;
