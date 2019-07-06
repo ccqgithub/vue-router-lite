@@ -34,6 +34,9 @@ npm install
 # build dist files
 npm run build
 
+# unit test
+npm run test
+
 # serve examples at localhost:8080
 npm run examples
 

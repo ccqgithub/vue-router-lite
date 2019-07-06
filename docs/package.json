@@ -1,7 +1,7 @@
 {
   "scripts": {
     "docs": "vuepress dev .",
-    "docs:build": "cross-env VUEPRESS_BASE=/vue-router-lite/docs/ vuepress build ."
+    "docs:build": "vuepress build ."
   },
   "devDependencies": {
     "@vuepress/theme-default": "^1.0.2",

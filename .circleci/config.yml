@@ -6,12 +6,9 @@ defaults: &defaults
     - image: circleci/node:lts-browsers
 
 jobs:
-  deploy-docs-examples:
+  install:
     <<: *defaults
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "e6:03:a3:2c:0c:7f:18:c8:9a:ac:57:92:c8:f4:8a:a6"
       - checkout
       - restore_cache:
           keys:
@@ -32,18 +29,27 @@ jobs:
           key: v1-vue-router-lite-docs-{{ .Branch }}-{{ checksum "docs/package-lock.json" }}
           paths:
             - docs/node_modules/
+      - persist_to_workspace:
+          root: ~/project
+          paths:
+            - vue-router-lite
+
+  docs-examples:
+    <<: *defaults
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "e6:03:a3:2c:0c:7f:18:c8:9a:ac:57:92:c8:f4:8a:a6"
+      - attach_workspace:
+          at: ~/project
       # init gh-pages
       - run: cd ../ && mkdir gh-pages
       # docs
-      - run: npm run docs:build && cp -r docs/.vuepress/dist ../gh-pages/docs 
+      - run: VUEPRESS_BASE=/vue-router-lite/docs/ npm run docs:build && cp -r docs/.vuepress/dist ../gh-pages/docs 
       # examples
-      - run: npm run examples:build && cp -r examples/__build__ ../gh-pages/examples 
+      - run: PUBLIC_PATH=/vue-router-lite/examples/ npm run examples:build && cp -r examples/__build__ ../gh-pages/examples 
       # push
       - run: cd ../gh-pages && git init && git config --global user.email "season.chen.i@foxmail.com" && git config --global user.name "Season Chen" && git add -A && git commit -m 'deploy [ci skip]' && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
-      # - persist_to_workspace:
-      #     root: ~/project
-      #     paths:
-      #       - vue-router-lite
 
   # lint-flow-types:
   #   <<: *defaults
@@ -54,19 +60,19 @@ jobs:
   #     - run: yarn run flow
   #     - run: yarn run test:types
 
-  # test-unit:
-  #   <<: *defaults
-  #   steps:
-  #     - attach_workspace:
-  #         at: ~/project
-  #     - run: yarn run test:unit
-  #     # add codecov once it is actually ran
-  #     # - run:
-  #     #    name: report coverage stats for non-PRs
-  #     #    command: |
-  #     #      if [[ -z $CI_PULL_REQUEST ]]; then
-  #     #        ./node_modules/.bin/codecov
-  #     #      fi
+  test-unit:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: ~/project
+      - run: npm run test
+      # add codecov once it is actually ran
+      # - run:
+      #    name: report coverage stats for non-PRs
+      #    command: |
+      #      if [[ -z $CI_PULL_REQUEST ]]; then
+      #        ./node_modules/.bin/codecov
+      #      fi
 
   # test-e2e:
   #   <<: *defaults
@@ -84,18 +90,26 @@ jobs:
 
 workflows:
   version: 2
-  deploy-docs-examples:
+  all:
     jobs:
-      - deploy-docs-examples:
+      - install:
+          requires:
+            - install
           filters:
             branches:
               only: master
-      # - docs:
-      #     requires:
-      #       - install
-      # - test-unit:
-      #     requires:
-      #       - install
+      - docs-examples:
+          requires:
+            - install
+          filters:
+            branches:
+              only: master
+      - test-unit:
+          requires:
+            - install
+          filters:
+            branches:
+              only: master
       # - lint-flow-types:
       #     requires:
       #       - install

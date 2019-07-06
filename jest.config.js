@@ -21,7 +21,10 @@ module.exports = {
   collectCoverage: true,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  collectCoverageFrom: ["**/*.{js,vue}", "!**/node_modules/**"],
+  collectCoverageFrom: [
+    "src/**.{js,vue}", 
+    "!**/node_modules/**"
+  ],
 
   // The directory where Jest should output its coverage files
   coverageDirectory: "coverage",
@@ -78,7 +81,7 @@ module.exports = {
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1"
+    "vue-router-lite": "<rootDir>/dist/vue-router-lite.js"
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
@@ -134,7 +137,7 @@ module.exports = {
   ],
 
   // The test environment that will be used for testing
-  // testEnvironment: "jest-environment-jsdom",
+  testEnvironment: "jest-environment-jsdom-global",
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -155,7 +158,7 @@ module.exports = {
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
   testRegex: [
-    "<rootDir>/test/unit/.*\.test.js$"
+    "/test/.*\\.test\\.js$"
   ],
 
   // This option allows the use of a custom results processor
