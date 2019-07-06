@@ -9,9 +9,6 @@ jobs:
   install:
     <<: *defaults
     steps:
-      - add_ssh_keys:
-          fingerprints:
-            - "e6:03:a3:2c:0c:7f:18:c8:9a:ac:57:92:c8:f4:8a:a6"
       - checkout
       - restore_cache:
           keys:
@@ -52,7 +49,7 @@ jobs:
       # examples
       - run: PUBLIC_PATH=/vue-router-lite/examples/ npm run examples:build && cp -r examples/__build__ ../gh-pages/examples 
       # push
-      - run: cd ../gh-pages && git init && git config --global user.email "season.chen.i@foxmail.com" && git config --global user.name "Season Chen" && git add -A && git commit -m 'deploy [ci skip]' && git push -f git@github.com:ccqgithub/vue-router-lite.git master:gh-pages
+      - run: cd ../gh-pages && git init && git config --global user.email "season.chen.i@foxmail.com" && git config --global user.name "Season Chen" && git add -A && git commit -m 'deploy [ci skip]' && git push -f https://github.com/ccqgithub/vue-router-lite.git master:gh-pages
 
   # lint-flow-types:
   #   <<: *defaults
