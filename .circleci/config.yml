@@ -37,11 +37,11 @@ jobs:
   docs-examples:
     <<: *defaults
     steps:
+      - attach_workspace:
+          at: ~/project
       - add_ssh_keys:
           fingerprints:
             - "e6:03:a3:2c:0c:7f:18:c8:9a:ac:57:92:c8:f4:8a:a6"
-      - attach_workspace:
-          at: ~/project
       # init gh-pages
       - run: cd ../ && mkdir gh-pages
       # docs
