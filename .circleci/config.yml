@@ -49,7 +49,7 @@ jobs:
       # examples
       - run: PUBLIC_PATH=/vue-router-lite/examples/ npm run examples:build && cp -r examples/__build__ ../gh-pages/examples 
       # push
-      - run: cd ../gh-pages && git init && git config --global user.email "season.chen.i@foxmail.com" && git config --global user.name "Season Chen" && git add -A && git commit -m 'deploy [ci skip]' && git push -f https://github.com/ccqgithub/vue-router-lite.git master:gh-pages
+      - run: cd ../gh-pages && git init && git config --global user.email "season.chen.i@foxmail.com" && git config --global user.name "Season Chen" && git add -A && git commit -m 'deploy [ci skip]' && git push -f git+https://github.com/ccqgithub/vue-router-lite.git master:gh-pages
 
   # lint-flow-types:
   #   <<: *defaults
