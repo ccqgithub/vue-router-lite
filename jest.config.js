@@ -18,10 +18,10 @@ module.exports = {
   clearMocks: true,
 
   // Indicates whether the coverage information should be collected while executing the test
-  // collectCoverage: false,
+  collectCoverage: true,
 
   // An array of glob patterns indicating a set of files for which coverage information should be collected
-  // collectCoverageFrom: null,
+  collectCoverageFrom: ["**/*.{js,vue}", "!**/node_modules/**"],
 
   // The directory where Jest should output its coverage files
   coverageDirectory: "coverage",
@@ -77,7 +77,9 @@ module.exports = {
   ],
 
   // A map from regular expressions to module names that allow to stub out resources with a single module
-  // moduleNameMapper: {},
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/src/$1"
+  },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
   // modulePathIgnorePatterns: [],
@@ -127,7 +129,9 @@ module.exports = {
   // setupFilesAfterEnv: [],
 
   // A list of paths to snapshot serializer modules Jest should use for snapshot testing
-  // snapshotSerializers: [],
+  snapshotSerializers: [
+    "<rootDir>/node_modules/jest-serializer-vue"
+  ],
 
   // The test environment that will be used for testing
   // testEnvironment: "jest-environment-jsdom",
@@ -150,7 +154,9 @@ module.exports = {
   // ],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
-  // testRegex: [],
+  testRegex: [
+    "<rootDir>/test/unit/.*\.test.js$"
+  ],
 
   // This option allows the use of a custom results processor
   // testResultsProcessor: null,
@@ -166,8 +172,8 @@ module.exports = {
 
   // A map from regular expressions to paths to transformers
   "transform": {
-    "^.+\\.js$": "node_modules/babel-jest",
-    ".*\\.(vue)$": "node_modules/vue-jest"
+    "^.+\\.js$": "<rootDir>/node_modules/babel-jest",
+    ".*\\.(vue)$": "<rootDir>/node_modules/vue-jest"
   },
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation

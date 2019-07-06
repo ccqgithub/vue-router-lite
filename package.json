@@ -9,6 +9,7 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/preset-env": "^7.4.5",
+    "@vue/test-utils": "^1.0.0-beta.29",
     "babel-eslint": "^10.0.2",
     "babel-jest": "^24.8.0",
     "babel-loader": "^8.0.6",
@@ -61,10 +62,10 @@
   },
   "homepage": "https://github.com/ccqgithub/vue-router-lite#readme",
   "dependencies": {
-    "history": "~4.9.0",
-    "path-to-regexp": "~3.0.0"
+    "history": "^4.9.0",
+    "path-to-regexp": "^3.0.0"
   },
   "peerDependencies": {
-    "vue": "~2.6.0"
+    "vue": "^2.6.0"
   }
 }
