@@ -2,7 +2,7 @@
 import { assert } from '../util/utils';
 
 const Prompt = {
-  name: 'prompt',
+  name: 'Prompt',
 
   props: {
     when: {
@@ -71,6 +71,10 @@ const Prompt = {
   render() {
     return null;
   }
+}
+
+Prompt.install = function(Vue) {
+  Vue.component(Prompt.name, Prompt);
 }
 
 export default Prompt;

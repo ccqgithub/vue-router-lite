@@ -1098,7 +1098,7 @@ function isNotTextNode(c) {
 }
 
 const Router = {
-  name: 'router',
+  name: 'Router',
 
   props: {
     // history control
@@ -1172,6 +1172,10 @@ const Router = {
 
     return children[0];
   }
+};
+
+Router.install = function(Vue) {
+  Vue.component(Router.name, Router);
 };
 
 function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
@@ -1292,7 +1296,7 @@ const __vue_script__ = Router;
 //
 
 const MemoryRouter = {
-  name: 'memory-router',
+  name: 'MemoryRouter',
 
   components: {
     Router: Router$1
@@ -1329,6 +1333,10 @@ const MemoryRouter = {
       history
     };
   }
+};
+
+MemoryRouter.install = function(Vue) {
+  Vue.component(MemoryRouter.name, MemoryRouter);
 };
 
 /* script */
@@ -1386,7 +1394,7 @@ __vue_render__._withStripped = true;
 //
 
 const HashRouter = {
-  name: 'hash-router',
+  name: 'HashRouter',
 
   components: {
     Router: Router$1
@@ -1422,6 +1430,10 @@ const HashRouter = {
       history
     };
   }
+};
+
+HashRouter.install = function(Vue) {
+  Vue.component(HashRouter.name, HashRouter);
 };
 
 /* script */
@@ -1479,7 +1491,7 @@ __vue_render__$1._withStripped = true;
 //
 
 const BrowserRouter = {
-  name: 'browser-router',
+  name: 'BrowserRouter',
 
   components: {
     Router: Router$1
@@ -1518,6 +1530,10 @@ const BrowserRouter = {
       history
     };
   }
+};
+
+BrowserRouter.install = function(Vue) {
+  Vue.component(BrowserRouter.name, BrowserRouter);
 };
 
 /* script */
@@ -1643,7 +1659,7 @@ function createStaticHistory({ basename = '', context = {}, location = '/' }) {
 //
 
 const StaticRouter = {
-  name: 'static-router',
+  name: 'StaticRouter',
 
   components: {
     Router: Router$1
@@ -1675,6 +1691,10 @@ const StaticRouter = {
       history
     };
   }
+};
+
+StaticRouter.install = function(Vue) {
+  Vue.component(StaticRouter.name, StaticRouter);
 };
 
 /* script */
@@ -2168,7 +2188,7 @@ function matchPath(pathname, options = {}) {
 }
 
 var script = {
-  name: 'tag',
+  name: 'Tag',
   functional: true,
   props: {
     tag: String
@@ -2211,7 +2231,7 @@ const __vue_script__$5 = script;
 //
 
 const RouterLink = {
-  name: 'router-link',
+  name: 'RouterLink',
   
   components: {
     Tag
@@ -2350,6 +2370,10 @@ const RouterLink = {
   }
 };
 
+RouterLink.install = function(Vue) {
+  Vue.component(RouterLink.name, RouterLink);
+};
+
 /* script */
 const __vue_script__$6 = RouterLink;
 
@@ -2415,7 +2439,7 @@ __vue_render__$4._withStripped = true;
   );
 
 const Prompt = {
-  name: 'prompt',
+  name: 'Prompt',
 
   props: {
     when: {
@@ -2486,6 +2510,10 @@ const Prompt = {
   }
 };
 
+Prompt.install = function(Vue) {
+  Vue.component(Prompt.name, Prompt);
+};
+
 /* script */
 const __vue_script__$7 = Prompt;
 
@@ -2546,7 +2574,7 @@ function generatePath(path = "/", params = {}, options = {}) {
 }
 
 const Redirect = {
-  name: 'redirect',
+  name: 'Redirect',
 
   props: {
     // from path
@@ -2672,6 +2700,10 @@ const Redirect = {
   }
 };
 
+Redirect.install = function(Vue) {
+  Vue.component(Redirect.name, Redirect);
+};
+
 /* script */
 const __vue_script__$8 = Redirect;
 
@@ -2703,7 +2735,7 @@ const __vue_script__$8 = Redirect;
   );
 
 const Route = {
-  name: 'route',
+  name: 'Route',
   
   props: {
     path: {
@@ -2879,6 +2911,10 @@ const Route = {
   }
 };
 
+Route.install = function(Vue) {
+  Vue.component(Route.name, Route);
+};
+
 /* script */
 const __vue_script__$9 = Route;
 
@@ -2909,8 +2945,8 @@ const __vue_script__$9 = Route;
     undefined
   );
 
-var script$1 = {
-  name: 'router-context',
+const RouterContext = {
+  name: 'RouterContext',
   inject: ['router', 'route'],
   data() {
     return {
@@ -2924,8 +2960,12 @@ var script$1 = {
   }
 };
 
+RouterContext.install = function(Vue) {
+  Vue.component(RouterContext.name, RouterContext);
+};
+
 /* script */
-const __vue_script__$a = script$1;
+const __vue_script__$a = RouterContext;
 
 /* template */
 
@@ -2954,8 +2994,8 @@ const __vue_script__$a = script$1;
     undefined
   );
 
-var script$2 = {
-  name: 'route-switch',
+const RouteSwitch = {
+  name: 'RouteSwitch',
   props: {
     location: Object
   },
@@ -3091,8 +3131,12 @@ var script$2 = {
   }
 };
 
+RouteSwitch.install = function(Vue) {
+  Vue.component(RouteSwitch.name, RouteSwitch);
+};
+
 /* script */
-const __vue_script__$b = script$2;
+const __vue_script__$b = RouteSwitch;
 
 /* template */
 
@@ -3110,7 +3154,7 @@ const __vue_script__$b = script$2;
   
 
   
-  var RouteSwitch = normalizeComponent_1(
+  var RouteSwitch$1 = normalizeComponent_1(
     {},
     __vue_inject_styles__$b,
     __vue_script__$b,
@@ -3121,4 +3165,33 @@ const __vue_script__$b = script$2;
     undefined
   );
 
-export { BrowserRouter$1 as BrowserRouter, HashRouter$1 as HashRouter, MemoryRouter$1 as MemoryRouter, Prompt$1 as Prompt, Redirect$1 as Redirect, Route$1 as Route, RouteContext, RouteSwitch, Router$1 as Router, RouterLink$1 as RouterLink, StaticRouter$1 as StaticRouter, createBrowserHistory, createHashHistory, createMemoryHistory, createStaticHistory, generatePath, matchPath };
+const install = function(Vue) {
+  [
+    MemoryRouter$1,
+    HashRouter$1,
+    BrowserRouter$1,
+    StaticRouter$1,
+    Router$1,
+    RouterLink$1,
+    Prompt$1,
+    Redirect$1,
+    Route$1,
+    RouteContext,
+    RouteSwitch$1,
+  ].map(component => {
+    Vue.use(component);
+  });
+};
+
+/* istanbul ignore if */
+if (typeof window !== 'undefined' && window.Vue) {
+  install(window.Vue);
+}
+
+var index = {
+  version: '1.2.0',
+  install
+};
+
+export default index;
+export { BrowserRouter$1 as BrowserRouter, HashRouter$1 as HashRouter, MemoryRouter$1 as MemoryRouter, Prompt$1 as Prompt, Redirect$1 as Redirect, Route$1 as Route, RouteContext, RouteSwitch$1 as RouteSwitch, Router$1 as Router, RouterLink$1 as RouterLink, StaticRouter$1 as StaticRouter, createBrowserHistory, createHashHistory, createMemoryHistory, createStaticHistory, generatePath, matchPath };

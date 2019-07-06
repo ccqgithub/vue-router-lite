@@ -2,8 +2,8 @@
 import { assert, isNotTextNode } from '../util/utils';
 import matchPath from "../util/matchPath";
 
-export default {
-  name: 'route-switch',
+const RouteSwitch = {
+  name: 'RouteSwitch',
   props: {
     location: Object
   },
@@ -138,4 +138,10 @@ export default {
     return vnode;
   }
 }
+
+RouteSwitch.install = function(Vue) {
+  Vue.component(RouteSwitch.name, RouteSwitch);
+}
+
+export default RouteSwitch;
 </script>

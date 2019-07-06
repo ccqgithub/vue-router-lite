@@ -5,7 +5,7 @@ import generatePath from "../util/generatePath";
 import matchPath from "../util/matchPath";
 
 const Redirect = {
-  name: 'redirect',
+  name: 'Redirect',
 
   props: {
     // from path
@@ -129,6 +129,10 @@ const Redirect = {
   render() {
     return null;
   }
+}
+
+Redirect.install = function(Vue) {
+  Vue.component(Redirect.name, Redirect);
 }
 
 export default Redirect;

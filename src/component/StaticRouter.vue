@@ -10,7 +10,7 @@ import createStaticHistory from "../util/createStaticHistory";
 import Router from "./Router.vue";
 
 const StaticRouter = {
-  name: 'static-router',
+  name: 'StaticRouter',
 
   components: {
     Router
@@ -42,6 +42,10 @@ const StaticRouter = {
       history
     };
   }
+}
+
+StaticRouter.install = function(Vue) {
+  Vue.component(StaticRouter.name, StaticRouter);
 }
 
 export default StaticRouter;

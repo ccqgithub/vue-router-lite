@@ -3,7 +3,7 @@ import { assert, isNotTextNode } from '../util/utils';
 import matchPath from '../util/matchPath';
 
 const Route = {
-  name: 'route',
+  name: 'Route',
   
   props: {
     path: {
@@ -178,6 +178,10 @@ const Route = {
     return vnode;
   }
 };
+
+Route.install = function(Vue) {
+  Vue.component(Route.name, Route);
+}
 
 export default Route;
 </script>

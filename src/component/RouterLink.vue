@@ -26,7 +26,7 @@ import matchPath from '../util/matchPath';
 import Tag from './Tag.vue';
 
 const RouterLink = {
-  name: 'router-link',
+  name: 'RouterLink',
   
   components: {
     Tag
@@ -163,6 +163,10 @@ const RouterLink = {
       'You should not use <router-link> outside a <router>'
     );
   }
+}
+
+RouterLink.install = function(Vue) {
+  Vue.component(RouterLink.name, RouterLink);
 }
 
 export default RouterLink;

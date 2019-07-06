@@ -2,7 +2,7 @@
 import { assert, isNotTextNode } from '../util/utils';
 
 const Router = {
-  name: 'router',
+  name: 'Router',
 
   props: {
     // history control
@@ -76,6 +76,10 @@ const Router = {
 
     return children[0];
   }
+}
+
+Router.install = function(Vue) {
+  Vue.component(Router.name, Router);
 }
 
 export default Router;

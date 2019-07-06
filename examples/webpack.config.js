@@ -20,7 +20,7 @@ const entry = fs.readdirSync(__dirname).reduce((entries, dir) => {
   const entry = path.join(fullDir, 'app.js')
   const entryName = path.join('js', dir);
   if (fs.statSync(fullDir).isDirectory() && fs.existsSync(entry)) {
-    entries[entryName] = ['es6-promise/auto', entry]
+    entries[entryName] = entry;
     const filename = path.join(dir, 'index.html')
     const template = path.join(fullDir, 'index.html')
     htmlPlugins.push(new HtmlWebpackPlugin({

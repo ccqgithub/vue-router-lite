@@ -10,7 +10,7 @@ import { assert } from '../util/utils';
 import Router from './Router.vue';
 
 const BrowserRouter = {
-  name: 'browser-router',
+  name: 'BrowserRouter',
 
   components: {
     Router
@@ -49,6 +49,10 @@ const BrowserRouter = {
       history
     };
   }
+}
+
+BrowserRouter.install = function(Vue) {
+  Vue.component(BrowserRouter.name, BrowserRouter);
 }
 
 export default BrowserRouter;

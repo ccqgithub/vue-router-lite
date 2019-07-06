@@ -10,7 +10,7 @@ import { assert } from '../util/utils';
 import Router from './Router.vue';
 
 const HashRouter = {
-  name: 'hash-router',
+  name: 'HashRouter',
 
   components: {
     Router
@@ -46,6 +46,10 @@ const HashRouter = {
       history
     };
   }
+}
+
+HashRouter.install = function(Vue) {
+  Vue.component(HashRouter.name, HashRouter);
 }
 
 export default HashRouter;

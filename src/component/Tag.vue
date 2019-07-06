@@ -1,6 +1,6 @@
 <script>
 export default {
-  name: 'tag',
+  name: 'Tag',
   functional: true,
   props: {
     tag: String

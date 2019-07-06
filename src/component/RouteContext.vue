@@ -1,6 +1,6 @@
 <script>
-export default {
-  name: 'router-context',
+const RouterContext = {
+  name: 'RouterContext',
   inject: ['router', 'route'],
   data() {
     return {
@@ -13,4 +13,10 @@ export default {
     return null;
   }
 }
+
+RouterContext.install = function(Vue) {
+  Vue.component(RouterContext.name, RouterContext);
+}
+
+export default RouterContext;
 </script>

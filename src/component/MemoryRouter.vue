@@ -10,7 +10,7 @@ import { assert } from '../util/utils';
 import Router from './Router.vue';
 
 const MemoryRouter = {
-  name: 'memory-router',
+  name: 'MemoryRouter',
 
   components: {
     Router
@@ -47,6 +47,10 @@ const MemoryRouter = {
       history
     };
   }
+}
+
+MemoryRouter.install = function(Vue) {
+  Vue.component(MemoryRouter.name, MemoryRouter);
 }
 
 export default MemoryRouter;

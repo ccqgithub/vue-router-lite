@@ -37,3 +37,31 @@ export {
   createMemoryHistory,
   createStaticHistory
 };
+
+const install = function(Vue) {
+  [
+    MemoryRouter,
+    HashRouter,
+    BrowserRouter,
+    StaticRouter,
+    Router,
+    RouterLink,
+    Prompt,
+    Redirect,
+    Route,
+    RouteContext,
+    RouteSwitch,
+  ].map(component => {
+    Vue.use(component);
+  });
+};
+
+/* istanbul ignore if */
+if (typeof window !== 'undefined' && window.Vue) {
+  install(window.Vue);
+}
+
+export default {
+  version: '__VERSION__',
+  install
+}

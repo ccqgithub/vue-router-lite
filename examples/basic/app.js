@@ -1,5 +1,7 @@
 import Vue from 'vue'
-import { BrowserRouter as Router, Route, RouterLink } from 'vue-router-lite'
+import VueRouter from 'vue-router-lite'
+
+Vue.use(VueRouter)
 
 const Home = { 
   template: `
@@ -33,9 +35,7 @@ const Topic = {
 
 const Topics = {
   components: {
-    RouterLink,
-    Topic,
-    Route
+    Topic
   },
   props: {
     match: {
@@ -84,8 +84,6 @@ const App = {
     }
   },
   components: {
-    Route, 
-    RouterLink,
     Topics,
     About,
     Home
@@ -126,8 +124,7 @@ const App = {
 
 new Vue({
   components: {
-    App,
-    Router
+    App
   },
   data() {
     const p = '/basic';
@@ -137,8 +134,8 @@ new Vue({
     }
   },
   template: `
-    <router :basename="basename">
+    <browser-router :basename="basename">
       <app />
-    </router>
+    </browser-router>
   `
 }).$mount('#app')
