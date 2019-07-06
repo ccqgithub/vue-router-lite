@@ -93,8 +93,6 @@ workflows:
   all:
     jobs:
       - install:
-          requires:
-            - install
           filters:
             branches:
               only: master
