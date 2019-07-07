@@ -43,7 +43,21 @@ module.exports = {
             title: 'Essentials',
             collapsable: false,
             children: [
-              '/guide/'
+              '/guide/',
+              '/guide/routers.md',
+              '/guide/route-matching.md',
+              '/guide/route-info.md',
+              '/guide/control-history.md',
+              '/guide/navigation.md',
+              '/guide/redirects.md',
+              '/guide/preventing-transitions.md'
+            ]
+          },
+          {
+            title: 'Advanced',
+            collapsable: false,
+            children: [
+              '/advanced/data-fetching.md'
             ]
           }
         ]
