@@ -165,9 +165,5 @@ const RouterLink = {
   }
 }
 
-RouterLink.install = function(Vue) {
-  Vue.component(RouterLink.name, RouterLink);
-}
-
 export default RouterLink;
 </script>

@@ -48,9 +48,5 @@ const HashRouter = {
   }
 }
 
-HashRouter.install = function(Vue) {
-  Vue.component(HashRouter.name, HashRouter);
-}
-
 export default HashRouter;
 </script>

@@ -179,9 +179,5 @@ const Route = {
   }
 };
 
-Route.install = function(Vue) {
-  Vue.component(Route.name, Route);
-}
-
 export default Route;
 </script>

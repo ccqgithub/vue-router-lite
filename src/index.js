@@ -52,7 +52,7 @@ const install = function(Vue) {
     RouteContext,
     RouteSwitch,
   ].map(component => {
-    Vue.use(component);
+    Vue.component(component.name, component);
   });
 };
 

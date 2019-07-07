@@ -4,6 +4,7 @@
   "description": "> `vue-router-lite` is a component-based router for Vue.js.",
   "main": "dist/vue-router-lite.js",
   "module": "dist/vue-router-lite.module.js",
+  "unpkg": "dist/vue-router-lite.umd.js",
   "devDependencies": {
     "@babel/core": "^7.5.0",
     "@babel/plugin-proposal-object-rest-spread": "^7.4.4",

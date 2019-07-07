@@ -44,9 +44,5 @@ const StaticRouter = {
   }
 }
 
-StaticRouter.install = function(Vue) {
-  Vue.component(StaticRouter.name, StaticRouter);
-}
-
 export default StaticRouter;
 </script>

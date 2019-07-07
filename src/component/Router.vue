@@ -78,9 +78,5 @@ const Router = {
   }
 }
 
-Router.install = function(Vue) {
-  Vue.component(Router.name, Router);
-}
-
 export default Router;
 </script>

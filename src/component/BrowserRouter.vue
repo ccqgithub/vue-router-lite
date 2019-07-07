@@ -51,9 +51,5 @@ const BrowserRouter = {
   }
 }
 
-BrowserRouter.install = function(Vue) {
-  Vue.component(BrowserRouter.name, BrowserRouter);
-}
-
 export default BrowserRouter;
 </script>

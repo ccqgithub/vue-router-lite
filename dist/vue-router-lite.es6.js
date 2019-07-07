@@ -1174,10 +1174,6 @@ const Router = {
   }
 };
 
-Router.install = function(Vue) {
-  Vue.component(Router.name, Router);
-};
-
 function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
 /* server only */
 , shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
@@ -1335,10 +1331,6 @@ const MemoryRouter = {
   }
 };
 
-MemoryRouter.install = function(Vue) {
-  Vue.component(MemoryRouter.name, MemoryRouter);
-};
-
 /* script */
 const __vue_script__$1 = MemoryRouter;
 
@@ -1430,10 +1422,6 @@ const HashRouter = {
       history
     };
   }
-};
-
-HashRouter.install = function(Vue) {
-  Vue.component(HashRouter.name, HashRouter);
 };
 
 /* script */
@@ -1530,10 +1518,6 @@ const BrowserRouter = {
       history
     };
   }
-};
-
-BrowserRouter.install = function(Vue) {
-  Vue.component(BrowserRouter.name, BrowserRouter);
 };
 
 /* script */
@@ -1691,10 +1675,6 @@ const StaticRouter = {
       history
     };
   }
-};
-
-StaticRouter.install = function(Vue) {
-  Vue.component(StaticRouter.name, StaticRouter);
 };
 
 /* script */
@@ -2370,10 +2350,6 @@ const RouterLink = {
   }
 };
 
-RouterLink.install = function(Vue) {
-  Vue.component(RouterLink.name, RouterLink);
-};
-
 /* script */
 const __vue_script__$6 = RouterLink;
 
@@ -2508,10 +2484,6 @@ const Prompt = {
   render() {
     return null;
   }
-};
-
-Prompt.install = function(Vue) {
-  Vue.component(Prompt.name, Prompt);
 };
 
 /* script */
@@ -2698,10 +2670,6 @@ const Redirect = {
   render() {
     return null;
   }
-};
-
-Redirect.install = function(Vue) {
-  Vue.component(Redirect.name, Redirect);
 };
 
 /* script */
@@ -2911,10 +2879,6 @@ const Route = {
   }
 };
 
-Route.install = function(Vue) {
-  Vue.component(Route.name, Route);
-};
-
 /* script */
 const __vue_script__$9 = Route;
 
@@ -2958,10 +2922,6 @@ const RouterContext = {
   render() {
     return null;
   }
-};
-
-RouterContext.install = function(Vue) {
-  Vue.component(RouterContext.name, RouterContext);
 };
 
 /* script */
@@ -3131,10 +3091,6 @@ const RouteSwitch = {
   }
 };
 
-RouteSwitch.install = function(Vue) {
-  Vue.component(RouteSwitch.name, RouteSwitch);
-};
-
 /* script */
 const __vue_script__$b = RouteSwitch;
 
@@ -3179,7 +3135,7 @@ const install = function(Vue) {
     RouteContext,
     RouteSwitch$1,
   ].map(component => {
-    Vue.use(component);
+    Vue.component(component.name, component);
   });
 };
 

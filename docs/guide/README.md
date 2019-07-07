@@ -1,81 +1,100 @@
 # Getting Started
 
-## Basic: BrowserRouter
+> `vue-router-lite` is a component-based router for vue.js, so all the features of it can do with it's components, just like use ohter general components.
 
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/basic](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/basic)
+## Use Components
 
-## HashRouter
+### Global Registration
 
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/hash-router](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/hash-router)
+If you use `Vue.use` to `Global Registration` like this, you can use those components directly:
 
-## MemoryRouter
+```js
+import Vue from 'vue'
+import VueRouter from 'vue-router-lite'
 
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/memory-router](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/memory-router)
+// register the components to global
+Vue.use(VueRouter)
+```
 
-## StaticRouter
+It will install itself automatically when using global script tags.
 
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/static-router](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/static-router)
+### Manual import
 
-## Control History: Router
+If you use `vue-router-lite` with package tools like `webpack` and `npm`, you can manual import these components and use them.
 
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/control-history](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/control-history)
+```js
+import Vue from 'vue'
+import { BrowserRouter, Route, RouterLink, RouteSwitch } from 'vue-router-lite'
 
-## URL Parameters
+new Vue({
+  components: {
+    BrowserRouter,
+    Route,
+    RouterLink,
+    RouteSwitch
+  }
+})
+```
 
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/url-parameters](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/url-parameters)
+## HTML
 
-## Auth Flow And Redirect
+```html
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-router-lite/dist/vue-router-lite.umd.js"></script>
 
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/auth-flow](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/auth-flow)
+<browser-router v-slot="{ history, location, match }" id="app">
+  <div>
+    <h1>Hello App!</h1>
+    <p>
+      <!-- use router-link component for navigation. -->
+      <!-- specify the link by passing the `to` prop. -->
+      <!-- `<router-link>` will be rendered as an `<a>` tag by default -->
+      <router-link to="/">Go to Foo</router-link>
+      <router-link to="/about">Go to Bar</router-link>
+      <router-link to="/xxxx">Go to Bar</router-link>
+    </p>
 
-## Chustom Link (Force Render Route)
+    <!-- routes -->
+    <route-switch>
+      <route path="/" exact v-slot="{ history, location, match }">
+        <div>
+          <h2>Home</h2>
+          matched url: {{ match.url }}
+        </div>
+      </route>
+      <route path="/about" v-slot="{ history, location, match }">
+        <div>
+          <h2>About</h2>
+          matched url: {{ match.url }}
+        </div>
+      </route>
+      <route v-slot="{ history, location, match }">
+        <div>
+          <h2>Other</h2>
+          matched url: {{ match.url }}
+        </div>
+      </route>
+    </route-switch>
+  </div>
+</browser-router>
+```
 
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/custom-link](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/custom-link)
+## JavaScript
 
-## Preventing Transitions (Prompt)
+```js
+const app = new Vue({
+  el: '#app'
+});
+```
 
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/preventing-transitions](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/preventing-transitions)
+The `<router>`, `<browser-router>`, `<hash-router>`, `<memory-router>`, `<static-router>`, `<route>` will use [Scoped Slot Props](https://vuejs.org/v2/guide/components-slots.html#Scoped-Slots) to provide the route info.
 
-## No Match (404)
+```html
+<route path="/" exact v-slot="{ history, location, match }">
+  ...
+</route>
+```
 
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/no-match](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/no-match)
+Notice that a `<router-link>` automatically gets the .router-link-active class when its target route is matched. You can learn more about it in its [API reference](./api/).
 
-## Recursive Paths
-
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/recursive-paths](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/recursive-paths)
-
-## Sidebar
-
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/sidebar](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/sidebar)
-
-## Transitions
-
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/transitions](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/transitions)
-
-## Keep Alive
-
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/keep-alive](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/keep-alive)
-
-## Ambiguous Matches (RouteSwitch)
-
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/ambiguous-matches](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/ambiguous-matches)
-
-## Route Config
-
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/route-config](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/route-config)
-
-## Modal Gallery 1: RouteSwitch
-
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/modal-gallery](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/modal-gallery)
-
-## Modal Gallery 2: path control
-
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/modal-gallery2](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/modal-gallery2)
-
-## Active Links
-
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/active-links](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/active-links)
-
-## Data Fetching
-
-[https://github.com/ccqgithub/vue-router-lite/tree/master/examples/data-fetching](https://github.com/ccqgithub/vue-router-lite/tree/master/examples/data-fetching)
+You can also check out this example [live](https://jsfiddle.net/SeasonChen/akeh2fp7/7/).

@@ -14,9 +14,5 @@ const RouterContext = {
   }
 }
 
-RouterContext.install = function(Vue) {
-  Vue.component(RouterContext.name, RouterContext);
-}
-
 export default RouterContext;
 </script>

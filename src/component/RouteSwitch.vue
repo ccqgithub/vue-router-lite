@@ -139,9 +139,5 @@ const RouteSwitch = {
   }
 }
 
-RouteSwitch.install = function(Vue) {
-  Vue.component(RouteSwitch.name, RouteSwitch);
-}
-
 export default RouteSwitch;
 </script>

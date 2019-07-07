@@ -131,9 +131,5 @@ const Redirect = {
   }
 }
 
-Redirect.install = function(Vue) {
-  Vue.component(Redirect.name, Redirect);
-}
-
 export default Redirect;
 </script>

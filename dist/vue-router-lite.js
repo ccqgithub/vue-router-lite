@@ -124,10 +124,6 @@ var Router = {
   }
 };
 
-Router.install = function (Vue) {
-  Vue.component(Router.name, Router);
-};
-
 function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
 /* server only */
 , shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
@@ -282,10 +278,6 @@ var MemoryRouter = {
   }
 };
 
-MemoryRouter.install = function (Vue) {
-  Vue.component(MemoryRouter.name, MemoryRouter);
-};
-
 /* script */
 const __vue_script__$1 = MemoryRouter;
 
@@ -372,10 +364,6 @@ var HashRouter = {
       history: history$1
     };
   }
-};
-
-HashRouter.install = function (Vue) {
-  Vue.component(HashRouter.name, HashRouter);
 };
 
 /* script */
@@ -467,10 +455,6 @@ var BrowserRouter = {
       history: history$1
     };
   }
-};
-
-BrowserRouter.install = function (Vue) {
-  Vue.component(BrowserRouter.name, BrowserRouter);
 };
 
 /* script */
@@ -683,10 +667,6 @@ var StaticRouter = {
       history: history
     };
   }
-};
-
-StaticRouter.install = function (Vue) {
-  Vue.component(StaticRouter.name, StaticRouter);
 };
 
 /* script */
@@ -984,10 +964,6 @@ var RouterLink = {
   }
 };
 
-RouterLink.install = function (Vue) {
-  Vue.component(RouterLink.name, RouterLink);
-};
-
 /* script */
 const __vue_script__$6 = RouterLink;
 
@@ -1107,10 +1083,6 @@ var Prompt = {
   render: function render() {
     return null;
   }
-};
-
-Prompt.install = function (Vue) {
-  Vue.component(Prompt.name, Prompt);
 };
 
 /* script */
@@ -1275,10 +1247,6 @@ var Redirect = {
   render: function render() {
     return null;
   }
-};
-
-Redirect.install = function (Vue) {
-  Vue.component(Redirect.name, Redirect);
 };
 
 /* script */
@@ -1474,10 +1442,6 @@ var Route = {
   }
 };
 
-Route.install = function (Vue) {
-  Vue.component(Route.name, Route);
-};
-
 /* script */
 const __vue_script__$9 = Route;
 
@@ -1521,10 +1485,6 @@ var RouterContext = {
   render: function render() {
     return null;
   }
-};
-
-RouterContext.install = function (Vue) {
-  Vue.component(RouterContext.name, RouterContext);
 };
 
 /* script */
@@ -1681,10 +1641,6 @@ var RouteSwitch = {
   }
 };
 
-RouteSwitch.install = function (Vue) {
-  Vue.component(RouteSwitch.name, RouteSwitch);
-};
-
 /* script */
 const __vue_script__$b = RouteSwitch;
 
@@ -1717,7 +1673,7 @@ const __vue_script__$b = RouteSwitch;
 
 var install = function install(Vue) {
   [MemoryRouter$1, HashRouter$1, BrowserRouter$1, StaticRouter$1, Router$1, RouterLink$1, Prompt$1, Redirect$1, Route$1, RouteContext, RouteSwitch$1].map(function (component) {
-    Vue.use(component);
+    Vue.component(component.name, component);
   });
 };
 /* istanbul ignore if */

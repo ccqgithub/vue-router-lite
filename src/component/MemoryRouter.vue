@@ -49,9 +49,5 @@ const MemoryRouter = {
   }
 }
 
-MemoryRouter.install = function(Vue) {
-  Vue.component(MemoryRouter.name, MemoryRouter);
-}
-
 export default MemoryRouter;
 </script>

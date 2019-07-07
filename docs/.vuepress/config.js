@@ -37,9 +37,15 @@ module.exports = {
           }
         ],
         sidebar: [
-          '/',
           '/installation.md',
-          '/guide/'
+          '/',
+          {
+            title: 'Essentials',
+            collapsable: false,
+            children: [
+              '/guide/'
+            ]
+          }
         ]
       }
     }

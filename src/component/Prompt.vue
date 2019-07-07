@@ -73,9 +73,5 @@ const Prompt = {
   }
 }
 
-Prompt.install = function(Vue) {
-  Vue.component(Prompt.name, Prompt);
-}
-
 export default Prompt;
 </script>
