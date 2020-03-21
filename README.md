@@ -21,7 +21,7 @@ Features include:
 ## Doccuments And Examples
 
 - [Examples](http://ccqgithub.github.io/vue-router-lite/examples/).
-- [Examples Code](http://ccqgithub.github.io/vue-router-lite/tree/master/examples).
+- [Examples Code](https://github.com/ccqgithub/vue-router-lite/tree/master/examples).
 - [Documentations](http://ccqgithub.github.io/vue-router-lite/docs/).
 - [Documentations Code](https://github.com/ccqgithub/vue-router-lite/tree/master/docs).
 
