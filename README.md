@@ -4,7 +4,7 @@
 
 ## Introduction
 
-`vue-router-lite` is a component-based router for [Vue.js](http://vuejs.org/). Read [Documents](https://github.chenchangqin.com/vue-router-lite/docs/) for more details.
+`vue-router-lite` is a component-based router for [Vue.js](http://vuejs.org/). Read [Documents](http://ccqgithub.github.io/vue-router-lite/docs/) for more details.
 
 Features include:
 
@@ -20,9 +20,9 @@ Features include:
 
 ## Doccuments And Examples
 
-- [Examples](https://github.chenchangqin.com/vue-router-lite/examples/).
+- [Examples](http://ccqgithub.github.io/vue-router-lite/examples/).
 - [Examples Code](https://github.com/ccqgithub/vue-router-lite/tree/master/examples).
-- [Documentations](https://github.chenchangqin.com/vue-router-lite/docs/).
+- [Documentations](http://ccqgithub.github.io/vue-router-lite/docs/).
 - [Documentations Code](https://github.com/ccqgithub/vue-router-lite/tree/master/docs).
 
 ## Development Setup
