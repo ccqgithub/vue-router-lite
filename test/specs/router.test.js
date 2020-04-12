@@ -68,7 +68,7 @@ describe('memory router', () => {
       }
     });
     const pages = wrapper.findAll('.mod');
-    console.log(pages.at(0).html())
+    // console.log(pages.at(0).html())
     expect(pages.at(0).is('.home')).toBe(true);
   });
 

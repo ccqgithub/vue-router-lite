@@ -1,1 +1,1 @@
-export { createMemoryHistory as default } from "history";
+export { createMemoryHistory as default } from 'history';

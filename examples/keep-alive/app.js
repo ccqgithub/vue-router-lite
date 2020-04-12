@@ -5,6 +5,7 @@ const Home = {
   template: `
     <div>
       <h2>Home</h2>
+      <div><input /></div>
     </div>
   ` 
 }
@@ -12,7 +13,7 @@ const Home = {
 const Alive = { 
   template: `
     <div>
-      <h2>Alive Component</h2>
+      <h2>Keep Alive Component</h2>
       <div><input /></div>
     </div>
   ` 
@@ -27,7 +28,7 @@ const AliveChild = {
   },
   template: `
     <div>
-      <h3>Keep Alive Child: {{ id }}</h3>
+      <h3>Nested Keep Alive Child: {{ id }}</h3>
       <div><input /></div>
     </div>
   `
@@ -35,6 +36,7 @@ const AliveChild = {
 
 const NestAlive = {
   components: {
+    RouteSwitch,
     RouterLink,
     Route,
     AliveChild
@@ -47,7 +49,7 @@ const NestAlive = {
   },
   template: `
     <div>
-      <h2>Alive Parent</h2>
+      <h2>Nested Keep Alive Parent</h2>
       <ul>
         <li>
           <router-link :to="match.url + '/a'">Keep Alive Child A</router-link>
@@ -64,7 +66,7 @@ const NestAlive = {
 
       <hr />
 
-      <keep-alive>
+      <route-switch keep-alive>
         <route 
           :path="match.path + '/:id(a|b)'" 
           v-slot="{ match }"
@@ -74,29 +76,29 @@ const NestAlive = {
             :key="match.params.id" 
           />
         </route>
-      </keep-alive>
+      </route-switch>
 
       <route 
         :path="match.path + '/:id(c)'" 
-        v-slot="{ match }"
+        v-slot="props"
       >
-        <alive-child 
-          :id="match.params.id" 
-          :key="match.params.id" 
-        />
+        <h3 v-if="props.match">
+          without keep alive <input />
+        </h3>
       </route>
 
-      <keep-alive>
+      <route-switch keep-alive>
         <route
           exact
           :path="match.path"
           v-slot="props"
         >
           <h3 v-if="props.match">
-            this is not a component, so can not keep alive. <input />
+            defautl route:
+            <input />
           </h3>
         </route>
-      </keep-alive>
+      </route-switch>
     </div>
   `
 }
@@ -117,7 +119,7 @@ const App = {
   },
   template: `
     <div id="app">
-      <h1>Basic: BrowserRouter</h1>
+      <h1>Keep Alive (RouteSwitch)</h1>
       <ul>
         <li>
           <router-link to="/">Home</router-link>
@@ -126,30 +128,25 @@ const App = {
           <router-link to="/alive">Keep Alive Route</router-link>
         </li>
         <li>
-          <router-link to="/nest-alive">Keep Alive Nest Alive</router-link>
-        </li>
-        <li>
-          <router-link to="/nest-alive/c">Keep Alive Child C</router-link>
+          <router-link to="/nest-alive">Nested Keep Alive Route</router-link>
         </li>
       </ul>
 
       <hr />
       
-      <keep-alive>
-        <route-switch>
-          <route exact path="/" v-slot="props">
-            <home v-bind="props"/>
-          </route>
+      <route-switch keep-alive>
+        <route exact path="/" v-slot="props">
+          <home v-bind="props"/>
+        </route>
 
-          <route path="/alive" v-slot="props">
-            <alive v-bind="props"/>
-          </route>
-          
-          <route path="/nest-alive" v-slot="props">
-            <nest-alive v-bind="props" />
-          </route>
-        </route-switch>
-      </keep-alive>
+        <route path="/alive" v-slot="props">
+          <alive v-bind="props"/>
+        </route>
+        
+        <route path="/nest-alive" v-slot="props">
+          <nest-alive v-bind="props" />
+        </route>
+      </route-switch>
     </div>
   `,
 

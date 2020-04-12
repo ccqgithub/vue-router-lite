@@ -1,1 +1,1 @@
-export { createBrowserHistory as default } from "history";
+export { createBrowserHistory as default } from 'history';

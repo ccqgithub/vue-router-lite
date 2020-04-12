@@ -541,12 +541,36 @@ Now, if we’re at `/about`, `<switch>` will start looking for a matching `<rout
 
 Props:
 
+### keepAlive
+
+- Type: `Boolean`,
+- Defaults: `false`
+
+Weather keep alive the route's components, it will add a `keep-alive` component to wrap the components rendered from matched route.
+
+If the `router-switch` not remount, all the matched components in it will be cached.
+
+```html
+<route-switch keep-alive>
+  <route exact path="/" v-slot="props">
+    <home v-bind="props"/>
+  </route>
+
+  <route path="/alive" v-slot="props">
+    <alive v-bind="props"/>
+  </route>
+  
+  <route path="/nest-alive" v-slot="props">
+    <nest-alive v-bind="props" />
+  </route>
+</route-switch>
+```
+
 ### location
 
 - Type: `Location`
 
 A `location` object to be used for matching children elements instead of the current history location (usually the current browser URL).
-
 
 ## `<router-link>`
 

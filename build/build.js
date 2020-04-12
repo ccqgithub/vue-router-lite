@@ -1,24 +1,24 @@
 const { rollup } = require('rollup');
+const cjsPlugin = require('@rollup/plugin-commonjs');
+const resolvePlugin = require('@rollup/plugin-node-resolve');
+const replacePlugin = require('@rollup/plugin-replace');
 const babelPlugin = require('rollup-plugin-babel');
-const cjsPlugin = require('rollup-plugin-commonjs');
 const vuePlugin = require('rollup-plugin-vue');
-const resolvePlugin = require('rollup-plugin-node-resolve');
 const filesizePlugin = require('rollup-plugin-filesize');
-const replacePlugin = require('rollup-plugin-replace');
 const terserPlugin = require('rollup-plugin-terser').terser;
 
 const fs = require('fs-extra');
 const path = require('path');
 
 const pkg = require('../package.json');
+
 const version = process.env.VERSION || pkg.version;
-const banner =
-`/*!
+const banner = `/*!
   * vue-router-lite v${version}
   * (c) 2019-present Season Chen
   * @license MIT
   */`;
-const resolve = _path => path.resolve(__dirname, '../', _path);
+const resolve = (_path) => path.resolve(__dirname, '../', _path);
 let external = [];
 external = external.concat(Object.keys(pkg.dependencies || {}));
 external = external.concat(Object.keys(pkg.peerDependencies || {}));
@@ -28,14 +28,14 @@ process.chdir(path.resolve(__dirname, '../'));
 
 fs.removeSync('../dist');
 
-async function generateBundledModule({ 
-  inputFile, 
-  outputFile, 
-  format, 
-  min, 
-  env, 
-  es5, 
-  external = [] 
+async function generateBundledModule({
+  inputFile,
+  outputFile,
+  format,
+  min,
+  env,
+  es5,
+  external = []
 }) {
   console.log(`Generating ${outputFile} bundle.`);
 
@@ -53,23 +53,23 @@ async function generateBundledModule({
 
   // process.env.NODE_ENV
   if (env) {
-    plugins.push(replacePlugin({
-      'process.env.NODE_ENV': JSON.stringify(env)
-    }));
+    plugins.push(
+      replacePlugin({
+        'process.env.NODE_ENV': JSON.stringify(env)
+      })
+    );
   }
 
   // babel compield to es5
   if (es5) {
-    plugins.push(babelPlugin({
-      // configFile: path.join(__dirname, '../babel.config.js')
-    }));
+    plugins.push(babelPlugin({}));
   }
 
   // min
   if (min) {
     plugins.push(terserPlugin());
   }
-  
+
   // file size
   plugins.push(filesizePlugin());
 
@@ -140,20 +140,22 @@ const outputs = [
 
 async function build() {
   const inputFile = path.join(__dirname, '../src/index.js');
-  await Promise.all(outputs.map(item => {
-    return generateBundledModule({
-      inputFile,
-      outputFile: item.file,
-      format: item.format,
-      es5: item.es5,
-      env: item.env,
-      min: item.min,
-      external: item.external
-    });
-  }));
+  await Promise.all(
+    outputs.map((item) => {
+      return generateBundledModule({
+        inputFile,
+        outputFile: item.file,
+        format: item.format,
+        es5: item.es5,
+        env: item.env,
+        min: item.min,
+        external: item.external
+      });
+    })
+  );
 }
 
-build().catch(e => {
+build().catch((e) => {
   console.error(e);
   if (e.frame) {
     console.error(e.frame);

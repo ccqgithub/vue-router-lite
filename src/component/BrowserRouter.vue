@@ -1,12 +1,11 @@
 <template>
   <router :history="history" name="browser-router" v-slot="routerProps">
-    <slot v-bind="routerProps"/>
+    <slot v-bind="routerProps" />
   </router>
 </template>
 
 <script>
 import createBrowserHistory from '../util/createBrowserHistory';
-import { assert } from '../util/utils';
 import Router from './Router.vue';
 
 const BrowserRouter = {
@@ -32,6 +31,7 @@ const BrowserRouter = {
     getUserConfirmation: {
       type: Function,
       default(message, callback) {
+        // eslint-disable-next-line no-alert
         callback(window.confirm(message));
       }
     }
@@ -49,7 +49,7 @@ const BrowserRouter = {
       history
     };
   }
-}
+};
 
 export default BrowserRouter;
 </script>

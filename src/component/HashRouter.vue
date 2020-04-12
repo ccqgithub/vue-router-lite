@@ -1,12 +1,11 @@
 <template>
   <router :history="history" name="hash-router" v-slot="routerProps">
-    <slot v-bind="routerProps"/>
+    <slot v-bind="routerProps" />
   </router>
 </template>
 
 <script>
 import createHashHistory from '../util/createHashHistory';
-import { assert } from '../util/utils';
 import Router from './Router.vue';
 
 const HashRouter = {
@@ -23,13 +22,14 @@ const HashRouter = {
     },
     hashType: {
       validator(value) {
-        return ["hashbang", "noslash", "slash"].indexOf(value) !== -1;
+        return ['hashbang', 'noslash', 'slash'].indexOf(value) !== -1;
       },
       default: 'slash'
     },
     getUserConfirmation: {
       type: Function,
       default(message, callback) {
+        // eslint-disable-next-line no-alert
         callback(window.confirm(message));
       }
     }
@@ -46,7 +46,7 @@ const HashRouter = {
       history
     };
   }
-}
+};
 
 export default HashRouter;
 </script>

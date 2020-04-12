@@ -1,5 +1,5 @@
 /*!
-  * vue-router-lite v1.2.1
+  * vue-router-lite v1.3.0
   * (c) 2019-present Season Chen
   * @license MIT
   */
@@ -35,11 +35,11 @@ function spliceOne(list, index) {
 }
 
 // This implementation is based heavily on node's url.parse
-function resolvePathname(to) {
-  var from = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+function resolvePathname(to, from) {
+  if (from === undefined) from = '';
 
-  var toParts = to && to.split('/') || [];
-  var fromParts = from && from.split('/') || [];
+  var toParts = (to && to.split('/')) || [];
+  var fromParts = (from && from.split('/')) || [];
 
   var isToAbs = to && isAbsolute(to);
   var isFromAbs = from && isAbsolute(from);
@@ -56,7 +56,7 @@ function resolvePathname(to) {
 
   if (!fromParts.length) return '/';
 
-  var hasTrailingSlash = void 0;
+  var hasTrailingSlash;
   if (fromParts.length) {
     var last = fromParts[fromParts.length - 1];
     hasTrailingSlash = last === '.' || last === '..' || last === '';
@@ -79,9 +79,14 @@ function resolvePathname(to) {
     }
   }
 
-  if (!mustEndAbs) for (; up--; up) {
-    fromParts.unshift('..');
-  }if (mustEndAbs && fromParts[0] !== '' && (!fromParts[0] || !isAbsolute(fromParts[0]))) fromParts.unshift('');
+  if (!mustEndAbs) for (; up--; up) fromParts.unshift('..');
+
+  if (
+    mustEndAbs &&
+    fromParts[0] !== '' &&
+    (!fromParts[0] || !isAbsolute(fromParts[0]))
+  )
+    fromParts.unshift('');
 
   var result = fromParts.join('/');
 
@@ -90,36 +95,34 @@ function resolvePathname(to) {
   return result;
 }
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+function valueOf(obj) {
+  return obj.valueOf ? obj.valueOf() : Object.prototype.valueOf.call(obj);
+}
 
 function valueEqual(a, b) {
+  // Test for strict equality first.
   if (a === b) return true;
 
+  // Otherwise, if either of them == null they are not equal.
   if (a == null || b == null) return false;
 
   if (Array.isArray(a)) {
-    return Array.isArray(b) && a.length === b.length && a.every(function (item, index) {
-      return valueEqual(item, b[index]);
-    });
+    return (
+      Array.isArray(b) &&
+      a.length === b.length &&
+      a.every(function(item, index) {
+        return valueEqual(item, b[index]);
+      })
+    );
   }
 
-  var aType = typeof a === 'undefined' ? 'undefined' : _typeof(a);
-  var bType = typeof b === 'undefined' ? 'undefined' : _typeof(b);
-
-  if (aType !== bType) return false;
-
-  if (aType === 'object') {
-    var aValue = a.valueOf();
-    var bValue = b.valueOf();
+  if (typeof a === 'object' || typeof b === 'object') {
+    var aValue = valueOf(a);
+    var bValue = valueOf(b);
 
     if (aValue !== a || bValue !== b) return valueEqual(aValue, bValue);
 
-    var aKeys = Object.keys(a);
-    var bKeys = Object.keys(b);
-
-    if (aKeys.length !== bKeys.length) return false;
-
-    return aKeys.every(function (key) {
+    return Object.keys(Object.assign({}, a, b)).every(function(key) {
       return valueEqual(a[key], b[key]);
     });
   }
@@ -147,13 +150,10 @@ function warning(condition, message) {
 
 var prefix = 'Invariant failed';
 function invariant(condition, message) {
-  if (condition) {
-    return;
-  }
-
-  {
+    if (condition) {
+        return;
+    }
     throw new Error(prefix + ": " + (message || ''));
-  }
 }
 
 function addLeadingSlash(path) {
@@ -163,7 +163,7 @@ function stripLeadingSlash(path) {
   return path.charAt(0) === '/' ? path.substr(1) : path;
 }
 function hasBasename(path, prefix) {
-  return new RegExp('^' + prefix + '(\\/|\\?|#|$)', 'i').test(path);
+  return path.toLowerCase().indexOf(prefix.toLowerCase()) === 0 && '/?#'.indexOf(path.charAt(prefix.length)) !== -1;
 }
 function stripBasename(path, prefix) {
   return hasBasename(path, prefix) ? path.substr(prefix.length) : path;
@@ -373,7 +373,7 @@ function supportsGoWithoutReloadUsingHash() {
  */
 
 function isExtraneousPopstateEvent(event) {
-  event.state === undefined && navigator.userAgent.indexOf('CriOS') === -1;
+  return event.state === undefined && navigator.userAgent.indexOf('CriOS') === -1;
 }
 
 var PopStateEvent = 'popstate';
@@ -515,7 +515,7 @@ function createBrowserHistory(props) {
           window.location.href = href;
         } else {
           var prevIndex = allKeys.indexOf(history.location.key);
-          var nextKeys = allKeys.slice(0, prevIndex === -1 ? 0 : prevIndex + 1);
+          var nextKeys = allKeys.slice(0, prevIndex + 1);
           nextKeys.push(location.key);
           allKeys = nextKeys;
           setState({
@@ -658,6 +658,11 @@ var HashPathCoders = {
   }
 };
 
+function stripHash(url) {
+  var hashIndex = url.indexOf('#');
+  return hashIndex === -1 ? url : url.slice(0, hashIndex);
+}
+
 function getHashPath() {
   // We can't use window.location.hash here because it's not
   // consistent across browsers - Firefox will pre-decode it!
@@ -671,8 +676,7 @@ function pushHashPath(path) {
 }
 
 function replaceHashPath(path) {
-  var hashIndex = window.location.href.indexOf('#');
-  window.location.replace(window.location.href.slice(0, hashIndex >= 0 ? hashIndex : 0) + '#' + path);
+  window.location.replace(stripHash(window.location.href) + '#' + path);
 }
 
 function createHashHistory(props) {
@@ -712,6 +716,10 @@ function createHashHistory(props) {
   var forceNextPop = false;
   var ignorePath = null;
 
+  function locationsAreEqual$$1(a, b) {
+    return a.pathname === b.pathname && a.search === b.search && a.hash === b.hash;
+  }
+
   function handleHashChange() {
     var path = getHashPath();
     var encodedPath = encodePath(path);
@@ -722,7 +730,7 @@ function createHashHistory(props) {
     } else {
       var location = getDOMLocation();
       var prevLocation = history.location;
-      if (!forceNextPop && locationsAreEqual(prevLocation, location)) return; // A hashchange doesn't always == location change.
+      if (!forceNextPop && locationsAreEqual$$1(prevLocation, location)) return; // A hashchange doesn't always == location change.
 
       if (ignorePath === createPath(location)) return; // Ignore this change; we already setState in push/replace.
 
@@ -775,7 +783,14 @@ function createHashHistory(props) {
   var allPaths = [createPath(initialLocation)]; // Public interface
 
   function createHref(location) {
-    return '#' + encodePath(basename + createPath(location));
+    var baseTag = document.querySelector('base');
+    var href = '';
+
+    if (baseTag && baseTag.getAttribute('href')) {
+      href = stripHash(window.location.href);
+    }
+
+    return href + '#' + encodePath(basename + createPath(location));
   }
 
   function push(path, state) {
@@ -795,7 +810,7 @@ function createHashHistory(props) {
         ignorePath = path;
         pushHashPath(encodedPath);
         var prevIndex = allPaths.lastIndexOf(createPath(history.location));
-        var nextPaths = allPaths.slice(0, prevIndex === -1 ? 0 : prevIndex + 1);
+        var nextPaths = allPaths.slice(0, prevIndex + 1);
         nextPaths.push(path);
         allPaths = nextPaths;
         setState({
@@ -1059,13 +1074,13 @@ function assert(condition, message) {
   }
 }
 
-// 
+//
 const resolveToLocation = (to, currentLocation) =>
-  typeof to === "function" ? to(currentLocation) : to;
+  typeof to === 'function' ? to(currentLocation) : to;
 
-// 
+//
 const normalizeToLocation = (to, currentLocation) => {
-  return typeof to === "string"
+  return typeof to === 'string'
     ? createLocation(to, null, null, currentLocation)
     : to;
 };
@@ -1093,9 +1108,24 @@ function isAsyncPlaceholder(node) {
   return node.isComment && node.asyncFactory;
 }
 
-function isNotTextNode(c) { 
-  return c.tag || isAsyncPlaceholder(c); 
+function isNotTextNode(c) {
+  return c.tag || isAsyncPlaceholder(c);
 }
+
+function getBooleanProps(val, defaultVal = false) {
+  if (typeof val === 'undefined') return defaultVal;
+  return val !== 'false';
+}
+
+function getSymbol(str) {
+  if (typeof Symbol === 'function') {
+    return Symbol(str);
+  }
+  return `vue-router-lite-symbol-${str}`;
+}
+
+const route = getSymbol('route');
+const router = getSymbol('router');
 
 const Router = {
   name: 'Router',
@@ -1115,18 +1145,18 @@ const Router = {
 
   provide() {
     return {
-      router: this.router,
-      route: this.route
+      [router]: this.router,
+      [route]: this.route
     };
   },
 
   data() {
     return {
-      // add provide's properties in data, to make provide reactivity 
+      // add provide's properties in data, to make provide reactivity
       router: {
         history: this.history
       },
-      // add provide's properties in data, to make provide reactivity 
+      // add provide's properties in data, to make provide reactivity
       route: {
         location: this.history.location,
         match: this.computeMatch(this.history.location.pathname)
@@ -1153,7 +1183,7 @@ const Router = {
   },
   methods: {
     computeMatch(pathname) {
-      return { path: "/", url: "/", params: {}, isExact: pathname === "/" };
+      return { path: '/', url: '/', params: {}, isExact: pathname === '/' };
     }
   },
   render(createElement) {
@@ -1164,9 +1194,9 @@ const Router = {
     });
 
     children = children.filter(isNotTextNode);
-  
+
     assert(
-      children.length === 1, 
+      children.length === 1,
       `<${this.name}> must only be used on a single child element.`
     );
 
@@ -1174,90 +1204,80 @@ const Router = {
   }
 };
 
-function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
-/* server only */
-, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
-  if (typeof shadowMode !== 'boolean') {
-    createInjectorSSR = createInjector;
-    createInjector = shadowMode;
-    shadowMode = false;
-  } // Vue.extend constructor export interop.
-
-
-  var options = typeof script === 'function' ? script.options : script; // render functions
-
-  if (template && template.render) {
-    options.render = template.render;
-    options.staticRenderFns = template.staticRenderFns;
-    options._compiled = true; // functional template
-
-    if (isFunctionalTemplate) {
-      options.functional = true;
+function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier /* server only */, shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
+    if (typeof shadowMode !== 'boolean') {
+        createInjectorSSR = createInjector;
+        createInjector = shadowMode;
+        shadowMode = false;
     }
-  } // scopedId
-
-
-  if (scopeId) {
-    options._scopeId = scopeId;
-  }
-
-  var hook;
-
-  if (moduleIdentifier) {
-    // server build
-    hook = function hook(context) {
-      // 2.3 injection
-      context = context || // cached call
-      this.$vnode && this.$vnode.ssrContext || // stateful
-      this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext; // functional
-      // 2.2 with runInNewContext: true
-
-      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-        context = __VUE_SSR_CONTEXT__;
-      } // inject component styles
-
-
-      if (style) {
-        style.call(this, createInjectorSSR(context));
-      } // register component module identifier for async chunk inference
-
-
-      if (context && context._registeredComponents) {
-        context._registeredComponents.add(moduleIdentifier);
-      }
-    }; // used by ssr in case component is cached and beforeCreate
-    // never gets called
-
-
-    options._ssrRegister = hook;
-  } else if (style) {
-    hook = shadowMode ? function () {
-      style.call(this, createInjectorShadow(this.$root.$options.shadowRoot));
-    } : function (context) {
-      style.call(this, createInjector(context));
-    };
-  }
-
-  if (hook) {
-    if (options.functional) {
-      // register for functional component in vue file
-      var originalRender = options.render;
-
-      options.render = function renderWithStyleInjection(h, context) {
-        hook.call(context);
-        return originalRender(h, context);
-      };
-    } else {
-      // inject component registration as beforeCreate hook
-      var existing = options.beforeCreate;
-      options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
+    // Vue.extend constructor export interop.
+    const options = typeof script === 'function' ? script.options : script;
+    // render functions
+    if (template && template.render) {
+        options.render = template.render;
+        options.staticRenderFns = template.staticRenderFns;
+        options._compiled = true;
+        // functional template
+        if (isFunctionalTemplate) {
+            options.functional = true;
+        }
     }
-  }
-
-  return script;
+    // scopedId
+    if (scopeId) {
+        options._scopeId = scopeId;
+    }
+    let hook;
+    if (moduleIdentifier) {
+        // server build
+        hook = function (context) {
+            // 2.3 injection
+            context =
+                context || // cached call
+                    (this.$vnode && this.$vnode.ssrContext) || // stateful
+                    (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext); // functional
+            // 2.2 with runInNewContext: true
+            if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+                context = __VUE_SSR_CONTEXT__;
+            }
+            // inject component styles
+            if (style) {
+                style.call(this, createInjectorSSR(context));
+            }
+            // register component module identifier for async chunk inference
+            if (context && context._registeredComponents) {
+                context._registeredComponents.add(moduleIdentifier);
+            }
+        };
+        // used by ssr in case component is cached and beforeCreate
+        // never gets called
+        options._ssrRegister = hook;
+    }
+    else if (style) {
+        hook = shadowMode
+            ? function (context) {
+                style.call(this, createInjectorShadow(context, this.$root.$options.shadowRoot));
+            }
+            : function (context) {
+                style.call(this, createInjector(context));
+            };
+    }
+    if (hook) {
+        if (options.functional) {
+            // register for functional component in vue file
+            const originalRender = options.render;
+            options.render = function renderWithStyleInjection(h, context) {
+                hook.call(context);
+                return originalRender(h, context);
+            };
+        }
+        else {
+            // inject component registration as beforeCreate hook
+            const existing = options.beforeCreate;
+            options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
+        }
+    }
+    return script;
 }
-
-var normalizeComponent_1 = normalizeComponent;
 
 /* script */
 const __vue_script__ = Router;
@@ -1276,15 +1296,19 @@ const __vue_script__ = Router;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var Router$1 = normalizeComponent_1(
+  const __vue_component__ = normalizeComponent(
     {},
     __vue_inject_styles__,
     __vue_script__,
     __vue_scope_id__,
     __vue_is_functional_template__,
     __vue_module_identifier__,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -1295,7 +1319,7 @@ const MemoryRouter = {
   name: 'MemoryRouter',
 
   components: {
-    Router: Router$1
+    Router: __vue_component__
   },
 
   props: {
@@ -1370,15 +1394,19 @@ __vue_render__._withStripped = true;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var MemoryRouter$1 = normalizeComponent_1(
+  const __vue_component__$1 = normalizeComponent(
     { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
     __vue_inject_styles__$1,
     __vue_script__$1,
     __vue_scope_id__$1,
     __vue_is_functional_template__$1,
     __vue_module_identifier__$1,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -1389,7 +1417,7 @@ const HashRouter = {
   name: 'HashRouter',
 
   components: {
-    Router: Router$1
+    Router: __vue_component__
   },
 
   props: {
@@ -1399,13 +1427,14 @@ const HashRouter = {
     },
     hashType: {
       validator(value) {
-        return ["hashbang", "noslash", "slash"].indexOf(value) !== -1;
+        return ['hashbang', 'noslash', 'slash'].indexOf(value) !== -1;
       },
       default: 'slash'
     },
     getUserConfirmation: {
       type: Function,
       default(message, callback) {
+        // eslint-disable-next-line no-alert
         callback(window.confirm(message));
       }
     }
@@ -1463,15 +1492,19 @@ __vue_render__$1._withStripped = true;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var HashRouter$1 = normalizeComponent_1(
+  const __vue_component__$2 = normalizeComponent(
     { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
     __vue_inject_styles__$2,
     __vue_script__$2,
     __vue_scope_id__$2,
     __vue_is_functional_template__$2,
     __vue_module_identifier__$2,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -1482,7 +1515,7 @@ const BrowserRouter = {
   name: 'BrowserRouter',
 
   components: {
-    Router: Router$1
+    Router: __vue_component__
   },
 
   props: {
@@ -1501,6 +1534,7 @@ const BrowserRouter = {
     getUserConfirmation: {
       type: Function,
       default(message, callback) {
+        // eslint-disable-next-line no-alert
         callback(window.confirm(message));
       }
     }
@@ -1559,21 +1593,25 @@ __vue_render__$2._withStripped = true;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var BrowserRouter$1 = normalizeComponent_1(
+  const __vue_component__$3 = normalizeComponent(
     { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
     __vue_inject_styles__$3,
     __vue_script__$3,
     __vue_scope_id__$3,
     __vue_is_functional_template__$3,
     __vue_module_identifier__$3,
+    false,
+    undefined,
     undefined,
     undefined
   );
 
 const addLeadingSlash$1 = (path) => {
-  return path.charAt(0) === "/" ? path : "/" + path;
+  return path.charAt(0) === '/' ? path : `/${path}`;
 };
 
 const removeTailSlash = (path) => {
@@ -1585,7 +1623,9 @@ const addBasename = (basename, location) => {
 
   return {
     ...location,
-    pathname: removeTailSlash(addLeadingSlash$1(basename)) + addLeadingSlash$1(location.pathname)
+    pathname:
+      removeTailSlash(addLeadingSlash$1(basename)) +
+      addLeadingSlash$1(location.pathname)
   };
 };
 
@@ -1603,7 +1643,7 @@ const stripBasename$1 = (basename, location) => {
 };
 
 const createURL = (location) =>
-  typeof location === "string" ? location : createPath(location);
+  typeof location === 'string' ? location : createPath(location);
 
 const staticHandler = (methodName) => () => {
   throw new Error(`You cannot ${methodName} with <StaticRouter>`);
@@ -1614,25 +1654,25 @@ const noop = () => {};
 function createStaticHistory({ basename = '', context = {}, location = '/' }) {
   const history = {
     isStatic: true,
-    context: context,
-    action: "POP",
+    context,
+    action: 'POP',
     location: stripBasename$1(basename, createLocation(location)),
-    go: staticHandler("go"),
-    goBack: staticHandler("goBack"),
-    goForward: staticHandler("goForward"),
-    createHref: (location) => {
-      return addLeadingSlash$1(removeTailSlash(basename) + createURL(location))
+    go: staticHandler('go'),
+    goBack: staticHandler('goBack'),
+    goForward: staticHandler('goForward'),
+    createHref: (loc) => {
+      return addLeadingSlash$1(removeTailSlash(basename) + createURL(loc));
     },
-    push: (location) => {
-      context.action = "PUSH";
-      context.location = addBasename(basename, createLocation(location));
+    push: (loc) => {
+      context.action = 'PUSH';
+      context.location = addBasename(basename, createLocation(loc));
       context.url = createURL(context.location);
     },
-    replace: (location) => {
-      context.action = "REPLACE";
-      context.location = addBasename(basename, createLocation(location));
+    replace: (loc) => {
+      context.action = 'REPLACE';
+      context.location = addBasename(basename, createLocation(loc));
       context.url = createURL(context.location);
-    }, 
+    },
     listen: () => noop,
     block: () => noop
   };
@@ -1646,9 +1686,9 @@ const StaticRouter = {
   name: 'StaticRouter',
 
   components: {
-    Router: Router$1
+    Router: __vue_component__
   },
-  
+
   props: {
     basename: {
       type: String,
@@ -1665,7 +1705,7 @@ const StaticRouter = {
   },
 
   data() {
-    const history = createStaticHistory({ 
+    const history = createStaticHistory({
       basename: this.basename,
       context: this.context,
       location: this.location
@@ -1716,393 +1756,382 @@ __vue_render__$3._withStripped = true;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var StaticRouter$1 = normalizeComponent_1(
+  const __vue_component__$4 = normalizeComponent(
     { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
     __vue_inject_styles__$4,
     __vue_script__$4,
     __vue_scope_id__$4,
     __vue_is_functional_template__$4,
     __vue_module_identifier__$4,
+    false,
+    undefined,
     undefined,
     undefined
   );
 
 /**
- * Expose `pathToRegexp`.
+ * Tokenize input string.
  */
-var pathToRegexp_1 = pathToRegexp;
-var parse_1 = parse;
-var compile_1 = compile;
-var tokensToFunction_1 = tokensToFunction;
-var tokensToRegExp_1 = tokensToRegExp;
-
-/**
- * Default configs.
- */
-var DEFAULT_DELIMITER = '/';
-
-/**
- * The main path matching regexp utility.
- *
- * @type {RegExp}
- */
-var PATH_REGEXP = new RegExp([
-  // Match escaped characters that would otherwise appear in future matches.
-  // This allows the user to escape special characters that won't transform.
-  '(\\\\.)',
-  // Match Express-style parameters and un-named parameters with a prefix
-  // and optional suffixes. Matches appear as:
-  //
-  // ":test(\\d+)?" => ["test", "\d+", undefined, "?"]
-  // "(\\d+)"  => [undefined, undefined, "\d+", undefined]
-  '(?:\\:(\\w+)(?:\\(((?:\\\\.|[^\\\\()])+)\\))?|\\(((?:\\\\.|[^\\\\()])+)\\))([+*?])?'
-].join('|'), 'g');
-
+function lexer(str) {
+    var tokens = [];
+    var i = 0;
+    while (i < str.length) {
+        var char = str[i];
+        if (char === "*" || char === "+" || char === "?") {
+            tokens.push({ type: "MODIFIER", index: i, value: str[i++] });
+            continue;
+        }
+        if (char === "\\") {
+            tokens.push({ type: "ESCAPED_CHAR", index: i++, value: str[i++] });
+            continue;
+        }
+        if (char === "{") {
+            tokens.push({ type: "OPEN", index: i, value: str[i++] });
+            continue;
+        }
+        if (char === "}") {
+            tokens.push({ type: "CLOSE", index: i, value: str[i++] });
+            continue;
+        }
+        if (char === ":") {
+            var name = "";
+            var j = i + 1;
+            while (j < str.length) {
+                var code = str.charCodeAt(j);
+                if (
+                // `0-9`
+                (code >= 48 && code <= 57) ||
+                    // `A-Z`
+                    (code >= 65 && code <= 90) ||
+                    // `a-z`
+                    (code >= 97 && code <= 122) ||
+                    // `_`
+                    code === 95) {
+                    name += str[j++];
+                    continue;
+                }
+                break;
+            }
+            if (!name)
+                throw new TypeError("Missing parameter name at " + i);
+            tokens.push({ type: "NAME", index: i, value: name });
+            i = j;
+            continue;
+        }
+        if (char === "(") {
+            var count = 1;
+            var pattern = "";
+            var j = i + 1;
+            if (str[j] === "?") {
+                throw new TypeError("Pattern cannot start with \"?\" at " + j);
+            }
+            while (j < str.length) {
+                if (str[j] === "\\") {
+                    pattern += str[j++] + str[j++];
+                    continue;
+                }
+                if (str[j] === ")") {
+                    count--;
+                    if (count === 0) {
+                        j++;
+                        break;
+                    }
+                }
+                else if (str[j] === "(") {
+                    count++;
+                    if (str[j + 1] !== "?") {
+                        throw new TypeError("Capturing groups are not allowed at " + j);
+                    }
+                }
+                pattern += str[j++];
+            }
+            if (count)
+                throw new TypeError("Unbalanced pattern at " + i);
+            if (!pattern)
+                throw new TypeError("Missing pattern at " + i);
+            tokens.push({ type: "PATTERN", index: i, value: pattern });
+            i = j;
+            continue;
+        }
+        tokens.push({ type: "CHAR", index: i, value: str[i++] });
+    }
+    tokens.push({ type: "END", index: i, value: "" });
+    return tokens;
+}
 /**
  * Parse a string for the raw tokens.
- *
- * @param  {string}  str
- * @param  {Object=} options
- * @return {!Array}
  */
-function parse (str, options) {
-  var tokens = [];
-  var key = 0;
-  var index = 0;
-  var path = '';
-  var defaultDelimiter = (options && options.delimiter) || DEFAULT_DELIMITER;
-  var whitelist = (options && options.whitelist) || undefined;
-  var pathEscaped = false;
-  var res;
-
-  while ((res = PATH_REGEXP.exec(str)) !== null) {
-    var m = res[0];
-    var escaped = res[1];
-    var offset = res.index;
-    path += str.slice(index, offset);
-    index = offset + m.length;
-
-    // Ignore already escaped sequences.
-    if (escaped) {
-      path += escaped[1];
-      pathEscaped = true;
-      continue
+function parse(str, options) {
+    if (options === void 0) { options = {}; }
+    var tokens = lexer(str);
+    var _a = options.prefixes, prefixes = _a === void 0 ? "./" : _a;
+    var defaultPattern = "[^" + escapeString(options.delimiter || "/#?") + "]+?";
+    var result = [];
+    var key = 0;
+    var i = 0;
+    var path = "";
+    var tryConsume = function (type) {
+        if (i < tokens.length && tokens[i].type === type)
+            return tokens[i++].value;
+    };
+    var mustConsume = function (type) {
+        var value = tryConsume(type);
+        if (value !== undefined)
+            return value;
+        var _a = tokens[i], nextType = _a.type, index = _a.index;
+        throw new TypeError("Unexpected " + nextType + " at " + index + ", expected " + type);
+    };
+    var consumeText = function () {
+        var result = "";
+        var value;
+        // tslint:disable-next-line
+        while ((value = tryConsume("CHAR") || tryConsume("ESCAPED_CHAR"))) {
+            result += value;
+        }
+        return result;
+    };
+    while (i < tokens.length) {
+        var char = tryConsume("CHAR");
+        var name = tryConsume("NAME");
+        var pattern = tryConsume("PATTERN");
+        if (name || pattern) {
+            var prefix = char || "";
+            if (prefixes.indexOf(prefix) === -1) {
+                path += prefix;
+                prefix = "";
+            }
+            if (path) {
+                result.push(path);
+                path = "";
+            }
+            result.push({
+                name: name || key++,
+                prefix: prefix,
+                suffix: "",
+                pattern: pattern || defaultPattern,
+                modifier: tryConsume("MODIFIER") || ""
+            });
+            continue;
+        }
+        var value = char || tryConsume("ESCAPED_CHAR");
+        if (value) {
+            path += value;
+            continue;
+        }
+        if (path) {
+            result.push(path);
+            path = "";
+        }
+        var open = tryConsume("OPEN");
+        if (open) {
+            var prefix = consumeText();
+            var name_1 = tryConsume("NAME") || "";
+            var pattern_1 = tryConsume("PATTERN") || "";
+            var suffix = consumeText();
+            mustConsume("CLOSE");
+            result.push({
+                name: name_1 || (pattern_1 ? key++ : ""),
+                pattern: name_1 && !pattern_1 ? defaultPattern : pattern_1,
+                prefix: prefix,
+                suffix: suffix,
+                modifier: tryConsume("MODIFIER") || ""
+            });
+            continue;
+        }
+        mustConsume("END");
     }
-
-    var prev = '';
-    var name = res[2];
-    var capture = res[3];
-    var group = res[4];
-    var modifier = res[5];
-
-    if (!pathEscaped && path.length) {
-      var k = path.length - 1;
-      var c = path[k];
-      var matches = whitelist ? whitelist.indexOf(c) > -1 : true;
-
-      if (matches) {
-        prev = c;
-        path = path.slice(0, k);
-      }
-    }
-
-    // Push the current path onto the tokens.
-    if (path) {
-      tokens.push(path);
-      path = '';
-      pathEscaped = false;
-    }
-
-    var repeat = modifier === '+' || modifier === '*';
-    var optional = modifier === '?' || modifier === '*';
-    var pattern = capture || group;
-    var delimiter = prev || defaultDelimiter;
-
-    tokens.push({
-      name: name || key++,
-      prefix: prev,
-      delimiter: delimiter,
-      optional: optional,
-      repeat: repeat,
-      pattern: pattern
-        ? escapeGroup(pattern)
-        : '[^' + escapeString(delimiter === defaultDelimiter ? delimiter : (delimiter + defaultDelimiter)) + ']+?'
-    });
-  }
-
-  // Push any remaining characters.
-  if (path || index < str.length) {
-    tokens.push(path + str.substr(index));
-  }
-
-  return tokens
+    return result;
 }
-
 /**
  * Compile a string to a template function for the path.
- *
- * @param  {string}             str
- * @param  {Object=}            options
- * @return {!function(Object=, Object=)}
  */
-function compile (str, options) {
-  return tokensToFunction(parse(str, options))
+function compile(str, options) {
+    return tokensToFunction(parse(str, options), options);
 }
-
 /**
  * Expose a method for transforming tokens into the path function.
  */
-function tokensToFunction (tokens) {
-  // Compile all the tokens into regexps.
-  var matches = new Array(tokens.length);
-
-  // Compile all the patterns before compilation.
-  for (var i = 0; i < tokens.length; i++) {
-    if (typeof tokens[i] === 'object') {
-      matches[i] = new RegExp('^(?:' + tokens[i].pattern + ')$');
-    }
-  }
-
-  return function (data, options) {
-    var path = '';
-    var encode = (options && options.encode) || encodeURIComponent;
-
-    for (var i = 0; i < tokens.length; i++) {
-      var token = tokens[i];
-
-      if (typeof token === 'string') {
-        path += token;
-        continue
-      }
-
-      var value = data ? data[token.name] : undefined;
-      var segment;
-
-      if (Array.isArray(value)) {
-        if (!token.repeat) {
-          throw new TypeError('Expected "' + token.name + '" to not repeat, but got array')
+function tokensToFunction(tokens, options) {
+    if (options === void 0) { options = {}; }
+    var reFlags = flags(options);
+    var _a = options.encode, encode = _a === void 0 ? function (x) { return x; } : _a, _b = options.validate, validate = _b === void 0 ? true : _b;
+    // Compile all the tokens into regexps.
+    var matches = tokens.map(function (token) {
+        if (typeof token === "object") {
+            return new RegExp("^(?:" + token.pattern + ")$", reFlags);
         }
-
-        if (value.length === 0) {
-          if (token.optional) continue
-
-          throw new TypeError('Expected "' + token.name + '" to not be empty')
+    });
+    return function (data) {
+        var path = "";
+        for (var i = 0; i < tokens.length; i++) {
+            var token = tokens[i];
+            if (typeof token === "string") {
+                path += token;
+                continue;
+            }
+            var value = data ? data[token.name] : undefined;
+            var optional = token.modifier === "?" || token.modifier === "*";
+            var repeat = token.modifier === "*" || token.modifier === "+";
+            if (Array.isArray(value)) {
+                if (!repeat) {
+                    throw new TypeError("Expected \"" + token.name + "\" to not repeat, but got an array");
+                }
+                if (value.length === 0) {
+                    if (optional)
+                        continue;
+                    throw new TypeError("Expected \"" + token.name + "\" to not be empty");
+                }
+                for (var j = 0; j < value.length; j++) {
+                    var segment = encode(value[j], token);
+                    if (validate && !matches[i].test(segment)) {
+                        throw new TypeError("Expected all \"" + token.name + "\" to match \"" + token.pattern + "\", but got \"" + segment + "\"");
+                    }
+                    path += token.prefix + segment + token.suffix;
+                }
+                continue;
+            }
+            if (typeof value === "string" || typeof value === "number") {
+                var segment = encode(String(value), token);
+                if (validate && !matches[i].test(segment)) {
+                    throw new TypeError("Expected \"" + token.name + "\" to match \"" + token.pattern + "\", but got \"" + segment + "\"");
+                }
+                path += token.prefix + segment + token.suffix;
+                continue;
+            }
+            if (optional)
+                continue;
+            var typeOfMessage = repeat ? "an array" : "a string";
+            throw new TypeError("Expected \"" + token.name + "\" to be " + typeOfMessage);
         }
-
-        for (var j = 0; j < value.length; j++) {
-          segment = encode(value[j], token);
-
-          if (!matches[i].test(segment)) {
-            throw new TypeError('Expected all "' + token.name + '" to match "' + token.pattern + '"')
-          }
-
-          path += (j === 0 ? token.prefix : token.delimiter) + segment;
-        }
-
-        continue
-      }
-
-      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-        segment = encode(String(value), token);
-
-        if (!matches[i].test(segment)) {
-          throw new TypeError('Expected "' + token.name + '" to match "' + token.pattern + '", but got "' + segment + '"')
-        }
-
-        path += token.prefix + segment;
-        continue
-      }
-
-      if (token.optional) continue
-
-      throw new TypeError('Expected "' + token.name + '" to be ' + (token.repeat ? 'an array' : 'a string'))
-    }
-
-    return path
-  }
+        return path;
+    };
 }
-
 /**
  * Escape a regular expression string.
- *
- * @param  {string} str
- * @return {string}
  */
-function escapeString (str) {
-  return str.replace(/([.+*?=^!:${}()[\]|/\\])/g, '\\$1')
+function escapeString(str) {
+    return str.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
 }
-
-/**
- * Escape the capturing group by escaping special characters and meaning.
- *
- * @param  {string} group
- * @return {string}
- */
-function escapeGroup (group) {
-  return group.replace(/([=!:$/()])/g, '\\$1')
-}
-
 /**
  * Get the flags for a regexp from the options.
- *
- * @param  {Object} options
- * @return {string}
  */
-function flags (options) {
-  return options && options.sensitive ? '' : 'i'
+function flags(options) {
+    return options && options.sensitive ? "" : "i";
 }
-
 /**
  * Pull out keys from a regexp.
- *
- * @param  {!RegExp} path
- * @param  {Array=}  keys
- * @return {!RegExp}
  */
-function regexpToRegexp (path, keys) {
-  if (!keys) return path
-
-  // Use a negative lookahead to match only capturing groups.
-  var groups = path.source.match(/\((?!\?)/g);
-
-  if (groups) {
-    for (var i = 0; i < groups.length; i++) {
-      keys.push({
-        name: i,
-        prefix: null,
-        delimiter: null,
-        optional: false,
-        repeat: false,
-        pattern: null
-      });
+function regexpToRegexp(path, keys) {
+    if (!keys)
+        return path;
+    // Use a negative lookahead to match only capturing groups.
+    var groups = path.source.match(/\((?!\?)/g);
+    if (groups) {
+        for (var i = 0; i < groups.length; i++) {
+            keys.push({
+                name: i,
+                prefix: "",
+                suffix: "",
+                modifier: "",
+                pattern: ""
+            });
+        }
     }
-  }
-
-  return path
+    return path;
 }
-
 /**
  * Transform an array into a regexp.
- *
- * @param  {!Array}  path
- * @param  {Array=}  keys
- * @param  {Object=} options
- * @return {!RegExp}
  */
-function arrayToRegexp (path, keys, options) {
-  var parts = [];
-
-  for (var i = 0; i < path.length; i++) {
-    parts.push(pathToRegexp(path[i], keys, options).source);
-  }
-
-  return new RegExp('(?:' + parts.join('|') + ')', flags(options))
+function arrayToRegexp(paths, keys, options) {
+    var parts = paths.map(function (path) { return pathToRegexp(path, keys, options).source; });
+    return new RegExp("(?:" + parts.join("|") + ")", flags(options));
 }
-
 /**
  * Create a path regexp from string input.
- *
- * @param  {string}  path
- * @param  {Array=}  keys
- * @param  {Object=} options
- * @return {!RegExp}
  */
-function stringToRegexp (path, keys, options) {
-  return tokensToRegExp(parse(path, options), keys, options)
+function stringToRegexp(path, keys, options) {
+    return tokensToRegexp(parse(path, options), keys, options);
 }
-
 /**
  * Expose a function for taking tokens and returning a RegExp.
- *
- * @param  {!Array}  tokens
- * @param  {Array=}  keys
- * @param  {Object=} options
- * @return {!RegExp}
  */
-function tokensToRegExp (tokens, keys, options) {
-  options = options || {};
-
-  var strict = options.strict;
-  var start = options.start !== false;
-  var end = options.end !== false;
-  var delimiter = options.delimiter || DEFAULT_DELIMITER;
-  var endsWith = [].concat(options.endsWith || []).map(escapeString).concat('$').join('|');
-  var route = start ? '^' : '';
-
-  // Iterate over the tokens and create our regexp string.
-  for (var i = 0; i < tokens.length; i++) {
-    var token = tokens[i];
-
-    if (typeof token === 'string') {
-      route += escapeString(token);
-    } else {
-      var capture = token.repeat
-        ? '(?:' + token.pattern + ')(?:' + escapeString(token.delimiter) + '(?:' + token.pattern + '))*'
-        : token.pattern;
-
-      if (keys) keys.push(token);
-
-      if (token.optional) {
-        if (!token.prefix) {
-          route += '(' + capture + ')?';
-        } else {
-          route += '(?:' + escapeString(token.prefix) + '(' + capture + '))?';
+function tokensToRegexp(tokens, keys, options) {
+    if (options === void 0) { options = {}; }
+    var _a = options.strict, strict = _a === void 0 ? false : _a, _b = options.start, start = _b === void 0 ? true : _b, _c = options.end, end = _c === void 0 ? true : _c, _d = options.encode, encode = _d === void 0 ? function (x) { return x; } : _d;
+    var endsWith = "[" + escapeString(options.endsWith || "") + "]|$";
+    var delimiter = "[" + escapeString(options.delimiter || "/#?") + "]";
+    var route = start ? "^" : "";
+    // Iterate over the tokens and create our regexp string.
+    for (var _i = 0, tokens_1 = tokens; _i < tokens_1.length; _i++) {
+        var token = tokens_1[_i];
+        if (typeof token === "string") {
+            route += escapeString(encode(token));
         }
-      } else {
-        route += escapeString(token.prefix) + '(' + capture + ')';
-      }
+        else {
+            var prefix = escapeString(encode(token.prefix));
+            var suffix = escapeString(encode(token.suffix));
+            if (token.pattern) {
+                if (keys)
+                    keys.push(token);
+                if (prefix || suffix) {
+                    if (token.modifier === "+" || token.modifier === "*") {
+                        var mod = token.modifier === "*" ? "?" : "";
+                        route += "(?:" + prefix + "((?:" + token.pattern + ")(?:" + suffix + prefix + "(?:" + token.pattern + "))*)" + suffix + ")" + mod;
+                    }
+                    else {
+                        route += "(?:" + prefix + "(" + token.pattern + ")" + suffix + ")" + token.modifier;
+                    }
+                }
+                else {
+                    route += "(" + token.pattern + ")" + token.modifier;
+                }
+            }
+            else {
+                route += "(?:" + prefix + suffix + ")" + token.modifier;
+            }
+        }
     }
-  }
-
-  if (end) {
-    if (!strict) route += '(?:' + escapeString(delimiter) + ')?';
-
-    route += endsWith === '$' ? '$' : '(?=' + endsWith + ')';
-  } else {
-    var endToken = tokens[tokens.length - 1];
-    var isEndDelimited = typeof endToken === 'string'
-      ? endToken[endToken.length - 1] === delimiter
-      : endToken === undefined;
-
-    if (!strict) route += '(?:' + escapeString(delimiter) + '(?=' + endsWith + '))?';
-    if (!isEndDelimited) route += '(?=' + escapeString(delimiter) + '|' + endsWith + ')';
-  }
-
-  return new RegExp(route, flags(options))
+    if (end) {
+        if (!strict)
+            route += delimiter + "?";
+        route += !options.endsWith ? "$" : "(?=" + endsWith + ")";
+    }
+    else {
+        var endToken = tokens[tokens.length - 1];
+        var isEndDelimited = typeof endToken === "string"
+            ? delimiter.indexOf(endToken[endToken.length - 1]) > -1
+            : // tslint:disable-next-line
+                endToken === undefined;
+        if (!strict) {
+            route += "(?:" + delimiter + "(?=" + endsWith + "))?";
+        }
+        if (!isEndDelimited) {
+            route += "(?=" + delimiter + "|" + endsWith + ")";
+        }
+    }
+    return new RegExp(route, flags(options));
 }
-
 /**
  * Normalize the given path string, returning a regular expression.
  *
  * An empty array can be passed in for the keys, which will hold the
  * placeholder key descriptions. For example, using `/user/:id`, `keys` will
  * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
- *
- * @param  {(string|RegExp|Array)} path
- * @param  {Array=}                keys
- * @param  {Object=}               options
- * @return {!RegExp}
  */
-function pathToRegexp (path, keys, options) {
-  if (path instanceof RegExp) {
-    return regexpToRegexp(path, keys)
-  }
-
-  if (Array.isArray(path)) {
-    return arrayToRegexp(/** @type {!Array} */ (path), keys, options)
-  }
-
-  return stringToRegexp(/** @type {string} */ (path), keys, options)
+function pathToRegexp(path, keys, options) {
+    if (path instanceof RegExp)
+        return regexpToRegexp(path, keys);
+    if (Array.isArray(path))
+        return arrayToRegexp(path, keys, options);
+    return stringToRegexp(path, keys, options);
 }
-pathToRegexp_1.parse = parse_1;
-pathToRegexp_1.compile = compile_1;
-pathToRegexp_1.tokensToFunction = tokensToFunction_1;
-pathToRegexp_1.tokensToRegExp = tokensToRegExp_1;
 
 /**
- * copy from:
+ * reference from:
  * https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/matchPath.js
  */
 
@@ -2111,13 +2140,13 @@ const cacheLimit = 10000;
 let cacheCount = 0;
 
 function compilePath(path, options) {
-  const cacheKey = `${options.end}${options.strict}${options.sensitive}`;
+  const cacheKey = `${options.end}-${options.strict}-${options.sensitive}`;
   const pathCache = cache[cacheKey] || (cache[cacheKey] = {});
 
   if (pathCache[path]) return pathCache[path];
 
   const keys = [];
-  const regexp = pathToRegexp_1(path, keys, options);
+  const regexp = pathToRegexp(path, keys, options);
   const result = { regexp, keys };
 
   if (cacheCount < cacheLimit) {
@@ -2133,11 +2162,11 @@ function compilePath(path, options) {
  * pathname: current locations's pathname
  */
 function matchPath(pathname, options = {}) {
-  if (typeof options === "string") options = { path: options };
+  if (typeof options === 'string') options = { path: options };
 
-  const { path, exact = true, strict = false, sensitive = true } = options;
+  const { path: p, exact = false, strict = false, sensitive = true } = options;
 
-  const paths = [].concat(path);
+  const paths = [].concat(p);
 
   return paths.reduce((matched, path) => {
     if (matched) return matched;
@@ -2157,7 +2186,7 @@ function matchPath(pathname, options = {}) {
 
     return {
       path, // the path used to match
-      url: path === "/" && url === "" ? "/" : url, // the matched portion of the URL
+      url: path === '/' && url === '' ? '/' : url, // the matched portion of the URL
       isExact, // whether or not we matched exactly
       params: keys.reduce((memo, key, index) => {
         memo[key.name] = values[index];
@@ -2171,10 +2200,13 @@ var script = {
   name: 'Tag',
   functional: true,
   props: {
-    tag: String
+    tag: {
+      type: String,
+      default: 'div'
+    }
   },
   render(createElement, context) {
-    return createElement(context.props.tag || 'div', context.data, context.children);
+    return createElement(context.props.tag, context.data, context.children);
   }
 };
 
@@ -2195,15 +2227,19 @@ const __vue_script__$5 = script;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var Tag = normalizeComponent_1(
+  const __vue_component__$5 = normalizeComponent(
     {},
     __vue_inject_styles__$5,
     __vue_script__$5,
     __vue_scope_id__$5,
     __vue_is_functional_template__$5,
     __vue_module_identifier__$5,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -2212,9 +2248,9 @@ const __vue_script__$5 = script;
 
 const RouterLink = {
   name: 'RouterLink',
-  
+
   components: {
-    Tag
+    Tag: __vue_component__$5
   },
 
   props: {
@@ -2269,7 +2305,10 @@ const RouterLink = {
     }
   },
 
-  inject: ['router', 'route'],
+  inject: {
+    router: { from: router },
+    route: { from: route }
+  },
 
   computed: {
     // current location
@@ -2299,9 +2338,14 @@ const RouterLink = {
       const { pathname: path } = this.toLocation;
       // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
       const escapedPath =
-        path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
+        path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, '\\$1');
       const match = escapedPath
-        ? matchPath(pathToMatch, { path: escapedPath, exact, strict, sensitive })
+        ? matchPath(pathToMatch, {
+            path: escapedPath,
+            exact,
+            strict,
+            sensitive
+          })
         : null;
 
       return match;
@@ -2312,7 +2356,7 @@ const RouterLink = {
 
       classNames += ` ${this.activeClass}`;
       if (this.match.exact) classNames += ` ${this.exactActiveClass}`;
-      
+
       return classNames;
     }
   },
@@ -2336,17 +2380,11 @@ const RouterLink = {
   },
 
   created() {
-    assert(
-      this.router,
-      'You should not use <router-link> outside a <router>'
-    );
+    assert(this.router, 'You should not use <router-link> outside a <router>');
   },
 
   beforeUpdate() {
-    assert(
-      this.router,
-      'You should not use <router-link> outside a <router>'
-    );
+    assert(this.router, 'You should not use <router-link> outside a <router>');
   }
 };
 
@@ -2401,15 +2439,19 @@ __vue_render__$4._withStripped = true;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var RouterLink$1 = normalizeComponent_1(
+  const __vue_component__$6 = normalizeComponent(
     { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
     __vue_inject_styles__$6,
     __vue_script__$6,
     __vue_scope_id__$6,
     __vue_is_functional_template__$6,
     __vue_module_identifier__$6,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -2428,27 +2470,24 @@ const Prompt = {
     }
   },
 
-  inject: ['router', 'route'],
+  inject: {
+    router: { from: router },
+    route: { from: route }
+  },
 
   created() {
-    assert(
-      this.router,
-      'You should not use <prompt> outside a <router>'
-    );
+    assert(this.router, 'You should not use <prompt> outside a <router>');
 
     this.lastMessage = null;
     this.unblock = null;
   },
 
   beforeUpdate() {
-    assert(
-      this.router,
-      'You should not use <prompt> outside a <router>'
-    );
+    assert(this.router, 'You should not use <prompt> outside a <router>');
   },
 
   mounted() {
-    if(this.when) this.block(); 
+    if (this.when) this.block();
   },
 
   watch: {
@@ -2503,21 +2542,25 @@ const __vue_script__$7 = Prompt;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var Prompt$1 = normalizeComponent_1(
+  const __vue_component__$7 = normalizeComponent(
     {},
     __vue_inject_styles__$7,
     __vue_script__$7,
     __vue_scope_id__$7,
     __vue_is_functional_template__$7,
     __vue_module_identifier__$7,
+    false,
+    undefined,
     undefined,
     undefined
   );
 
 /**
- * copy from:
+ * reference from:
  * https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/generatePath.js
  */
 
@@ -2528,7 +2571,7 @@ let cacheCount$1 = 0;
 function compilePath$1(path) {
   if (cache$1[path]) return cache$1[path];
 
-  const generator = pathToRegexp_1.compile(path);
+  const generator = compile(path);
 
   if (cacheCount$1 < cacheLimit$1) {
     cache$1[path] = generator;
@@ -2541,8 +2584,8 @@ function compilePath$1(path) {
 /**
  * generating a URL pathname from a path and parameters.
  */
-function generatePath(path = "/", params = {}, options = {}) {
-  return path === "/" ? path : compilePath$1(path)(params, options);
+function generatePath(path = '/', params = {}, options = {}) {
+  return path === '/' ? path : compilePath$1(path)(params, options);
 }
 
 const Redirect = {
@@ -2551,7 +2594,8 @@ const Redirect = {
   props: {
     // from path
     from: {
-      type: String
+      type: String,
+      default: null
     },
     // to path
     to: {
@@ -2577,13 +2621,13 @@ const Redirect = {
     }
   },
 
-  inject: ['router', 'route'],
+  inject: {
+    router: { from: router },
+    route: { from: route }
+  },
 
   created() {
-    assert(
-      this.router,
-      'You must not use <redirect> outside a <router>.'
-    );
+    assert(this.router, 'You must not use <redirect> outside a <router>.');
 
     // static router
     if (this.isStatic()) this.perform();
@@ -2595,10 +2639,7 @@ const Redirect = {
   },
 
   beforeUpdate() {
-    assert(
-      this.router,
-      'You must not use <redirect> outside a <router>.'
-    );
+    assert(this.router, 'You must not use <redirect> outside a <router>.');
 
     const to = this.computeTo();
 
@@ -2620,11 +2661,9 @@ const Redirect = {
     computeTo() {
       const { from, strict, exact, sensitive, route } = this;
       const pathname = route.location.pathname;
-      const match = from ? 
-        matchPath(
-          pathname,
-          { from, strict, exact, sensitive }
-        ) : route.match;
+      const match = from
+        ? matchPath(pathname, { from, strict, exact, sensitive })
+        : route.match;
 
       // to
       let p = this.to;
@@ -2637,16 +2676,13 @@ const Redirect = {
           // to is object
           p = {
             ...this.to,
-            pathname: generatePath(
-              this.to.pathname,
-              match.params
-            )
+            pathname: generatePath(this.to.pathname, match.params)
           };
         }
       }
 
       // to
-      const to = createLocation(p); 
+      const to = createLocation(p);
 
       return to;
     },
@@ -2655,9 +2691,7 @@ const Redirect = {
       const { history } = this.router;
 
       // history method
-      const method = this.push
-        ? history.push
-        : history.replace;
+      const method = this.push ? history.push : history.replace;
 
       const to = this.computeTo();
 
@@ -2689,22 +2723,26 @@ const __vue_script__$8 = Redirect;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var Redirect$1 = normalizeComponent_1(
+  const __vue_component__$8 = normalizeComponent(
     {},
     __vue_inject_styles__$8,
     __vue_script__$8,
     __vue_scope_id__$8,
     __vue_is_functional_template__$8,
     __vue_module_identifier__$8,
+    false,
+    undefined,
     undefined,
     undefined
   );
 
 const Route = {
   name: 'Route',
-  
+
   props: {
     path: {
       type: [String, Array],
@@ -2727,27 +2765,31 @@ const Route = {
       default: false
     },
     location: {
-      type: Object
+      type: Object,
+      default: null
     }
   },
 
-  inject: ['router', 'route'],
+  inject: {
+    router: { from: router },
+    route: { from: route }
+  },
 
   provide() {
     return {
-      route: this.computedRoute
-    }
+      [route]: this.computedRoute
+    };
   },
 
   data() {
     return {
       isActive: true,
-      // add provide's properties in data, to make provide reactivity 
+      // add provide's properties in data, to make provide reactivity
       computedRoute: {
-        location: this.location || this.route.location,
+        location: this.route.location,
         match: this.route.match
       }
-    }
+    };
   },
 
   computed: {
@@ -2758,11 +2800,9 @@ const Route = {
       const computedLocation = this.computeLocation;
       const { path, strict, exact, sensitive, route } = this;
       const pathname = computedLocation.pathname;
-      const match = path ? 
-        matchPath(
-          pathname,
-          { path, strict, exact, sensitive }
-        ) : route.match;
+      const match = path
+        ? matchPath(pathname, { path, strict, exact, sensitive })
+        : route.match;
 
       return match;
     }
@@ -2780,47 +2820,19 @@ const Route = {
   methods: {
     updateRoute() {
       if (!this.isActive) return;
-      const match = this.computeMatch;
-
-      // cache
-      if (!this.cacheMatch || !match) {
-        this.cacheMatch = match;
-      } else {
-        Object.keys(match).forEach(key => {
-          this.cacheMatch[key] = match[key];
-        });
-      }
-
       this.computedRoute.location = this.computeLocation;
-      this.computedRoute.match = this.cacheMatch;
-    },
-    clearCache() {
-      for (let key in this.cache) {
-        this.cache[key].componentInstance.$destroy();
-        this.cache[key] = null;
-      }
+      this.computedRoute.match = this.computeMatch;
     }
   },
 
   created() {
-    assert(
-      this.router,
-      `You should not use <route> outside a <router>.`
-    );
-
-    // cache match object
-    this.cacheMatch = null;
-    // use for cache keepalive component
-    this.cache = Object.create(null);
+    assert(this.router, `You should not use <route> outside a <router>.`);
     // update current route
     this.updateRoute();
   },
 
   beforeUpdate() {
-    assert(
-      this.router,
-      `You should not use <route> outside a <router>.`
-    );
+    assert(this.router, `You should not use <route> outside a <router>.`);
   },
 
   activated() {
@@ -2832,20 +2844,10 @@ const Route = {
     this.isActive = false;
   },
 
-  destroyed () {
-    this.clearCache();
-  },
-
   render(createElement) {
-    const { router, computedRoute, forceRender, $scopedSlots, name, cache } = this;
+    const { router, computedRoute, forceRender, $scopedSlots, name } = this;
     const { history } = router;
     const { match, location } = computedRoute;
-    const isKeepAlive = this.$vnode.data.keepAlive;
-
-    // no keep alive
-    if (!isKeepAlive) {
-      this.clearCache();
-    }
 
     if (!match && !forceRender) return null;
 
@@ -2855,26 +2857,11 @@ const Route = {
     if (!children.length) return null;
 
     assert(
-      children.length === 1, 
+      children.length === 1,
       `<${name}> can only be used on a single child element.`
     );
-    
-    const vnode = children[0];
-    const componentOptions = vnode && vnode.componentOptions;
 
-    // is keepAlive and is component
-    if (isKeepAlive && componentOptions) {
-      const key = vnode.key == null
-        ? componentOptions.Ctor.cid + (componentOptions.tag ? ("::" + (componentOptions.tag)) : '')
-        : vnode.key;
-      if (cache[key]) {
-        vnode.componentInstance = cache[key].componentInstance;
-      } else {
-        cache[key] = vnode;
-      }
-      vnode.data.keepAlive = true;
-    }
-    
+    const vnode = children[0];
     return vnode;
   }
 };
@@ -2896,22 +2883,29 @@ const __vue_script__$9 = Route;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var Route$1 = normalizeComponent_1(
+  const __vue_component__$9 = normalizeComponent(
     {},
     __vue_inject_styles__$9,
     __vue_script__$9,
     __vue_scope_id__$9,
     __vue_is_functional_template__$9,
     __vue_module_identifier__$9,
+    false,
+    undefined,
     undefined,
     undefined
   );
 
 const RouterContext = {
   name: 'RouterContext',
-  inject: ['router', 'route'],
+  inject: {
+    router: { from: router },
+    route: { from: route }
+  },
   data() {
     return {
       history: this.router.history,
@@ -2941,15 +2935,19 @@ const __vue_script__$a = RouterContext;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var RouteContext = normalizeComponent_1(
+  const __vue_component__$a = normalizeComponent(
     {},
     __vue_inject_styles__$a,
     __vue_script__$a,
     __vue_scope_id__$a,
     __vue_is_functional_template__$a,
     __vue_module_identifier__$a,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -2957,25 +2955,32 @@ const __vue_script__$a = RouterContext;
 const RouteSwitch = {
   name: 'RouteSwitch',
   props: {
-    location: Object
+    location: Object,
+    keepAlive: {
+      type: [Object, Boolean],
+      default: false
+    }
   },
-  inject: ['router', 'route'],
+  inject: {
+    router: { from: router },
+    route: { from: route }
+  },
 
   provide() {
     return {
-      route: this.computedRoute
-    }
+      [route]: this.computedRoute
+    };
   },
 
   data() {
     return {
       isActive: true,
-      // add provide's properties in data, to make provide reactivity 
+      // add provide's properties in data, to make provide reactivity
       computedRoute: {
         location: this.location || this.route.location,
         match: this.route.match
       }
-    }
+    };
   },
 
   computed: {
@@ -2998,12 +3003,6 @@ const RouteSwitch = {
       if (!this.isActive) return;
       this.computedRoute.location = this.computeLocation;
       this.computedRoute.match = this.route.match;
-    },
-    clearCache() {
-      for (let key in this.cache) {
-        this.cache[key].componentInstance.$destroy();
-        this.cache[key] = null;
-      }
     }
   },
 
@@ -3012,9 +3011,6 @@ const RouteSwitch = {
       this.router,
       `You should not use <route-switch> outside a <router>.`
     );
-
-    // use for cache keepalive component
-    this.cache = Object.create(null);
     // update current route
     this.updateRoute();
   },
@@ -3035,59 +3031,56 @@ const RouteSwitch = {
     this.isActive = false;
   },
 
-  destroyed () {
-    this.clearCache();
-  },
-
   render(createElement, context) {
-    const { router, cache } = this;
     const { location } = this.computedRoute;
     const children = (this.$slots.default || []).filter(isNotTextNode);
-    const isKeepAlive = this.$vnode.data.keepAlive;
+    let realChild = null;
 
-    // no keep alive
-    if (!isKeepAlive) {
-      this.clearCache();
+    if (children.length) {
+      realChild = children.find((node) => {
+        // filter text nodes
+        if (!node.tag) return false;
+        // check children if <route> component
+        assert(
+          node.componentOptions &&
+            node.componentOptions.Ctor &&
+            node.componentOptions.Ctor.options.name === 'Route',
+          `<route-switch>'s children can only be <route>.`
+        );
+
+        const propsData = node.componentOptions.propsData || {};
+        const { path = '' } = propsData;
+        const exact = getBooleanProps(propsData.exact, false);
+        const strict = getBooleanProps(propsData.strict, false);
+        const sensitive = getBooleanProps(propsData.sensitive, true);
+        // no path on route
+        if (!path) return true;
+        // check path to match
+        const match = matchPath(location.pathname, {
+          path,
+          exact,
+          strict,
+          sensitive
+        });
+        if (match) {
+          node.key = match.url;
+          return true;
+        }
+        return false;
+      });
     }
 
-    if (!children.length) return null;
-
-    let key = '';
-    const vnode = children.find((vnode) => {
-      // filter text nodes
-      if (!vnode.tag) return false;
-      // check children if <route> component
-      assert(
-        vnode.componentOptions, 
-        `<route-switch>'s children can only be <route>.`
+    if (this.keepAlive) {
+      return createElement(
+        'keep-alive',
+        {
+          props: typeof this.keepAlive === 'object' ? this.keepAlive : {}
+        },
+        [realChild]
       );
-
-      const propsData = vnode.componentOptions.propsData || {};
-      const { path = '', exact = false, strict = false, sensitive = true } = propsData;
-      // key
-      key = vnode.key || `path-${path}--exact-${exact}--strict-${strict}--sensitive-${sensitive}`;
-      // no path on route
-      if (!path) return true;
-      const match = matchPath(location.pathname, { path, exact, strict, sensitive });
-      return !!match;
-    });
-
-    if (!vnode) return vnode;
-
-    // is keepAlive and is component
-    if (isKeepAlive) {
-      if (cache[key]) {
-        vnode.componentInstance = cache[key].componentInstance;
-      } else {
-        cache[key] = vnode;
-      }
-      vnode.data.keepAlive = true;
     }
 
-    // key
-    vnode.key = key;
-
-    return vnode;
+    return realChild;
   }
 };
 
@@ -3108,33 +3101,37 @@ const __vue_script__$b = RouteSwitch;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var RouteSwitch$1 = normalizeComponent_1(
+  const __vue_component__$b = normalizeComponent(
     {},
     __vue_inject_styles__$b,
     __vue_script__$b,
     __vue_scope_id__$b,
     __vue_is_functional_template__$b,
     __vue_module_identifier__$b,
+    false,
+    undefined,
     undefined,
     undefined
   );
 
-const install = function(Vue) {
+const install = function install(Vue) {
   [
-    MemoryRouter$1,
-    HashRouter$1,
-    BrowserRouter$1,
-    StaticRouter$1,
-    Router$1,
-    RouterLink$1,
-    Prompt$1,
-    Redirect$1,
-    Route$1,
-    RouteContext,
-    RouteSwitch$1,
-  ].map(component => {
+    __vue_component__$1,
+    __vue_component__$2,
+    __vue_component__$3,
+    __vue_component__$4,
+    __vue_component__,
+    __vue_component__$6,
+    __vue_component__$7,
+    __vue_component__$8,
+    __vue_component__$9,
+    __vue_component__$a,
+    __vue_component__$b
+  ].forEach((component) => {
     Vue.component(component.name, component);
   });
 };
@@ -3145,9 +3142,9 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 
 var index = {
-  version: '1.2.1',
+  version: '1.3.0',
   install
 };
 
 export default index;
-export { BrowserRouter$1 as BrowserRouter, HashRouter$1 as HashRouter, MemoryRouter$1 as MemoryRouter, Prompt$1 as Prompt, Redirect$1 as Redirect, Route$1 as Route, RouteContext, RouteSwitch$1 as RouteSwitch, Router$1 as Router, RouterLink$1 as RouterLink, StaticRouter$1 as StaticRouter, createBrowserHistory, createHashHistory, createMemoryHistory, createStaticHistory, generatePath, matchPath };
+export { __vue_component__$3 as BrowserRouter, __vue_component__$2 as HashRouter, __vue_component__$1 as MemoryRouter, __vue_component__$7 as Prompt, __vue_component__$8 as Redirect, __vue_component__$9 as Route, __vue_component__$a as RouteContext, __vue_component__$b as RouteSwitch, __vue_component__ as Router, __vue_component__$6 as RouterLink, __vue_component__$4 as StaticRouter, createBrowserHistory, createHashHistory, createMemoryHistory, createStaticHistory, generatePath, matchPath };

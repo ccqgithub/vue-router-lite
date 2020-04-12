@@ -1,5 +1,5 @@
 /*!
-  * vue-router-lite v1.2.1
+  * vue-router-lite v1.3.0
   * (c) 2019-present Season Chen
   * @license MIT
   */
@@ -7,10 +7,106 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
-
 var history = require('history');
-var pathToRegexp = _interopDefault(require('path-to-regexp'));
+var pathToRegexp = require('path-to-regexp');
+
+function _typeof(obj) {
+  "@babel/helpers - typeof";
+
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+    _typeof = function (obj) {
+      return typeof obj;
+    };
+  } else {
+    _typeof = function (obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+  }
+
+  return _typeof(obj);
+}
+
+function _defineProperty(obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+}
+
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    if (enumerableOnly) symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    });
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+  }
+
+  return target;
+}
+
+function _toArray(arr) {
+  return _arrayWithHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableRest();
+}
+
+function _arrayWithHoles(arr) {
+  if (Array.isArray(arr)) return arr;
+}
+
+function _iterableToArray(iter) {
+  if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter);
+}
+
+function _unsupportedIterableToArray(o, minLen) {
+  if (!o) return;
+  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
+  var n = Object.prototype.toString.call(o).slice(8, -1);
+  if (n === "Object" && o.constructor) n = o.constructor.name;
+  if (n === "Map" || n === "Set") return Array.from(n);
+  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
+}
+
+function _arrayLikeToArray(arr, len) {
+  if (len == null || len > arr.length) len = arr.length;
+
+  for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i];
+
+  return arr2;
+}
+
+function _nonIterableRest() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
 
 function assert(condition, message) {
   if (!condition) {
@@ -19,11 +115,11 @@ function assert(condition, message) {
 }
 
 var resolveToLocation = function resolveToLocation(to, currentLocation) {
-  return typeof to === "function" ? to(currentLocation) : to;
-}; // 
+  return typeof to === 'function' ? to(currentLocation) : to;
+}; //
 
 var normalizeToLocation = function normalizeToLocation(to, currentLocation) {
-  return typeof to === "string" ? history.createLocation(to, null, null, currentLocation) : to;
+  return typeof to === 'string' ? history.createLocation(to, null, null, currentLocation) : to;
 };
 var guardEvent = function guardEvent(e) {
   // don't redirect with control keys
@@ -51,6 +147,21 @@ function isAsyncPlaceholder(node) {
 function isNotTextNode(c) {
   return c.tag || isAsyncPlaceholder(c);
 }
+function getBooleanProps(val) {
+  var defaultVal = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  if (typeof val === 'undefined') return defaultVal;
+  return val !== 'false';
+}
+
+function getSymbol(str) {
+  if (typeof Symbol === 'function') {
+    return Symbol(str);
+  }
+
+  return "vue-router-lite-symbol-".concat(str);
+}
+var route = getSymbol('route');
+var router = getSymbol('router');
 
 var Router = {
   name: 'Router',
@@ -67,18 +178,17 @@ var Router = {
     }
   },
   provide: function provide() {
-    return {
-      router: this.router,
-      route: this.route
-    };
+    var _ref;
+
+    return _ref = {}, _defineProperty(_ref, router, this.router), _defineProperty(_ref, route, this.route), _ref;
   },
   data: function data() {
     return {
-      // add provide's properties in data, to make provide reactivity 
+      // add provide's properties in data, to make provide reactivity
       router: {
         history: this.history
       },
-      // add provide's properties in data, to make provide reactivity 
+      // add provide's properties in data, to make provide reactivity
       route: {
         location: this.history.location,
         match: this.computeMatch(this.history.location.pathname)
@@ -105,10 +215,10 @@ var Router = {
   methods: {
     computeMatch: function computeMatch(pathname) {
       return {
-        path: "/",
-        url: "/",
+        path: '/',
+        url: '/',
         params: {},
-        isExact: pathname === "/"
+        isExact: pathname === '/'
       };
     }
   },
@@ -134,7 +244,7 @@ function normalizeComponent(template, style, script, scopeId, isFunctionalTempla
   } // Vue.extend constructor export interop.
 
 
-  var options = typeof script === 'function' ? script.options : script; // render functions
+  const options = typeof script === 'function' ? script.options : script; // render functions
 
   if (template && template.render) {
     options.render = template.render;
@@ -151,11 +261,11 @@ function normalizeComponent(template, style, script, scopeId, isFunctionalTempla
     options._scopeId = scopeId;
   }
 
-  var hook;
+  let hook;
 
   if (moduleIdentifier) {
     // server build
-    hook = function hook(context) {
+    hook = function (context) {
       // 2.3 injection
       context = context || // cached call
       this.$vnode && this.$vnode.ssrContext || // stateful
@@ -181,8 +291,8 @@ function normalizeComponent(template, style, script, scopeId, isFunctionalTempla
 
     options._ssrRegister = hook;
   } else if (style) {
-    hook = shadowMode ? function () {
-      style.call(this, createInjectorShadow(this.$root.$options.shadowRoot));
+    hook = shadowMode ? function (context) {
+      style.call(this, createInjectorShadow(context, this.$root.$options.shadowRoot));
     } : function (context) {
       style.call(this, createInjector(context));
     };
@@ -191,7 +301,7 @@ function normalizeComponent(template, style, script, scopeId, isFunctionalTempla
   if (hook) {
     if (options.functional) {
       // register for functional component in vue file
-      var originalRender = options.render;
+      const originalRender = options.render;
 
       options.render = function renderWithStyleInjection(h, context) {
         hook.call(context);
@@ -199,15 +309,13 @@ function normalizeComponent(template, style, script, scopeId, isFunctionalTempla
       };
     } else {
       // inject component registration as beforeCreate hook
-      var existing = options.beforeCreate;
+      const existing = options.beforeCreate;
       options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
     }
   }
 
   return script;
 }
-
-var normalizeComponent_1 = normalizeComponent;
 
 /* script */
 const __vue_script__ = Router;
@@ -226,15 +334,19 @@ const __vue_script__ = Router;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var Router$1 = normalizeComponent_1(
+  const __vue_component__ = normalizeComponent(
     {},
     __vue_inject_styles__,
     __vue_script__,
     __vue_scope_id__,
     __vue_is_functional_template__,
     __vue_module_identifier__,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -243,7 +355,7 @@ const __vue_script__ = Router;
 var MemoryRouter = {
   name: 'MemoryRouter',
   components: {
-    Router: Router$1
+    Router: __vue_component__
   },
   props: {
     initialEntries: {
@@ -317,15 +429,19 @@ __vue_render__._withStripped = true;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var MemoryRouter$1 = normalizeComponent_1(
+  const __vue_component__$1 = normalizeComponent(
     { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
     __vue_inject_styles__$1,
     __vue_script__$1,
     __vue_scope_id__$1,
     __vue_is_functional_template__$1,
     __vue_module_identifier__$1,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -334,7 +450,7 @@ __vue_render__._withStripped = true;
 var HashRouter = {
   name: 'HashRouter',
   components: {
-    Router: Router$1
+    Router: __vue_component__
   },
   props: {
     basename: {
@@ -343,13 +459,14 @@ var HashRouter = {
     },
     hashType: {
       validator: function validator(value) {
-        return ["hashbang", "noslash", "slash"].indexOf(value) !== -1;
+        return ['hashbang', 'noslash', 'slash'].indexOf(value) !== -1;
       },
       "default": 'slash'
     },
     getUserConfirmation: {
       type: Function,
       "default": function _default(message, callback) {
+        // eslint-disable-next-line no-alert
         callback(window.confirm(message));
       }
     }
@@ -405,15 +522,19 @@ __vue_render__$1._withStripped = true;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var HashRouter$1 = normalizeComponent_1(
+  const __vue_component__$2 = normalizeComponent(
     { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
     __vue_inject_styles__$2,
     __vue_script__$2,
     __vue_scope_id__$2,
     __vue_is_functional_template__$2,
     __vue_module_identifier__$2,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -422,7 +543,7 @@ __vue_render__$1._withStripped = true;
 var BrowserRouter = {
   name: 'BrowserRouter',
   components: {
-    Router: Router$1
+    Router: __vue_component__
   },
   props: {
     basename: {
@@ -440,6 +561,7 @@ var BrowserRouter = {
     getUserConfirmation: {
       type: Function,
       "default": function _default(message, callback) {
+        // eslint-disable-next-line no-alert
         callback(window.confirm(message));
       }
     }
@@ -496,75 +618,25 @@ __vue_render__$2._withStripped = true;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var BrowserRouter$1 = normalizeComponent_1(
+  const __vue_component__$3 = normalizeComponent(
     { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
     __vue_inject_styles__$3,
     __vue_script__$3,
     __vue_scope_id__$3,
     __vue_is_functional_template__$3,
     __vue_module_identifier__$3,
+    false,
+    undefined,
     undefined,
     undefined
   );
 
-function _defineProperty(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-
-function _objectSpread2(target) {
-  for (var i = 1; i < arguments.length; i++) {
-    if (i % 2) {
-      var source = arguments[i] != null ? arguments[i] : {};
-      var ownKeys = Object.keys(source);
-
-      if (typeof Object.getOwnPropertySymbols === 'function') {
-        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-          return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-        }));
-      }
-
-      ownKeys.forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
-    } else {
-      Object.defineProperties(target, Object.getOwnPropertyDescriptors(arguments[i]));
-    }
-  }
-
-  return target;
-}
-
-function _toArray(arr) {
-  return _arrayWithHoles(arr) || _iterableToArray(arr) || _nonIterableRest();
-}
-
-function _arrayWithHoles(arr) {
-  if (Array.isArray(arr)) return arr;
-}
-
-function _iterableToArray(iter) {
-  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
-}
-
-function _nonIterableRest() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance");
-}
-
 var addLeadingSlash = function addLeadingSlash(path) {
-  return path.charAt(0) === "/" ? path : "/" + path;
+  return path.charAt(0) === '/' ? path : "/".concat(path);
 };
 
 var removeTailSlash = function removeTailSlash(path) {
@@ -588,7 +660,7 @@ var stripBasename = function stripBasename(basename, location) {
 };
 
 var createURL = function createURL(location) {
-  return typeof location === "string" ? location : history.createPath(location);
+  return typeof location === 'string' ? location : history.createPath(location);
 };
 
 var staticHandler = function staticHandler(methodName) {
@@ -609,22 +681,22 @@ function createStaticHistory(_ref) {
   var history$1 = {
     isStatic: true,
     context: context,
-    action: "POP",
+    action: 'POP',
     location: stripBasename(basename, history.createLocation(location)),
-    go: staticHandler("go"),
-    goBack: staticHandler("goBack"),
-    goForward: staticHandler("goForward"),
-    createHref: function createHref(location) {
-      return addLeadingSlash(removeTailSlash(basename) + createURL(location));
+    go: staticHandler('go'),
+    goBack: staticHandler('goBack'),
+    goForward: staticHandler('goForward'),
+    createHref: function createHref(loc) {
+      return addLeadingSlash(removeTailSlash(basename) + createURL(loc));
     },
-    push: function push(location) {
-      context.action = "PUSH";
-      context.location = addBasename(basename, history.createLocation(location));
+    push: function push(loc) {
+      context.action = 'PUSH';
+      context.location = addBasename(basename, history.createLocation(loc));
       context.url = createURL(context.location);
     },
-    replace: function replace(location) {
-      context.action = "REPLACE";
-      context.location = addBasename(basename, history.createLocation(location));
+    replace: function replace(loc) {
+      context.action = 'REPLACE';
+      context.location = addBasename(basename, history.createLocation(loc));
       context.url = createURL(context.location);
     },
     listen: function listen() {
@@ -641,7 +713,7 @@ function createStaticHistory(_ref) {
 var StaticRouter = {
   name: 'StaticRouter',
   components: {
-    Router: Router$1
+    Router: __vue_component__
   },
   props: {
     basename: {
@@ -708,15 +780,19 @@ __vue_render__$3._withStripped = true;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var StaticRouter$1 = normalizeComponent_1(
+  const __vue_component__$4 = normalizeComponent(
     { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
     __vue_inject_styles__$4,
     __vue_script__$4,
     __vue_scope_id__$4,
     __vue_is_functional_template__$4,
     __vue_module_identifier__$4,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -726,11 +802,11 @@ var cacheLimit = 10000;
 var cacheCount = 0;
 
 function compilePath(path, options) {
-  var cacheKey = "".concat(options.end).concat(options.strict).concat(options.sensitive);
+  var cacheKey = "".concat(options.end, "-").concat(options.strict, "-").concat(options.sensitive);
   var pathCache = cache[cacheKey] || (cache[cacheKey] = {});
   if (pathCache[path]) return pathCache[path];
   var keys = [];
-  var regexp = pathToRegexp(path, keys, options);
+  var regexp = pathToRegexp.pathToRegexp(path, keys, options);
   var result = {
     regexp: regexp,
     keys: keys
@@ -751,18 +827,18 @@ function compilePath(path, options) {
 
 function matchPath(pathname) {
   var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  if (typeof options === "string") options = {
+  if (typeof options === 'string') options = {
     path: options
   };
   var _options = options,
-      path = _options.path,
+      p = _options.path,
       _options$exact = _options.exact,
-      exact = _options$exact === void 0 ? true : _options$exact,
+      exact = _options$exact === void 0 ? false : _options$exact,
       _options$strict = _options.strict,
       strict = _options$strict === void 0 ? false : _options$strict,
       _options$sensitive = _options.sensitive,
       sensitive = _options$sensitive === void 0 ? true : _options$sensitive;
-  var paths = [].concat(path);
+  var paths = [].concat(p);
   return paths.reduce(function (matched, path) {
     if (matched) return matched;
 
@@ -786,7 +862,7 @@ function matchPath(pathname) {
     return {
       path: path,
       // the path used to match
-      url: path === "/" && url === "" ? "/" : url,
+      url: path === '/' && url === '' ? '/' : url,
       // the matched portion of the URL
       isExact: isExact,
       // whether or not we matched exactly
@@ -802,10 +878,13 @@ var script = {
   name: 'Tag',
   functional: true,
   props: {
-    tag: String
+    tag: {
+      type: String,
+      "default": 'div'
+    }
   },
   render: function render(createElement, context) {
-    return createElement(context.props.tag || 'div', context.data, context.children);
+    return createElement(context.props.tag, context.data, context.children);
   }
 };
 
@@ -826,15 +905,19 @@ const __vue_script__$5 = script;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var Tag = normalizeComponent_1(
+  const __vue_component__$5 = normalizeComponent(
     {},
     __vue_inject_styles__$5,
     __vue_script__$5,
     __vue_scope_id__$5,
     __vue_is_functional_template__$5,
     __vue_module_identifier__$5,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -843,7 +926,7 @@ const __vue_script__$5 = script;
 var RouterLink = {
   name: 'RouterLink',
   components: {
-    Tag: Tag
+    Tag: __vue_component__$5
   },
   props: {
     // to path
@@ -896,7 +979,14 @@ var RouterLink = {
       type: Object
     }
   },
-  inject: ['router', 'route'],
+  inject: {
+    router: {
+      from: router
+    },
+    route: {
+      from: route
+    }
+  },
   computed: {
     // current location
     currentLocation: function currentLocation() {
@@ -923,7 +1013,7 @@ var RouterLink = {
       var pathToMatch = this.currentLocation.pathname;
       var path = this.toLocation.pathname; // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
 
-      var escapedPath = path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
+      var escapedPath = path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, '\\$1');
       var match = escapedPath ? matchPath(pathToMatch, {
         path: escapedPath,
         exact: exact,
@@ -1015,15 +1105,19 @@ __vue_render__$4._withStripped = true;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var RouterLink$1 = normalizeComponent_1(
+  const __vue_component__$6 = normalizeComponent(
     { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
     __vue_inject_styles__$6,
     __vue_script__$6,
     __vue_scope_id__$6,
     __vue_is_functional_template__$6,
     __vue_module_identifier__$6,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -1040,7 +1134,14 @@ var Prompt = {
       required: true
     }
   },
-  inject: ['router', 'route'],
+  inject: {
+    router: {
+      from: router
+    },
+    route: {
+      from: route
+    }
+  },
   created: function created() {
     assert(this.router, 'You should not use <prompt> outside a <router>');
     this.lastMessage = null;
@@ -1102,21 +1203,25 @@ const __vue_script__$7 = Prompt;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var Prompt$1 = normalizeComponent_1(
+  const __vue_component__$7 = normalizeComponent(
     {},
     __vue_inject_styles__$7,
     __vue_script__$7,
     __vue_scope_id__$7,
     __vue_is_functional_template__$7,
     __vue_module_identifier__$7,
+    false,
+    undefined,
     undefined,
     undefined
   );
 
 /**
- * copy from:
+ * reference from:
  * https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/generatePath.js
  */
 var cache$1 = {};
@@ -1140,10 +1245,10 @@ function compilePath$1(path) {
 
 
 function generatePath() {
-  var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "/";
+  var path = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '/';
   var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-  return path === "/" ? path : compilePath$1(path)(params, options);
+  return path === '/' ? path : compilePath$1(path)(params, options);
 }
 
 var Redirect = {
@@ -1151,7 +1256,8 @@ var Redirect = {
   props: {
     // from path
     from: {
-      type: String
+      type: String,
+      "default": null
     },
     // to path
     to: {
@@ -1176,7 +1282,14 @@ var Redirect = {
       "default": true
     }
   },
-  inject: ['router', 'route'],
+  inject: {
+    router: {
+      from: router
+    },
+    route: {
+      from: route
+    }
+  },
   created: function created() {
     assert(this.router, 'You must not use <redirect> outside a <router>.'); // static router
 
@@ -1266,15 +1379,19 @@ const __vue_script__$8 = Redirect;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var Redirect$1 = normalizeComponent_1(
+  const __vue_component__$8 = normalizeComponent(
     {},
     __vue_inject_styles__$8,
     __vue_script__$8,
     __vue_scope_id__$8,
     __vue_is_functional_template__$8,
     __vue_module_identifier__$8,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -1303,21 +1420,27 @@ var Route = {
       "default": false
     },
     location: {
-      type: Object
+      type: Object,
+      "default": null
     }
   },
-  inject: ['router', 'route'],
+  inject: {
+    router: {
+      from: router
+    },
+    route: {
+      from: route
+    }
+  },
   provide: function provide() {
-    return {
-      route: this.computedRoute
-    };
+    return _defineProperty({}, route, this.computedRoute);
   },
   data: function data() {
     return {
       isActive: true,
-      // add provide's properties in data, to make provide reactivity 
+      // add provide's properties in data, to make provide reactivity
       computedRoute: {
-        location: this.location || this.route.location,
+        location: this.route.location,
         match: this.route.match
       }
     };
@@ -1353,35 +1476,13 @@ var Route = {
   },
   methods: {
     updateRoute: function updateRoute() {
-      var _this = this;
-
       if (!this.isActive) return;
-      var match = this.computeMatch; // cache
-
-      if (!this.cacheMatch || !match) {
-        this.cacheMatch = match;
-      } else {
-        Object.keys(match).forEach(function (key) {
-          _this.cacheMatch[key] = match[key];
-        });
-      }
-
       this.computedRoute.location = this.computeLocation;
-      this.computedRoute.match = this.cacheMatch;
-    },
-    clearCache: function clearCache() {
-      for (var key in this.cache) {
-        this.cache[key].componentInstance.$destroy();
-        this.cache[key] = null;
-      }
+      this.computedRoute.match = this.computeMatch;
     }
   },
   created: function created() {
-    assert(this.router, "You should not use <route> outside a <router>."); // cache match object
-
-    this.cacheMatch = null; // use for cache keepalive component
-
-    this.cache = Object.create(null); // update current route
+    assert(this.router, "You should not use <route> outside a <router>."); // update current route
 
     this.updateRoute();
   },
@@ -1395,25 +1496,15 @@ var Route = {
   deactivated: function deactivated() {
     this.isActive = false;
   },
-  destroyed: function destroyed() {
-    this.clearCache();
-  },
   render: function render(createElement) {
     var router = this.router,
         computedRoute = this.computedRoute,
         forceRender = this.forceRender,
         $scopedSlots = this.$scopedSlots,
-        name = this.name,
-        cache = this.cache;
+        name = this.name;
     var history = router.history;
     var match = computedRoute.match,
         location = computedRoute.location;
-    var isKeepAlive = this.$vnode.data.keepAlive; // no keep alive
-
-    if (!isKeepAlive) {
-      this.clearCache();
-    }
-
     if (!match && !forceRender) return null;
     var children = $scopedSlots["default"]({
       match: match,
@@ -1424,20 +1515,6 @@ var Route = {
     if (!children.length) return null;
     assert(children.length === 1, "<".concat(name, "> can only be used on a single child element."));
     var vnode = children[0];
-    var componentOptions = vnode && vnode.componentOptions; // is keepAlive and is component
-
-    if (isKeepAlive && componentOptions) {
-      var key = vnode.key == null ? componentOptions.Ctor.cid + (componentOptions.tag ? "::" + componentOptions.tag : '') : vnode.key;
-
-      if (cache[key]) {
-        vnode.componentInstance = cache[key].componentInstance;
-      } else {
-        cache[key] = vnode;
-      }
-
-      vnode.data.keepAlive = true;
-    }
-
     return vnode;
   }
 };
@@ -1459,22 +1536,33 @@ const __vue_script__$9 = Route;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var Route$1 = normalizeComponent_1(
+  const __vue_component__$9 = normalizeComponent(
     {},
     __vue_inject_styles__$9,
     __vue_script__$9,
     __vue_scope_id__$9,
     __vue_is_functional_template__$9,
     __vue_module_identifier__$9,
+    false,
+    undefined,
     undefined,
     undefined
   );
 
 var RouterContext = {
   name: 'RouterContext',
-  inject: ['router', 'route'],
+  inject: {
+    router: {
+      from: router
+    },
+    route: {
+      from: route
+    }
+  },
   data: function data() {
     return {
       history: this.router.history,
@@ -1504,15 +1592,19 @@ const __vue_script__$a = RouterContext;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var RouteContext = normalizeComponent_1(
+  const __vue_component__$a = normalizeComponent(
     {},
     __vue_inject_styles__$a,
     __vue_script__$a,
     __vue_scope_id__$a,
     __vue_is_functional_template__$a,
     __vue_module_identifier__$a,
+    false,
+    undefined,
     undefined,
     undefined
   );
@@ -1520,18 +1612,27 @@ const __vue_script__$a = RouterContext;
 var RouteSwitch = {
   name: 'RouteSwitch',
   props: {
-    location: Object
+    location: Object,
+    keepAlive: {
+      type: [Object, Boolean],
+      "default": false
+    }
   },
-  inject: ['router', 'route'],
+  inject: {
+    router: {
+      from: router
+    },
+    route: {
+      from: route
+    }
+  },
   provide: function provide() {
-    return {
-      route: this.computedRoute
-    };
+    return _defineProperty({}, route, this.computedRoute);
   },
   data: function data() {
     return {
       isActive: true,
-      // add provide's properties in data, to make provide reactivity 
+      // add provide's properties in data, to make provide reactivity
       computedRoute: {
         location: this.location || this.route.location,
         match: this.route.match
@@ -1556,18 +1657,10 @@ var RouteSwitch = {
       if (!this.isActive) return;
       this.computedRoute.location = this.computeLocation;
       this.computedRoute.match = this.route.match;
-    },
-    clearCache: function clearCache() {
-      for (var key in this.cache) {
-        this.cache[key].componentInstance.$destroy();
-        this.cache[key] = null;
-      }
     }
   },
   created: function created() {
-    assert(this.router, "You should not use <route-switch> outside a <router>."); // use for cache keepalive component
-
-    this.cache = Object.create(null); // update current route
+    assert(this.router, "You should not use <route-switch> outside a <router>."); // update current route
 
     this.updateRoute();
   },
@@ -1581,63 +1674,49 @@ var RouteSwitch = {
   deactivated: function deactivated() {
     this.isActive = false;
   },
-  destroyed: function destroyed() {
-    this.clearCache();
-  },
   render: function render(createElement, context) {
-    var router = this.router,
-        cache = this.cache;
     var location = this.computedRoute.location;
     var children = (this.$slots["default"] || []).filter(isNotTextNode);
-    var isKeepAlive = this.$vnode.data.keepAlive; // no keep alive
+    var realChild = null;
 
-    if (!isKeepAlive) {
-      this.clearCache();
+    if (children.length) {
+      realChild = children.find(function (node) {
+        // filter text nodes
+        if (!node.tag) return false; // check children if <route> component
+
+        assert(node.componentOptions && node.componentOptions.Ctor && node.componentOptions.Ctor.options.name === 'Route', "<route-switch>'s children can only be <route>.");
+        var propsData = node.componentOptions.propsData || {};
+        var _propsData$path = propsData.path,
+            path = _propsData$path === void 0 ? '' : _propsData$path;
+        var exact = getBooleanProps(propsData.exact, false);
+        var strict = getBooleanProps(propsData.strict, false);
+        var sensitive = getBooleanProps(propsData.sensitive, true); // no path on route
+
+        if (!path) return true; // check path to match
+
+        var match = matchPath(location.pathname, {
+          path: path,
+          exact: exact,
+          strict: strict,
+          sensitive: sensitive
+        });
+
+        if (match) {
+          node.key = match.url;
+          return true;
+        }
+
+        return false;
+      });
     }
 
-    if (!children.length) return null;
-    var key = '';
-    var vnode = children.find(function (vnode) {
-      // filter text nodes
-      if (!vnode.tag) return false; // check children if <route> component
+    if (this.keepAlive) {
+      return createElement('keep-alive', {
+        props: _typeof(this.keepAlive) === 'object' ? this.keepAlive : {}
+      }, [realChild]);
+    }
 
-      assert(vnode.componentOptions, "<route-switch>'s children can only be <route>.");
-      var propsData = vnode.componentOptions.propsData || {};
-      var _propsData$path = propsData.path,
-          path = _propsData$path === void 0 ? '' : _propsData$path,
-          _propsData$exact = propsData.exact,
-          exact = _propsData$exact === void 0 ? false : _propsData$exact,
-          _propsData$strict = propsData.strict,
-          strict = _propsData$strict === void 0 ? false : _propsData$strict,
-          _propsData$sensitive = propsData.sensitive,
-          sensitive = _propsData$sensitive === void 0 ? true : _propsData$sensitive; // key
-
-      key = vnode.key || "path-".concat(path, "--exact-").concat(exact, "--strict-").concat(strict, "--sensitive-").concat(sensitive); // no path on route
-
-      if (!path) return true;
-      var match = matchPath(location.pathname, {
-        path: path,
-        exact: exact,
-        strict: strict,
-        sensitive: sensitive
-      });
-      return !!match;
-    });
-    if (!vnode) return vnode; // is keepAlive and is component
-
-    if (isKeepAlive) {
-      if (cache[key]) {
-        vnode.componentInstance = cache[key].componentInstance;
-      } else {
-        cache[key] = vnode;
-      }
-
-      vnode.data.keepAlive = true;
-    } // key
-
-
-    vnode.key = key;
-    return vnode;
+    return realChild;
   }
 };
 
@@ -1658,21 +1737,25 @@ const __vue_script__$b = RouteSwitch;
   
   /* style inject SSR */
   
+  /* style inject shadow dom */
+  
 
   
-  var RouteSwitch$1 = normalizeComponent_1(
+  const __vue_component__$b = normalizeComponent(
     {},
     __vue_inject_styles__$b,
     __vue_script__$b,
     __vue_scope_id__$b,
     __vue_is_functional_template__$b,
     __vue_module_identifier__$b,
+    false,
+    undefined,
     undefined,
     undefined
   );
 
 var install = function install(Vue) {
-  [MemoryRouter$1, HashRouter$1, BrowserRouter$1, StaticRouter$1, Router$1, RouterLink$1, Prompt$1, Redirect$1, Route$1, RouteContext, RouteSwitch$1].map(function (component) {
+  [__vue_component__$1, __vue_component__$2, __vue_component__$3, __vue_component__$4, __vue_component__, __vue_component__$6, __vue_component__$7, __vue_component__$8, __vue_component__$9, __vue_component__$a, __vue_component__$b].forEach(function (component) {
     Vue.component(component.name, component);
   });
 };
@@ -1684,7 +1767,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 
 var index = {
-  version: '1.2.1',
+  version: '1.3.0',
   install: install
 };
 
@@ -1706,17 +1789,17 @@ Object.defineProperty(exports, 'createMemoryHistory', {
     return history.createMemoryHistory;
   }
 });
-exports.BrowserRouter = BrowserRouter$1;
-exports.HashRouter = HashRouter$1;
-exports.MemoryRouter = MemoryRouter$1;
-exports.Prompt = Prompt$1;
-exports.Redirect = Redirect$1;
-exports.Route = Route$1;
-exports.RouteContext = RouteContext;
-exports.RouteSwitch = RouteSwitch$1;
-exports.Router = Router$1;
-exports.RouterLink = RouterLink$1;
-exports.StaticRouter = StaticRouter$1;
+exports.BrowserRouter = __vue_component__$3;
+exports.HashRouter = __vue_component__$2;
+exports.MemoryRouter = __vue_component__$1;
+exports.Prompt = __vue_component__$7;
+exports.Redirect = __vue_component__$8;
+exports.Route = __vue_component__$9;
+exports.RouteContext = __vue_component__$a;
+exports.RouteSwitch = __vue_component__$b;
+exports.Router = __vue_component__;
+exports.RouterLink = __vue_component__$6;
+exports.StaticRouter = __vue_component__$4;
 exports.createStaticHistory = createStaticHistory;
 exports.default = index;
 exports.generatePath = generatePath;

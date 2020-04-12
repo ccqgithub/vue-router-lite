@@ -1,12 +1,11 @@
 <template>
   <router :history="history" name="memory-router" v-slot="routerProps">
-    <slot v-bind="routerProps"/>
+    <slot v-bind="routerProps" />
   </router>
 </template>
 
 <script>
 import createMemoryHistory from '../util/createMemoryHistory';
-import { assert } from '../util/utils';
 import Router from './Router.vue';
 
 const MemoryRouter = {
@@ -47,7 +46,7 @@ const MemoryRouter = {
       history
     };
   }
-}
+};
 
 export default MemoryRouter;
 </script>

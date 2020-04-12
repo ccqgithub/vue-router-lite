@@ -29,7 +29,6 @@ export {
   Route,
   RouteContext,
   RouteSwitch,
-  
   generatePath,
   matchPath,
   createBrowserHistory,
@@ -38,7 +37,7 @@ export {
   createStaticHistory
 };
 
-const install = function(Vue) {
+const install = function install(Vue) {
   [
     MemoryRouter,
     HashRouter,
@@ -50,8 +49,8 @@ const install = function(Vue) {
     Redirect,
     Route,
     RouteContext,
-    RouteSwitch,
-  ].map(component => {
+    RouteSwitch
+  ].forEach((component) => {
     Vue.component(component.name, component);
   });
 };
@@ -64,4 +63,4 @@ if (typeof window !== 'undefined' && window.Vue) {
 export default {
   version: '__VERSION__',
   install
-}
+};

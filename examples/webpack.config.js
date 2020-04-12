@@ -69,10 +69,7 @@ module.exports = {
           {
             loader: 'html-loader',
             options: {
-              minimize: false,
-              removeComments: false,
-              collapseWhitespace: false,
-              interpolate: 'require'
+              minimize: false
             }
           }
         ]

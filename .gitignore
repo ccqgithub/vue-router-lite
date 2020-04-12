@@ -13,5 +13,5 @@ node_modules
 /examples/__build__
 
 npm-debug.log*
-yarn.lock
-package-lock.json
+# yarn.lock
+# package-lock.json

@@ -1,16 +1,16 @@
 /**
- * copy from:
+ * reference from:
  * https://github.com/ReactTraining/react-router/blob/master/packages/react-router/modules/matchPath.js
  */
 
-import pathToRegexp from "path-to-regexp";
+import { pathToRegexp } from 'path-to-regexp';
 
 const cache = {};
 const cacheLimit = 10000;
 let cacheCount = 0;
 
 function compilePath(path, options) {
-  const cacheKey = `${options.end}${options.strict}${options.sensitive}`;
+  const cacheKey = `${options.end}-${options.strict}-${options.sensitive}`;
   const pathCache = cache[cacheKey] || (cache[cacheKey] = {});
 
   if (pathCache[path]) return pathCache[path];
@@ -32,11 +32,11 @@ function compilePath(path, options) {
  * pathname: current locations's pathname
  */
 function matchPath(pathname, options = {}) {
-  if (typeof options === "string") options = { path: options };
+  if (typeof options === 'string') options = { path: options };
 
-  const { path, exact = true, strict = false, sensitive = true } = options;
+  const { path: p, exact = false, strict = false, sensitive = true } = options;
 
-  const paths = [].concat(path);
+  const paths = [].concat(p);
 
   return paths.reduce((matched, path) => {
     if (matched) return matched;
@@ -56,7 +56,7 @@ function matchPath(pathname, options = {}) {
 
     return {
       path, // the path used to match
-      url: path === "/" && url === "" ? "/" : url, // the matched portion of the URL
+      url: path === '/' && url === '' ? '/' : url, // the matched portion of the URL
       isExact, // whether or not we matched exactly
       params: keys.reduce((memo, key, index) => {
         memo[key.name] = values[index];

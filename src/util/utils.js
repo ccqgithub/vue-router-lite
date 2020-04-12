@@ -1,4 +1,4 @@
-import { createLocation } from "history";
+import { createLocation } from 'history';
 
 export function assert(condition, message) {
   if (!condition) {
@@ -8,11 +8,12 @@ export function assert(condition, message) {
 
 export function warn(condition, message) {
   if (process.env.NODE_ENV !== 'production' && !condition) {
-    typeof console !== 'undefined' && console.warn(`[vue-router-lite] ${message}`);
+    if (typeof console !== 'undefined')
+      console.warn(`[vue-router-lite] ${message}`);
   }
 }
 
-export function isError (err) {
+export function isError(err) {
   return Object.prototype.toString.call(err).indexOf('Error') > -1;
 }
 
@@ -21,13 +22,13 @@ export function copyJson(data) {
   return JSON.parse(JSON.stringify(data));
 }
 
-// 
+//
 export const resolveToLocation = (to, currentLocation) =>
-  typeof to === "function" ? to(currentLocation) : to;
+  typeof to === 'function' ? to(currentLocation) : to;
 
-// 
+//
 export const normalizeToLocation = (to, currentLocation) => {
-  return typeof to === "string"
+  return typeof to === 'string'
     ? createLocation(to, null, null, currentLocation)
     : to;
 };
@@ -49,12 +50,17 @@ export const guardEvent = (e) => {
     e.preventDefault();
   }
   return true;
-}
+};
 
 export function isAsyncPlaceholder(node) {
   return node.isComment && node.asyncFactory;
 }
 
-export function isNotTextNode(c) { 
-  return c.tag || isAsyncPlaceholder(c); 
-};
+export function isNotTextNode(c) {
+  return c.tag || isAsyncPlaceholder(c);
+}
+
+export function getBooleanProps(val, defaultVal = false) {
+  if (typeof val === 'undefined') return defaultVal;
+  return val !== 'false';
+}

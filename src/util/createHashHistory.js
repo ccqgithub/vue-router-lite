@@ -1,1 +1,1 @@
-export { createHashHistory as default } from "history";
+export { createHashHistory as default } from 'history';

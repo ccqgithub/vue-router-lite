@@ -6,28 +6,29 @@
     :class="classNames"
     @[event]="handleClick($event)"
   >
-    <slot 
-      :href="href" 
-      :match="match" 
-      :history="router.history" 
-      :location="router.history.location" 
+    <slot
+      :href="href"
+      :match="match"
+      :history="router.history"
+      :location="router.history.location"
     />
   </tag>
 </template>
 
 <script>
-import { 
-  assert, 
-  resolveToLocation, 
-  normalizeToLocation, 
-  guardEvent 
+import {
+  assert,
+  resolveToLocation,
+  normalizeToLocation,
+  guardEvent
 } from '../util/utils';
 import matchPath from '../util/matchPath';
+import * as symbols from '../util/symbol';
 import Tag from './Tag.vue';
 
 const RouterLink = {
   name: 'RouterLink',
-  
+
   components: {
     Tag
   },
@@ -84,7 +85,10 @@ const RouterLink = {
     }
   },
 
-  inject: ['router', 'route'],
+  inject: {
+    router: { from: symbols.router },
+    route: { from: symbols.route }
+  },
 
   computed: {
     // current location
@@ -114,9 +118,14 @@ const RouterLink = {
       const { pathname: path } = this.toLocation;
       // Regex taken from: https://github.com/pillarjs/path-to-regexp/blob/master/index.js#L202
       const escapedPath =
-        path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, "\\$1");
+        path && path.replace(/([.+*?=^!:${}()[\]|/\\])/g, '\\$1');
       const match = escapedPath
-        ? matchPath(pathToMatch, { path: escapedPath, exact, strict, sensitive })
+        ? matchPath(pathToMatch, {
+            path: escapedPath,
+            exact,
+            strict,
+            sensitive
+          })
         : null;
 
       return match;
@@ -127,7 +136,7 @@ const RouterLink = {
 
       classNames += ` ${this.activeClass}`;
       if (this.match.exact) classNames += ` ${this.exactActiveClass}`;
-      
+
       return classNames;
     }
   },
@@ -151,19 +160,13 @@ const RouterLink = {
   },
 
   created() {
-    assert(
-      this.router,
-      'You should not use <router-link> outside a <router>'
-    );
+    assert(this.router, 'You should not use <router-link> outside a <router>');
   },
 
   beforeUpdate() {
-    assert(
-      this.router,
-      'You should not use <router-link> outside a <router>'
-    );
+    assert(this.router, 'You should not use <router-link> outside a <router>');
   }
-}
+};
 
 export default RouterLink;
 </script>

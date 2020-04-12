@@ -1,8 +1,9 @@
 <script>
-import { createLocation, locationsAreEqual } from "history";
+import { createLocation, locationsAreEqual } from 'history';
 import { assert } from '../util/utils';
-import generatePath from "../util/generatePath";
-import matchPath from "../util/matchPath";
+import generatePath from '../util/generatePath';
+import matchPath from '../util/matchPath';
+import * as symbols from '../util/symbol';
 
 const Redirect = {
   name: 'Redirect',
@@ -10,7 +11,8 @@ const Redirect = {
   props: {
     // from path
     from: {
-      type: String
+      type: String,
+      default: null
     },
     // to path
     to: {
@@ -36,13 +38,13 @@ const Redirect = {
     }
   },
 
-  inject: ['router', 'route'],
+  inject: {
+    router: { from: symbols.router },
+    route: { from: symbols.route }
+  },
 
   created() {
-    assert(
-      this.router,
-      'You must not use <redirect> outside a <router>.'
-    );
+    assert(this.router, 'You must not use <redirect> outside a <router>.');
 
     // static router
     if (this.isStatic()) this.perform();
@@ -54,10 +56,7 @@ const Redirect = {
   },
 
   beforeUpdate() {
-    assert(
-      this.router,
-      'You must not use <redirect> outside a <router>.'
-    );
+    assert(this.router, 'You must not use <redirect> outside a <router>.');
 
     const to = this.computeTo();
 
@@ -79,11 +78,9 @@ const Redirect = {
     computeTo() {
       const { from, strict, exact, sensitive, route } = this;
       const pathname = route.location.pathname;
-      const match = from ? 
-        matchPath(
-          pathname,
-          { from, strict, exact, sensitive }
-        ) : route.match;
+      const match = from
+        ? matchPath(pathname, { from, strict, exact, sensitive })
+        : route.match;
 
       // to
       let p = this.to;
@@ -96,16 +93,13 @@ const Redirect = {
           // to is object
           p = {
             ...this.to,
-            pathname: generatePath(
-              this.to.pathname,
-              match.params
-            )
+            pathname: generatePath(this.to.pathname, match.params)
           };
         }
       }
 
       // to
-      const to = createLocation(p); 
+      const to = createLocation(p);
 
       return to;
     },
@@ -114,9 +108,7 @@ const Redirect = {
       const { history } = this.router;
 
       // history method
-      const method = this.push
-        ? history.push
-        : history.replace;
+      const method = this.push ? history.push : history.replace;
 
       const to = this.computeTo();
 
@@ -129,7 +121,7 @@ const Redirect = {
   render() {
     return null;
   }
-}
+};
 
 export default Redirect;
 </script>

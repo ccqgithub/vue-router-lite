@@ -1,5 +1,6 @@
 <script>
 import { assert, isNotTextNode } from '../util/utils';
+import * as symbols from '../util/symbol';
 
 const Router = {
   name: 'Router',
@@ -19,18 +20,18 @@ const Router = {
 
   provide() {
     return {
-      router: this.router,
-      route: this.route
+      [symbols.router]: this.router,
+      [symbols.route]: this.route
     };
   },
 
   data() {
     return {
-      // add provide's properties in data, to make provide reactivity 
+      // add provide's properties in data, to make provide reactivity
       router: {
         history: this.history
       },
-      // add provide's properties in data, to make provide reactivity 
+      // add provide's properties in data, to make provide reactivity
       route: {
         location: this.history.location,
         match: this.computeMatch(this.history.location.pathname)
@@ -57,7 +58,7 @@ const Router = {
   },
   methods: {
     computeMatch(pathname) {
-      return { path: "/", url: "/", params: {}, isExact: pathname === "/" };
+      return { path: '/', url: '/', params: {}, isExact: pathname === '/' };
     }
   },
   render(createElement) {
@@ -68,15 +69,15 @@ const Router = {
     });
 
     children = children.filter(isNotTextNode);
-  
+
     assert(
-      children.length === 1, 
+      children.length === 1,
       `<${this.name}> must only be used on a single child element.`
     );
 
     return children[0];
   }
-}
+};
 
 export default Router;
 </script>

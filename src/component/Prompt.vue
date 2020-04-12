@@ -1,5 +1,6 @@
 <script>
 import { assert } from '../util/utils';
+import * as symbols from '../util/symbol';
 
 const Prompt = {
   name: 'Prompt',
@@ -15,33 +16,30 @@ const Prompt = {
     }
   },
 
-  inject: ['router', 'route'],
+  inject: {
+    router: { from: symbols.router },
+    route: { from: symbols.route }
+  },
 
   created() {
-    assert(
-      this.router,
-      'You should not use <prompt> outside a <router>'
-    );
+    assert(this.router, 'You should not use <prompt> outside a <router>');
 
     this.lastMessage = null;
     this.unblock = null;
   },
 
   beforeUpdate() {
-    assert(
-      this.router,
-      'You should not use <prompt> outside a <router>'
-    );
+    assert(this.router, 'You should not use <prompt> outside a <router>');
   },
 
   mounted() {
-    if(this.when) this.block(); 
+    if (this.when) this.block();
   },
 
   watch: {
     when(val, oldVal) {
       if (!val) {
-        if (this.unblock) this.unblock()
+        if (this.unblock) this.unblock();
       } else {
         this.block();
       }
@@ -71,7 +69,7 @@ const Prompt = {
   render() {
     return null;
   }
-}
+};
 
 export default Prompt;
 </script>

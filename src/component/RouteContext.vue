@@ -1,7 +1,12 @@
 <script>
+import * as symbols from '../util/symbol';
+
 const RouterContext = {
   name: 'RouterContext',
-  inject: ['router', 'route'],
+  inject: {
+    router: { from: symbols.router },
+    route: { from: symbols.route }
+  },
   data() {
     return {
       history: this.router.history,
@@ -12,7 +17,7 @@ const RouterContext = {
   render() {
     return null;
   }
-}
+};
 
 export default RouterContext;
 </script>
